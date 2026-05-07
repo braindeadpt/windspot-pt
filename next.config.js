@@ -4,6 +4,7 @@ const nextConfig = {
   images: { unoptimized: true },
   trailingSlash: true,
   basePath: process.env.NODE_ENV === 'production' ? '/windspot-pt' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/windspot-pt' : '',
 }
 
 module.exports = nextConfig
