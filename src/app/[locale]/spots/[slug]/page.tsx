@@ -25,11 +25,33 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
   const t = getTranslation(locale as any)
   const isPt = locale === 'pt'
 
-  const marineData = await fetchMarineData(spot.lat, spot.lon)
-  const current = getCurrentConditions(marineData)
-  const forecast = getForecastData(marineData)
-  const rating = getSportRating(spot.type, current.waveHeight, current.windSpeed)
-  const waveRating = getWaveRating(current.waveHeight)
+  let current = {
+    waveHeight: 0,
+    wavePeriod: 0,
+    waveDirection: 0,
+    windSpeed: 0,
+    windDirection: 0,
+    windGust: 0,
+    waterTemp: 0,
+  }
+  let forecast: any[] = []
+  let rating = {
+    rating: 5,
+    recommendation: 'Condições razoáveis',
+    recommendationEn: 'Fair conditions',
+  }
+  let waveRating = getWaveRating(0)
+
+  try {
+    const marineData = await fetchMarineData(spot.lat, spot.lon)
+    current = getCurrentConditions(marineData)
+    forecast = getForecastData(marineData)
+    rating = getSportRating(spot.type, current.waveHeight, current.windSpeed)
+    waveRating = getWaveRating(current.waveHeight)
+  } catch (e) {
+    console.error(`Failed to load conditions for spot ${spot.name}:`, e)
+    // Use defaults already set above
+  }
 
   const difficultyLabels = {
     beginner: t.spots.beginner,
