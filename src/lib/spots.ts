@@ -481,6 +481,44 @@ export const spots: Spot[] = [
     hazards: ['Multidão', 'Correntes']
   },
 
+  // ==================== FOIL ====================
+  {
+    id: 'foil-lagoa-albufeira', slug: 'foil-lagoa-albufeira', name: 'Lagoa de Albufeira - Foil', nameEn: 'Albufeira Lagoon - Foil',
+    region: 'Sesimbra', regionEn: 'Sesimbra', lat: 38.501, lon: -9.140,
+    type: 'foil', difficulty: 'beginner', bestWind: 'NW, N', bestSwell: 'Lagoa',
+    description: 'Paraíso do foil! Água plana até à cintura, vento térmico consistente. Perfeito para aprender wing foil e kite foil. Sem ondas, sem stress.',
+    descriptionEn: 'Foil paradise! Chest-high flat water, consistent thermal wind. Perfect for learning wing foil and kite foil. No waves, no stress.',
+    images: ['/images/lagoa-albufeira-1.jpg'], facilities: ['Estacionamento', 'Escola foil', 'Aluguer', 'WC'],
+    hazards: ['Maré alta pode subir a lagoa', 'Outros riders']
+  },
+  {
+    id: 'foil-foz-arelho', slug: 'foil-foz-arelho', name: 'Foz do Arelho - Foil', nameEn: 'Foz do Arelho - Foil',
+    region: 'Oeste', regionEn: 'West Coast', lat: 39.427, lon: -9.210,
+    type: 'foil', difficulty: 'beginner', bestWind: 'N, NNE', bestSwell: 'Lagoa',
+    description: 'Lagoa de Óbidos perfeita para wing foil e kite foil. Água plana, vento side-onshore. Escolas com equipamento de foil.',
+    descriptionEn: 'Obidos Lagoon perfect for wing foil and kite foil. Flat water, side-onshore wind. Schools with foil equipment.',
+    images: ['/images/foz-arelho-1.jpg'], facilities: ['Estacionamento', 'Escolas foil', 'Aluguer', 'Restaurantes', 'WC'],
+    hazards: ['Tráfego de iniciantes', 'Maré baixa']
+  },
+  {
+    id: 'foil-alvor', slug: 'foil-alvor', name: 'Alvor - Foil', nameEn: 'Alvor - Foil',
+    region: 'Algarve', regionEn: 'Algarve', lat: 37.136, lon: -8.594,
+    type: 'foil', difficulty: 'intermediate', bestWind: 'W, NW', bestSwell: 'Lagoa',
+    description: 'Lagoa de Alvor é o spot secreto de foil do Algarve. Água plana com vento térmico. Wing foil e kite foil em condições perfeitas.',
+    descriptionEn: 'Alvor Lagoon is the secret foil spot of the Algarve. Flat water with thermal wind. Wing foil and kite foil in perfect conditions.',
+    images: ['/images/alvor-1.jpg'], facilities: ['Estacionamento', 'Escola foil', 'Aluguer', 'WC'],
+    hazards: ['Rochas na extremidade sul', 'Maré']
+  },
+  {
+    id: 'foil-cabedelo', slug: 'foil-cabedelo', name: 'Cabedelo - Foil', nameEn: 'Cabedelo - Foil',
+    region: 'Viana do Castelo', regionEn: 'Viana do Castelo', lat: 41.687, lon: -8.845,
+    type: 'foil', difficulty: 'intermediate', bestWind: 'NW, N', bestSwell: 'Rio',
+    description: 'Água plana na barra do rio Lima — perfeita para wing foil. Vento térmico de NW consistente. Spot de foil no norte de Portugal.',
+    descriptionEn: 'Flat water at the Lima river bar — perfect for wing foil. Consistent NW thermal wind. Foil spot in northern Portugal.',
+    images: ['/images/cabedelo-1.jpg'], facilities: ['Estacionamento', 'Escola foil', 'Aluguer', 'WC'],
+    hazards: ['Tráfego de barcos', 'Correntes na foz']
+  },
+
   // ==================== LAGOAS / WAKEBOARD ====================
   {
     id: 'castelo-bode', slug: 'castelo-bode', name: 'Castelo de Bode', nameEn: 'Castelo de Bode',
