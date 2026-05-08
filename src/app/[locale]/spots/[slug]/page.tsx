@@ -93,17 +93,12 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
         </div>
       </div>
 
-      {/* Map */}
-      <div className="w-full max-w-3xl mx-auto">
-        <SpotMap lat={spot.lat} lon={spot.lon} />
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
           <ConditionCard {...current} />
         </div>
-        <div className="lg:col-span-2">
-          <div className="glass-card p-6 h-full">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="glass-card p-6">
             <h3 className="text-lg font-semibold mb-4">{t.conditions.recommendation}</h3>
             <p className="text-xl text-white/80 mb-4">{isPt ? rating.recommendation : rating.recommendationEn}</p>
             <div className="grid grid-cols-2 gap-4 mt-6">
@@ -115,6 +110,17 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
                 <p className="text-sm text-white/50 mb-1">{isPt ? 'Swell ideal' : 'Best swell'}</p>
                 <p className="font-semibold">{spot.bestSwell}</p>
               </div>
+            </div>
+          </div>
+          
+          {/* Mapa pequeno integrado */}
+          <div className="glass-card p-4">
+            <h4 className="text-sm font-semibold text-white/60 mb-3 flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              {isPt ? 'Localização' : 'Location'}
+            </h4>
+            <div className="h-48 rounded-xl overflow-hidden">
+              <SpotMap lat={spot.lat} lon={spot.lon} />
             </div>
           </div>
         </div>

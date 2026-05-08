@@ -21,7 +21,7 @@ export default function SpotMap({ lat, lon }: SpotMapProps) {
     iframe.loading = 'lazy';
     iframe.allowFullscreen = true;
     
-    const url = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.03}%2C${lat-0.03}%2C${lon+0.03}%2C${lat+0.03}&layer=mapnik&marker=${lat}%2C${lon}`;
+    const url = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.015}%2C${lat-0.015}%2C${lon+0.015}%2C${lat+0.015}&layer=mapnik&marker=${lat}%2C${lon}`;
     iframe.src = url;
 
     mapRef.current.innerHTML = '';
