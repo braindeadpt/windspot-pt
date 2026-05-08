@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { MapPin, Wind, Waves, Star, Thermometer, Zap } from 'lucide-react';
 import { Spot } from '@/types';
 import { calculateSurfability, getScoreColor } from '@/lib/surfability';
+import { SPORT_LABELS, SportType } from '@/lib/sportRatings';
 
 interface SpotCardProps {
   spot: Spot;
@@ -16,9 +17,11 @@ interface SpotCardProps {
     windGust: number;
     waterTemp: number;
   };
+  sportRatings?: Record<string, any>;
+  selectedSport?: SportType | null;
 }
 
-export default function SpotCard({ spot, locale, conditions }: SpotCardProps) {
+export default function SpotCard({ spot, locale, conditions, sportRatings, selectedSport }: SpotCardProps) {
   const typeColors: Record<string, string> = {
     surf: 'bg-wave-500/20 text-wave-300 border-wave-500/30',
     kitesurf: 'bg-wind-500/20 text-wind-300 border-wind-500/30',
@@ -66,18 +69,38 @@ export default function SpotCard({ spot, locale, conditions }: SpotCardProps) {
     });
   }
 
+  // Get sport-specific rating if selected
+  const sportRating = selectedSport && sportRatings?.[selectedSport];
+  
+  // Get best sport rating for display
+  const bestSportRating = sportRatings 
+    ? Object.entries(sportRatings)
+        .sort(([, a], [, b]) => b.rating - a.rating)[0]
+    : null;
+
   const typeLabel = typeLabels[spot.type] || { pt: spot.type, en: spot.type };
   const diffLabel = difficultyLabels[spot.difficulty] || { pt: spot.difficulty, en: spot.difficulty };
 
+  // Determine display rating
+  const displayRating = sportRating || (surfability ? { score: surfability.score, rating: surfability.rating, color: getScoreColor(surfability.score).text.replace('text-', '') } : null);
+  const displayScore = sportRating ? sportRating.rating : (surfability?.score || 0);
+  const scoreLabel = sportRating ? (isPt ? sportRating.label : sportRating.label) : (isPt ? surfability?.rating : surfability?.ratingEn);
+  const maxScore = sportRating ? 10 : 100;
+
   return (
-    <Link href={`/${locale}/spots/${spot.slug}/`}>
+    <Link href={`/${locale}/spots/${spot.slug}/${selectedSport ? `?sport=${selectedSport}` : ''}`}>
       <div className="glass-card overflow-hidden hover:bg-white/10 transition-all duration-300 cursor-pointer group">
         {/* Header with spot info */}
         <div className="relative h-32 bg-gradient-to-br from-ocean-800 to-ocean-950 overflow-hidden">
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-3 left-3 flex gap-1 flex-wrap">
             <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${typeColors[spot.type]}`}>
               {isPt ? typeLabel.pt : typeLabel.en}
             </span>
+            {sportRating && (
+              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                {SPORT_LABELS[selectedSport].emoji} {SPORT_LABELS[selectedSport].pt}
+              </span>
+            )}
           </div>
           <div className="absolute top-3 right-3">
             <span className={`flex items-center gap-1 text-xs font-medium ${difficultyColors[spot.difficulty]}`}>
@@ -94,9 +117,15 @@ export default function SpotCard({ spot, locale, conditions }: SpotCardProps) {
           </div>
           {/* Rating badge */}
           <div className="absolute bottom-3 right-3">
-            {surfability ? (
-              <div className={`px-2 py-1 rounded-lg text-xs font-bold ${getScoreColor(surfability.score).bg} ${getScoreColor(surfability.score).text}`}>
-                {surfability.score}/100
+            {displayRating ? (
+              <div 
+                className="px-2 py-1 rounded-lg text-xs font-bold"
+                style={{ 
+                  backgroundColor: sportRating ? `${sportRating.color}20` : undefined,
+                  color: sportRating ? sportRating.color : undefined
+                }}
+              >
+                {sportRating ? `${sportRating.rating.toFixed(1)}/10` : `${surfability?.score}/100`}
               </div>
             ) : (
               <div className="px-2 py-1 rounded-lg text-xs font-bold bg-gray-500/30 text-gray-300">
@@ -108,6 +137,25 @@ export default function SpotCard({ spot, locale, conditions }: SpotCardProps) {
 
         {/* Conditions section - THE FOCUS */}
         <div className="p-4">
+          {/* Sport compatibility badges */}
+          {sportRatings && !selectedSport && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {Object.entries(sportRatings)
+                .sort(([, a], [, b]) => b.rating - a.rating)
+                .slice(0, 3)
+                .map(([sport, rating]) => (
+                  <span 
+                    key={sport}
+                    className="text-xs px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-300 border border-slate-600/30"
+                    style={{ borderLeftColor: rating.color, borderLeftWidth: '2px' }}
+                  >
+                    {SPORT_LABELS[sport as SportType].emoji} {rating.rating.toFixed(0)}
+                  </span>
+                ))
+              }
+            </div>
+          )}
+
           {conditions ? (
             <div className="space-y-3">
               {/* Wave height */}
@@ -142,9 +190,12 @@ export default function SpotCard({ spot, locale, conditions }: SpotCardProps) {
               
               {/* Recommendation */}
               <div className="pt-2 border-t border-white/10">
-                <p className="text-sm font-medium text-white/80">
-                  {surfability ? (isPt ? surfability.rating : surfability.ratingEn) : (isPt ? 'A carregar...' : 'Loading...')}
+                <p className="text-sm font-medium" style={{ color: sportRating ? sportRating.color : 'rgba(255,255,255,0.8)' }}>
+                  {scoreLabel || (isPt ? 'A carregar...' : 'Loading...')}
                 </p>
+                {sportRating && (
+                  <p className="text-xs text-white/50 mt-0.5">{sportRating.primaryFactor}</p>
+                )}
               </div>
             </div>
           ) : (

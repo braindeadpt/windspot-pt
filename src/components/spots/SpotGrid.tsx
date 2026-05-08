@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Spot } from '@/types';
+import { SportType, SPORT_LABELS } from '@/lib/sportRatings';
 import SpotCard from './SpotCard';
 import { Filter, MapPin } from 'lucide-react';
 
@@ -9,12 +10,14 @@ interface SpotGridProps {
   spots: Spot[];
   locale: string;
   conditions?: Record<string, any>;
+  sportRatings?: Record<string, Record<string, any>>;
+  selectedSport?: SportType | null;
 }
 
 type SportFilter = 'all' | 'surf' | 'kitesurf' | 'windsurf' | 'big-wave' | 'foil' | 'wakeboard';
 type RegionFilter = 'all' | 'norte' | 'centro' | 'lisboa' | 'oeste' | 'algarve' | 'alentejo' | 'acores' | 'madeira';
 
-export default function SpotGrid({ spots, locale, conditions = {} }: SpotGridProps) {
+export default function SpotGrid({ spots, locale, conditions = {}, sportRatings = {}, selectedSport }: SpotGridProps) {
   const [sportFilter, setSportFilter] = useState<SportFilter>('all');
   const [regionFilter, setRegionFilter] = useState<RegionFilter>('all');
 
@@ -70,23 +73,25 @@ export default function SpotGrid({ spots, locale, conditions = {} }: SpotGridPro
 
   return (
     <div className="space-y-6">
-      {/* Sport filters */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-        <Filter className="w-5 h-5 text-white/50 flex-shrink-0" />
-        {sportFilters.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => setSportFilter(f.value)}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-              sportFilter === f.value
-                ? 'bg-ocean-500 text-white shadow-lg shadow-ocean-500/25'
-                : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+      {/* Sport filters (only show if no selectedSport from URL) */}
+      {!selectedSport && (
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
+          <Filter className="w-5 h-5 text-white/50 flex-shrink-0" />
+          {sportFilters.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setSportFilter(f.value)}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                sportFilter === f.value
+                  ? 'bg-ocean-500 text-white shadow-lg shadow-ocean-500/25'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Region filters */}
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
@@ -113,6 +118,8 @@ export default function SpotGrid({ spots, locale, conditions = {} }: SpotGridPro
             spot={spot} 
             locale={locale} 
             conditions={conditions[spot.id]}
+            sportRatings={sportRatings[spot.id]}
+            selectedSport={selectedSport}
           />
         ))}
       </div>

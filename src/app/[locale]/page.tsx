@@ -2,15 +2,32 @@ import { getTranslation } from '@/lib/i18n'
 import { spots } from '@/lib/spots'
 import { fetchMarineData, getCurrentConditions, getForecastData } from '@/lib/openmeteo'
 import { calculateSurfability, getSessionForecast, estimateCrowd, getScoreColor } from '@/lib/surfability'
+import { calculateSportRating, SPORT_LABELS, SportType, getCompatibleSports } from '@/lib/sportRatings'
 import SpotGrid from '@/components/spots/SpotGrid'
+import SportSelector from '@/components/SportSelector'
 import { Wind, Waves, MapPin, ArrowRight, Activity, Thermometer, Star, Zap, Flame, Sunrise, Users } from 'lucide-react'
 import Link from 'next/link'
 
 export const revalidate = 1800
 
-async function getAllConditions() {
+function isSpotCompatibleWithSport(spot: any, sport: SportType): boolean {
+  const typeMapping: Record<string, SportType[]> = {
+    surf: ['surf', 'bodyboard', 'sup'],
+    kitesurf: ['kitesurf', 'windsurf'],
+    windsurf: ['windsurf', 'kitesurf'],
+    'big-wave': ['surf', 'bodyboard', 'windsurf'],
+    foil: ['windsurf', 'kitesurf', 'sup'],
+    multisport: ['surf', 'kitesurf', 'windsurf', 'bodyboard', 'sup', 'wakeboard'],
+    wakeboard: ['wakeboard'],
+  }
+  const compatible = typeMapping[spot.type] || ['surf']
+  return compatible.includes(sport)
+}
+
+async function getAllConditions(selectedSport?: SportType) {
   const conditions: Record<string, any> = {}
   const surfabilityScores: Record<string, any> = {}
+  const sportRatings: Record<string, Record<string, any>> = {}
 
   await Promise.all(
     spots.map(async (spot) => {
@@ -28,36 +45,76 @@ async function getAllConditions() {
           waterTemp: current.waterTemp,
         })
         surfabilityScores[spot.id] = score
+
+        sportRatings[spot.id] = {}
+        const compatibleSports = spot.compatibleSports?.length 
+          ? spot.compatibleSports 
+          : getCompatibleSports(current.waveHeight, current.windSpeed, current.wavePeriod)
+        
+        compatibleSports.forEach((sport: SportType) => {
+          sportRatings[spot.id][sport] = calculateSportRating(
+            sport,
+            current.waveHeight,
+            current.wavePeriod,
+            current.windSpeed,
+            current.windDirection
+          )
+        })
       } catch (e) {
         console.error(`Failed to fetch conditions for ${spot.name}`, e)
       }
     })
   )
 
-  return { conditions, surfabilityScores }
+  return { conditions, surfabilityScores, sportRatings }
 }
 
-// Get top spots by surfability score
-function getTopSpots(surfabilityScores: Record<string, any>, limit = 3) {
-  return Object.entries(surfabilityScores)
-    .sort(([, a], [, b]) => b.score - a.score)
-    .slice(0, limit)
-    .map(([id, score]) => ({
-      spot: spots.find(s => s.id === id)!,
-      score,
-    }))
-    .filter(item => item.spot)
+function getTopSpots(
+  surfabilityScores: Record<string, any>, 
+  sportRatings: Record<string, Record<string, any>>,
+  selectedSport?: SportType,
+  limit = 3
+) {
+  const scores = selectedSport && sportRatings
+    ? Object.entries(sportRatings)
+        .filter(([id, ratings]) => ratings[selectedSport])
+        .map(([id, ratings]) => ({
+          id,
+          score: ratings[selectedSport].rating * 10,
+          sportRating: ratings[selectedSport],
+        }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+    : Object.entries(surfabilityScores)
+        .sort(([, a], [, b]) => b.score - a.score)
+        .slice(0, limit)
+        .map(([id, score]) => ({ id, score, sportRating: null }))
+
+  return scores.map(({ id, score, sportRating }) => ({
+    spot: spots.find(s => s.id === id)!,
+    score: sportRating || score,
+    sportRating,
+  })).filter(item => item.spot)
 }
 
-export default async function HomePage({ params }: { params: { locale: string } }) {
+export default async function HomePage({ params, searchParams }: { params: { locale: string }, searchParams: { sport?: string } }) {
   const { locale } = params
   const t = getTranslation(locale as any)
-  const { conditions, surfabilityScores } = await getAllConditions()
+  const selectedSport = (searchParams.sport as SportType) || undefined
+  const { conditions, surfabilityScores, sportRatings } = await getAllConditions(selectedSport)
 
-  const topSpots = getTopSpots(surfabilityScores, 3)
+  const topSpots = getTopSpots(surfabilityScores, sportRatings, selectedSport, 3)
   const isPt = locale === 'pt'
 
-  // Get overall conditions from the best spot
+  const filteredSpots = selectedSport
+    ? spots.filter(spot => {
+        if (spot.compatibleSports?.length) {
+          return spot.compatibleSports.includes(selectedSport)
+        }
+        return isSpotCompatibleWithSport(spot, selectedSport)
+      })
+    : spots
+
   const bestSpot = topSpots[0]
   const bestConditions = bestSpot ? conditions[bestSpot.spot.id] : null
 
@@ -117,6 +174,11 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </div>
       </section>
 
+      {/* SPORT SELECTOR */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <SportSelector locale={locale} />
+      </section>
+
       {/* TOP 3 SPOTS — Onde está a boa onda hoje? */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-6">
@@ -132,12 +194,20 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {topSpots.map(({ spot, score }, index) => {
-            const colors = getScoreColor(score.score)
+          {topSpots.map(({ spot, score, sportRating }, index) => {
+            const isSportMode = !!sportRating
+            const ratingScore = isSportMode ? sportRating.rating : score.score / 10
+            const ratingLabel = isSportMode 
+              ? (isPt ? sportRating.label : sportRating.label)
+              : (isPt ? score.rating : score.ratingEn)
+            const colors = isSportMode 
+              ? { bg: `bg-[${sportRating.color}]/20`, text: `text-[${sportRating.color}]`, border: `border-[${sportRating.color}]/30` }
+              : getScoreColor(score.score)
+            
             return (
               <Link
                 key={spot.id}
-                href={`/${locale}/spots/${spot.slug}`}
+                href={`/${locale}/spots/${spot.slug}${selectedSport ? `?sport=${selectedSport}` : ''}`}
                 className={`glass-card p-5 hover:scale-[1.02] transition-all cursor-pointer group ${colors.border} border`}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -153,24 +223,49 @@ export default async function HomePage({ params }: { params: { locale: string } 
                     </div>
                   </div>
                   <div className={`px-3 py-1 rounded-full text-sm font-bold ${colors.bg} ${colors.text}`}>
-                    {score.score}/100
+                    {isSportMode ? `${sportRating.rating.toFixed(1)}/10` : `${score.score}/100`}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 mb-3">
                   <div className="flex gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className={`w-4 h-4 ${i < score.stars ? 'text-yellow-400 fill-yellow-400' : 'text-white/20'}`} />
+                      <Star key={i} className={`w-4 h-4 ${i < Math.round(ratingScore / 2) ? 'text-yellow-400 fill-yellow-400' : 'text-white/20'}`} />
                     ))}
                   </div>
                   <span className="text-sm font-medium text-white/70">
-                    {isPt ? score.rating : score.ratingEn}
+                    {isSportMode 
+                      ? (isPt ? SPORT_LABELS[selectedSport as SportType].pt : SPORT_LABELS[selectedSport as SportType].en)
+                      : ratingLabel
+                    }
                   </span>
                 </div>
 
                 <p className="text-sm text-white/60 mb-3">
-                  {isPt ? score.recommendation : score.recommendationEn}
+                  {isSportMode 
+                    ? (isPt ? sportRating.description : sportRating.description)
+                    : (isPt ? score.recommendation : score.recommendationEn)
+                  }
                 </p>
+
+                {/* Sport compatibility badges */}
+                {!isSportMode && sportRatings[spot.id] && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {Object.entries(sportRatings[spot.id])
+                      .sort(([, a], [, b]) => b.rating - a.rating)
+                      .slice(0, 3)
+                      .map(([sport, rating]) => (
+                        <span 
+                          key={sport}
+                          className="text-xs px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-300"
+                          style={{ borderColor: rating.color }}
+                        >
+                          {SPORT_LABELS[sport as SportType].emoji} {rating.rating.toFixed(0)}
+                        </span>
+                      ))
+                    }
+                  </div>
+                )}
 
                 {/* Mini conditions */}
                 <div className="flex gap-3 text-xs text-white/50">
@@ -184,7 +279,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
                   </span>
                   <span className="flex items-center gap-1">
                     <Users className="w-3 h-3" />
-                    {estimateCrowd(score.score, false, false, spot.difficulty).level}
+                    {isSportMode 
+                      ? (isPt ? 'Ver condições' : 'See conditions')
+                      : estimateCrowd(score.score, false, false, spot.difficulty).level
+                    }
                   </span>
                 </div>
               </Link>
@@ -203,27 +301,35 @@ export default async function HomePage({ params }: { params: { locale: string } 
             <h2 className="text-2xl md:text-3xl font-bold text-white/90">
               {isPt ? 'Mapa dos Spots' : 'Spots Map'}
             </h2>
-            <p className="text-white/50 text-sm">{isPt ? 'Clique num spot para ver detalhes' : 'Click a spot for details'}</p>
+            <p className="text-white/50 text-sm">{isPt ? `Clique num spot para ver detalhes${selectedSport ? ` para ${SPORT_LABELS[selectedSport as SportType].pt}` : ''}` : `Click a spot for details${selectedSport ? ` for ${SPORT_LABELS[selectedSport as SportType].en}` : ''}`}</p>
           </div>
         </div>
 
         <div className="glass-card p-6 relative overflow-hidden">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {spots.map((spot) => {
+            {filteredSpots.map((spot) => {
               const score = surfabilityScores[spot.id]
+              const sportRating = selectedSport && sportRatings[spot.id]?.[selectedSport]
+              const displayScore = sportRating ? sportRating.rating : (score?.score || 0)
+              const maxScore = sportRating ? 10 : 100
               const colors = score ? getScoreColor(score.score) : { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/30', glow: '' }
-
+              
               return (
                 <Link
                   key={spot.id}
-                  href={`/${locale}/spots/${spot.slug}`}
+                  href={`/${locale}/spots/${spot.slug}${selectedSport ? `?sport=${selectedSport}` : ''}`}
                   className={`p-3 rounded-xl ${colors.bg} ${colors.border} border hover:scale-105 transition-all group`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-bold text-sm text-white/90 group-hover:text-ocean-300 transition-colors">
                       {isPt ? spot.name : spot.nameEn}
                     </span>
-                    {score && (
+                    {sportRating && (
+                      <span className="text-xs font-bold" style={{ color: sportRating.color }}>
+                        {sportRating.rating.toFixed(1)}
+                      </span>
+                    )}
+                    {!sportRating && score && (
                       <span className={`text-xs font-bold ${colors.text}`}>
                         {score.score}
                       </span>
@@ -232,7 +338,10 @@ export default async function HomePage({ params }: { params: { locale: string } 
                   <div className="text-xs text-white/50">{isPt ? spot.region : spot.regionEn}</div>
                   {score && (
                     <div className="mt-2 flex items-center gap-1">
-                      <div className={`h-1.5 rounded-full flex-1 ${score.score >= 60 ? 'bg-gradient-to-r from-green-400 to-yellow-400' : 'bg-gray-500/30'}`} style={{ opacity: score.score / 100 }} />
+                      <div 
+                        className={`h-1.5 rounded-full flex-1 ${score.score >= 60 ? 'bg-gradient-to-r from-green-400 to-yellow-400' : 'bg-gray-500/30'}`} 
+                        style={{ opacity: sportRating ? sportRating.rating / 10 : score.score / 100 }} 
+                      />
                     </div>
                   )}
                 </Link>
@@ -310,15 +419,35 @@ export default async function HomePage({ params }: { params: { locale: string } 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-white/90">{t.spots.title}</h2>
-            <p className="text-white/50 mt-1">{t.hero.featured}</p>
+            <h2 className="text-3xl font-bold text-white/90">
+              {selectedSport 
+                ? (isPt 
+                  ? `${SPORT_LABELS[selectedSport as SportType].pt} Spots` 
+                  : `${SPORT_LABELS[selectedSport as SportType].en} Spots`)
+                : t.spots.title
+              }
+            </h2>
+            <p className="text-white/50 mt-1">
+              {selectedSport
+                ? (isPt 
+                  ? `${filteredSpots.length} spots para ${SPORT_LABELS[selectedSport as SportType].pt}` 
+                  : `${filteredSpots.length} spots for ${SPORT_LABELS[selectedSport as SportType].en}`)
+                : t.hero.featured
+              }
+            </p>
           </div>
           <Link href={`/${locale}/spots/`} className="flex items-center gap-2 text-ocean-400 hover:text-ocean-300 transition-colors">
             {t.hero.viewAll}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <SpotGrid spots={spots.slice(0, 6)} locale={locale} conditions={conditions} />
+        <SpotGrid 
+          spots={filteredSpots.slice(0, 6)} 
+          locale={locale} 
+          conditions={conditions} 
+          sportRatings={sportRatings}
+          selectedSport={selectedSport}
+        />
       </section>
 
       {/* STATS */}
