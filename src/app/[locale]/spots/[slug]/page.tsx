@@ -2,10 +2,11 @@ import { notFound } from 'next/navigation'
 import { getSpotBySlug } from '@/lib/spots'
 import { getTranslation } from '@/lib/i18n'
 import { fetchMarineData, getCurrentConditions, getForecastData, getSportRating, getWaveRating } from '@/lib/openmeteo'
+import { calculateSurfability, estimateCrowd, getScoreColor } from '@/lib/surfability'
 import ConditionCard from '@/components/weather/ConditionCard'
 import ForecastChart from '@/components/weather/ForecastChart'
 import SpotMap from '@/components/spots/SpotMap'
-import { MapPin, Star, ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react'
+import { MapPin, Star, ArrowLeft, CheckCircle, AlertTriangle, Zap, Users } from 'lucide-react'
 import Link from 'next/link'
 
 export const revalidate = 1800
@@ -53,6 +54,18 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
     console.error(`Failed to load conditions for spot ${spot.name}:`, e)
   }
 
+  // Calculate Surfability Score
+  const surfability = calculateSurfability(spot, {
+    waveHeight: current.waveHeight,
+    wavePeriod: current.wavePeriod,
+    waveDirection: current.waveDirection,
+    windSpeed: current.windSpeed,
+    windDirection: current.windDirection,
+    waterTemp: current.waterTemp,
+  })
+  const scoreColors = getScoreColor(surfability.score)
+  const crowd = estimateCrowd(surfability.score, false, false, spot.difficulty)
+
   const difficultyLabels = {
     beginner: t.spots.beginner,
     intermediate: t.spots.intermediate,
@@ -89,6 +102,72 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
           <div className="glass-card p-4 text-center">
             <div className="text-3xl font-bold text-ocean-400">{rating.rating}/10</div>
             <div className="text-sm text-white/50">{t.conditions.rating}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* SURFABILITY SCORE CARD */}
+      <div className={`glass-card p-6 ${scoreColors.border} border-2`}>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-center md:text-left">
+            <div className="flex items-center gap-3 mb-2">
+              <Zap className="w-6 h-6 text-yellow-400" />
+              <h2 className="text-xl font-bold">
+                {isPt ? 'Surfability Score' : 'Surfability Score'}
+              </h2>
+            </div>
+            <p className="text-lg text-white/80">
+              {isPt ? surfability.recommendation : surfability.recommendationEn}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="text-center">
+              <div className={`text-5xl font-bold ${scoreColors.text}`}>
+                {surfability.score}
+              </div>
+              <div className="text-sm text-white/50">/100</div>
+            </div>
+
+            <div className="text-center">
+              <div className="flex gap-1 mb-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className={`w-5 h-5 ${i < surfability.stars ? 'text-yellow-400 fill-yellow-400' : 'text-white/20'}`} />
+                ))}
+              </div>
+              <div className="text-sm font-medium text-white/70">
+                {isPt ? surfability.rating : surfability.ratingEn}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/10">
+          <div className="text-center">
+            <div className="text-sm text-white/50 mb-1">{isPt ? 'Ondas' : 'Waves'}</div>
+            <div className="text-xl font-bold text-wave-400">{surfability.details.waveScore}</div>
+            <div className="h-1.5 rounded-full bg-wave-500/20 mt-1">
+              <div className="h-1.5 rounded-full bg-wave-400" style={{ width: `${surfability.details.waveScore}%` }} />
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-white/50 mb-1">{isPt ? 'Vento' : 'Wind'}</div>
+            <div className="text-xl font-bold text-wind-400">{surfability.details.windScore}</div>
+            <div className="h-1.5 rounded-full bg-wind-500/20 mt-1">
+              <div className="h-1.5 rounded-full bg-wind-400" style={{ width: `${surfability.details.windScore}%` }} />
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-white/50 mb-1">{isPt ? 'Período' : 'Period'}</div>
+            <div className="text-xl font-bold text-surf-400">{surfability.details.periodScore}</div>
+            <div className="h-1.5 rounded-full bg-surf-500/20 mt-1">
+              <div className="h-1.5 rounded-full bg-surf-400" style={{ width: `${surfability.details.periodScore}%` }} />
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-white/50 mb-1">{isPt ? 'Crowd Est.' : 'Crowd Est.'}</div>
+            <div className="text-xl font-bold text-ocean-400">{crowd.icon}</div>
+            <div className="text-xs text-white/50 mt-1">{isPt ? crowd.level : crowd.levelEn} ({crowd.count})</div>
           </div>
         </div>
       </div>

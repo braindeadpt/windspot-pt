@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin, Wind, Waves, Star, Thermometer } from 'lucide-react';
+import { MapPin, Wind, Waves, Star, Thermometer, Zap } from 'lucide-react';
 import { Spot } from '@/types';
-import { getSportRating } from '@/lib/openmeteo';
+import { calculateSurfability, getScoreColor } from '@/lib/surfability';
 
 interface SpotCardProps {
   spot: Spot;
@@ -53,10 +53,17 @@ export default function SpotCard({ spot, locale, conditions }: SpotCardProps) {
 
   const isPt = locale === 'pt';
 
-  // Calculate sport-specific rating
-  let rating = { rating: 5, recommendation: 'Condições razoáveis', recommendationEn: 'Fair conditions' };
+  // Calculate Surfability Score
+  let surfability = null;
   if (conditions) {
-    rating = getSportRating(spot.type, conditions.waveHeight, conditions.windSpeed, conditions.wavePeriod, conditions.windDirection);
+    surfability = calculateSurfability(spot, {
+      waveHeight: conditions.waveHeight,
+      wavePeriod: conditions.wavePeriod,
+      waveDirection: conditions.windDirection, // approximate
+      windSpeed: conditions.windSpeed,
+      windDirection: conditions.windDirection,
+      waterTemp: conditions.waterTemp,
+    });
   }
 
   const typeLabel = typeLabels[spot.type] || { pt: spot.type, en: spot.type };
@@ -87,13 +94,15 @@ export default function SpotCard({ spot, locale, conditions }: SpotCardProps) {
           </div>
           {/* Rating badge */}
           <div className="absolute bottom-3 right-3">
-            <div className={`px-2 py-1 rounded-lg text-xs font-bold ${
-              rating.rating >= 7 ? 'bg-green-500/30 text-green-300' :
-              rating.rating >= 4 ? 'bg-yellow-500/30 text-yellow-300' :
-              'bg-red-500/30 text-red-300'
-            }`}>
-              {rating.rating}/10
-            </div>
+            {surfability ? (
+              <div className={`px-2 py-1 rounded-lg text-xs font-bold ${getScoreColor(surfability.score).bg} ${getScoreColor(surfability.score).text}`}>
+                {surfability.score}/100
+              </div>
+            ) : (
+              <div className="px-2 py-1 rounded-lg text-xs font-bold bg-gray-500/30 text-gray-300">
+                —
+              </div>
+            )}
           </div>
         </div>
 
@@ -133,7 +142,9 @@ export default function SpotCard({ spot, locale, conditions }: SpotCardProps) {
               
               {/* Recommendation */}
               <div className="pt-2 border-t border-white/10">
-                <p className="text-sm font-medium text-white/80">{locale === 'pt' ? rating.recommendation : rating.recommendationEn}</p>
+                <p className="text-sm font-medium text-white/80">
+                  {surfability ? (isPt ? surfability.rating : surfability.ratingEn) : (isPt ? 'A carregar...' : 'Loading...')}
+                </p>
               </div>
             </div>
           ) : (
