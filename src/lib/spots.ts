@@ -4,7 +4,7 @@ export const spots: Spot[] = [
   // ==================== NORTE ====================
   {
     id: 'matosinhos', slug: 'matosinhos', name: 'Matosinhos', nameEn: 'Matosinhos',
-    region: 'Porto', regionEn: 'Porto', lat: 41.174, lon: -8.688,
+    region: 'Porto', regionEn: 'Porto', lat: 41.177, lon: -8.692,
     type: 'surf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'W, NW',
     description: 'A melhor praia para aprender surf em Portugal. Sem correntes, sem rochas, ondas suaves e consistentes. O local mais seguro do norte.',
     descriptionEn: 'The best beach to learn surf in Portugal. No rip currents, no rocks, soft and consistent waves. The safest spot in the north.',
@@ -22,7 +22,7 @@ export const spots: Spot[] = [
   },
   {
     id: 'povoa-varzim', slug: 'povoa-varzim', name: 'Póvoa do Varzim', nameEn: 'Povoa do Varzim',
-    region: 'Porto', regionEn: 'Porto', lat: 41.380, lon: -8.770,
+    region: 'Porto', regionEn: 'Porto', lat: 41.377, lon: -8.760,
     type: 'surf', difficulty: 'beginner', bestWind: 'E, NE', bestSwell: 'W, NW',
     description: 'Praia longa com ondas suaves perfeitas para iniciantes. Escolas de surf com boa reputação. Ambiente familiar.',
     descriptionEn: 'Long beach with gentle waves perfect for beginners. Reputable surf schools. Family-friendly atmosphere.',
@@ -204,7 +204,7 @@ export const spots: Spot[] = [
   },
   {
     id: 'baleal', slug: 'baleal', name: 'Baleal', nameEn: 'Baleal',
-    region: 'Peniche', regionEn: 'Peniche', lat: 39.371, lon: -9.340,
+    region: 'Peniche', regionEn: 'Peniche', lat: 39.372, lon: -9.338,
     type: 'surf', difficulty: 'beginner', bestWind: 'N, NE', bestSwell: 'W, NW',
     description: 'Cantinho da Baía — ondas suaves protegidas da ilha. Perfeito para iniciantes e intermediários. Vários picos ao longo da baía.',
     descriptionEn: 'Cantinho da Baía — soft waves protected by the island. Perfect for beginners and intermediates. Multiple peaks along the bay.',
@@ -213,7 +213,7 @@ export const spots: Spot[] = [
   },
   {
     id: 'carcavelos', slug: 'carcavelos', name: 'Carcavelos', nameEn: 'Carcavelos',
-    region: 'Cascais', regionEn: 'Cascais', lat: 38.677, lon: -9.336,
+    region: 'Cascais', regionEn: 'Cascais', lat: 38.679, lon: -9.335,
     type: 'surf', difficulty: 'intermediate', bestWind: 'N, NE', bestSwell: 'W, NW',
     description: 'O beach break mais famoso de Lisboa. Ondas de classe mundial ao pé do Forte de São Julião. Multidão de surfistas de qualidade.',
     descriptionEn: 'The most famous beach break in Lisbon. World-class waves next to Forte de São Julião. Crowd of quality surfers.',
@@ -258,7 +258,7 @@ export const spots: Spot[] = [
   },
   {
     id: 'nazare', slug: 'nazare', name: 'Nazaré', nameEn: 'Nazare',
-    region: 'Oeste', regionEn: 'West Coast', lat: 39.601, lon: -9.068,
+    region: 'Oeste', regionEn: 'West Coast', lat: 39.597, lon: -9.073,
     type: 'big-wave', difficulty: 'expert', bestWind: 'N, NNE', bestSwell: 'W, WNW',
     description: 'Famoso pelas maiores ondas do mundo. Praia do Norte é o palco do Big Wave Surfing. Canal submarino amplifica ondas gigantescas.',
     descriptionEn: 'Famous for the biggest waves in the world. Praia do Norte is the stage for Big Wave Surfing. Underwater canyon amplifies giant waves.',
@@ -276,7 +276,7 @@ export const spots: Spot[] = [
   },
   {
     id: 'guincho', slug: 'guincho', name: 'Guincho', nameEn: 'Guincho',
-    region: 'Cascais', regionEn: 'Cascais', lat: 39.731, lon: -9.472,
+    region: 'Cascais', regionEn: 'Cascais', lat: 38.733, lon: -9.473,
     type: 'kitesurf', difficulty: 'intermediate', bestWind: 'N, NNW', bestSwell: 'SW, W',
     description: 'Spot icónico de kitesurf e windsurf. Vento térmico Nortada consistente no verão. Melhor vento de Portugal.',
     descriptionEn: 'Iconic kitesurf and windsurf spot. Consistent thermal Nortada wind in summer. Best wind in Portugal.',
