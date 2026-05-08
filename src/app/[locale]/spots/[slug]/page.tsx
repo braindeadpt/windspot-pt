@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getSpotBySlug } from '@/lib/spots'
 import { getTranslation } from '@/lib/i18n'
-import { fetchMarineData, getCurrentConditions, getForecastData, getSportRating, getWaveRating } from '@/lib/openmeteo'
+import { fetchMarineData, getCurrentConditions, getForecastData, getSportRating, getWaveRating, fetchWeatherData, getTideInfo, getWeatherDescription } from '@/lib/openmeteo'
 import { calculateSurfability, estimateCrowd, getScoreColor, getSessionForecast } from '@/lib/surfability'
 import { getLocalTips, getSecretTips, blueFlagBeaches } from '@/lib/spotTips'
 import ConditionCard from '@/components/weather/ConditionCard'
@@ -12,7 +12,7 @@ import { SecretTipsSection } from '@/components/spots/SecretTipsSection'
 import { WaterQualityBadge } from '@/components/spots/WaterQualityBadge'
 import { SessionForecastChart } from '@/components/spots/SessionForecastChart'
 import SpotChat from '@/components/spots/SpotChat'
-import { MapPin, Star, ArrowLeft, CheckCircle, AlertTriangle, Zap, Users } from 'lucide-react'
+import { MapPin, Star, ArrowLeft, CheckCircle, AlertTriangle, Zap, Users, CloudRain, Sun, Droplets } from 'lucide-react'
 import Link from 'next/link'
 
 export const revalidate = 1800
@@ -41,6 +41,7 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
     windDirection: 0,
     windGust: 0,
     waterTemp: 0,
+    seaLevelHeight: 0,
   }
   let forecast: any[] = []
   let rating = {
@@ -49,6 +50,15 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
     recommendationEn: 'Fair conditions',
   }
   let waveRating = getWaveRating(0)
+  let weatherData = {
+    temperature: 20,
+    weatherCode: 0,
+    precipitation: 0,
+    cloudCover: 0,
+    humidity: 60,
+    windSpeed: 10,
+    isDay: true,
+  }
 
   try {
     const marineData = await fetchMarineData(spot.lat, spot.lon)
@@ -56,6 +66,9 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
     forecast = getForecastData(marineData)
     rating = getSportRating(spot.type, current.waveHeight, current.windSpeed, current.wavePeriod, current.windDirection)
     waveRating = getWaveRating(current.waveHeight)
+    
+    // Fetch weather data
+    weatherData = await fetchWeatherData(spot.lat, spot.lon)
   } catch (e) {
     console.error(`Failed to load conditions for spot ${spot.name}:`, e)
   }
@@ -91,7 +104,9 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
   const spotWaterQualityEn = spot.waterQualityEn || beachInfo?.waterQuality
   const hasBlueFlag = spot.blueFlag || !!beachInfo
 
-  const difficultyLabels = {
+  // Get tide info
+  const tideInfo = getTideInfo(current.seaLevelHeight)
+  const weatherDesc = getWeatherDescription(weatherData.weatherCode)
     beginner: t.spots.beginner,
     intermediate: t.spots.intermediate,
     advanced: t.spots.advanced,
@@ -211,9 +226,41 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Bloco 1 - Condições meteorológicas */}
-        <div className="glass-card p-6">
-          <ConditionCard {...current} locale={locale} />
+        {/* Bloco 1 - Condições meteorológicas + Maré + Tempo */}
+        <div className="space-y-4">
+          <div className="glass-card p-6">
+            <ConditionCard {...current} locale={locale} />
+          </div>
+          
+          {/* Weather Badge */}
+          <div className="glass-card p-4 flex items-center gap-4">
+            <div className="text-3xl">{weatherDesc.icon}</div>
+            <div>
+              <div className="text-lg font-bold">{Math.round(weatherData.temperature)}°C</div>
+              <div className="text-sm text-white/60">{isPt ? weatherDesc.pt : weatherDesc.en}</div>
+              {weatherData.precipitation > 0 && (
+                <div className="text-xs text-wave-400 flex items-center gap-1 mt-1">
+                  <CloudRain className="w-3 h-3" />
+                  {weatherData.precipitation}mm/h
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Tide Badge */}
+          <div className={`glass-card p-4 flex items-center gap-4 border-l-4 ${
+            tideInfo.status === 'high' ? 'border-l-wave-400' :
+            tideInfo.status === 'low' ? 'border-l-surf-400' :
+            'border-l-wind-400'
+          }`}>
+            <Droplets className="w-8 h-8 text-ocean-400" />
+            <div>
+              <div className="text-sm font-bold">{isPt ? tideInfo.label : tideInfo.labelEn}</div>
+              <div className="text-xs text-white/50">
+                {isPt ? `Nível: ${tideInfo.height.toFixed(2)}m` : `Level: ${tideInfo.height.toFixed(2)}m`}
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* Bloco 2 - Recomendação */}

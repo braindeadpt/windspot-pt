@@ -1,6 +1,24 @@
 import { MarineData } from '@/types';
 
 const MARINE_API = 'https://marine-api.open-meteo.com/v1/marine';
+const WEATHER_API = 'https://api.open-meteo.com/v1/forecast';
+
+export interface WeatherData {
+  temperature: number;
+  weatherCode: number;
+  precipitation: number;
+  cloudCover: number;
+  humidity: number;
+  windSpeed: number;
+  isDay: boolean;
+}
+
+export interface TideInfo {
+  height: number;
+  status: 'high' | 'low' | 'rising' | 'falling';
+  label: string;
+  labelEn: string;
+}
 
 // Generate realistic mock data based on spot characteristics and season
 function generateMockData(lat: number, lon: number): MarineData {
@@ -36,6 +54,7 @@ function generateMockData(lat: number, lon: number): MarineData {
   const hourlyWindDirection: number[] = [];
   const hourlyWindGusts: number[] = [];
   const hourlyWaterTemp: number[] = [];
+  const hourlySeaLevel: number[] = [];
 
   const startOfDay = new Date(now);
   startOfDay.setHours(0, 0, 0, 0);
@@ -47,6 +66,7 @@ function generateMockData(lat: number, lon: number): MarineData {
     // Add some realistic variation
     const hourOfDay = hourTime.getHours();
     const dayVariation = Math.sin((hourOfDay - 6) * Math.PI / 12) * 0.3; // wind picks up during day
+    const tideVariation = Math.sin(i * Math.PI / 6.2) * 0.5; // ~12.4h tidal cycle
     
     hourlyWaveHeight.push(Math.max(0.1, baseWaveHeight + (Math.random() - 0.5) * 0.8));
     hourlyWaveDirection.push(270 + (Math.random() - 0.5) * 30); // W swell
@@ -55,6 +75,7 @@ function generateMockData(lat: number, lon: number): MarineData {
     hourlyWindDirection.push(330 + (Math.random() - 0.5) * 40); // N/NW wind
     hourlyWindGusts.push(Math.max(3, baseWindSpeed + dayVariation * 10 + (Math.random() - 0.5) * 8));
     hourlyWaterTemp.push(baseWaterTemp + (Math.random() - 0.5) * 2);
+    hourlySeaLevel.push(tideVariation + (Math.random() - 0.5) * 0.1);
   }
 
   const dailyTime: string[] = [];
@@ -83,6 +104,7 @@ function generateMockData(lat: number, lon: number): MarineData {
       wind_direction_10m: hourlyWindDirection,
       wind_gusts_10m: hourlyWindGusts,
       water_temperature: hourlyWaterTemp,
+      sea_level_height: hourlySeaLevel,
     },
     daily: {
       time: dailyTime,
@@ -97,7 +119,7 @@ export async function fetchMarineData(lat: number, lon: number): Promise<MarineD
   const params = new URLSearchParams({
     latitude: lat.toString(),
     longitude: lon.toString(),
-    hourly: 'wave_height,wave_direction,wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m,water_temperature',
+    hourly: 'wave_height,wave_direction,wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m,water_temperature,sea_level_height_msl',
     daily: 'wave_height_max,wind_speed_max,water_temperature_max',
     timezone: 'Europe/Lisbon',
     forecast_days: '7',
@@ -137,6 +159,7 @@ export async function fetchMarineData(lat: number, lon: number): Promise<MarineD
         wind_direction_10m: data.hourly.wind_direction_10m || [],
         wind_gusts_10m: data.hourly.wind_gusts_10m || [],
         water_temperature: data.hourly.water_temperature || [],
+        sea_level_height: data.hourly.sea_level_height_msl || [],
       },
       daily: {
         time: data.daily?.time || [],
@@ -168,6 +191,7 @@ export function getCurrentConditions(data: MarineData) {
     windDirection: data.hourly.wind_direction_10m[timeIndex] || 0,
     windGust: data.hourly.wind_gusts_10m[timeIndex] || 0,
     waterTemp: data.hourly.water_temperature[timeIndex] || 0,
+    seaLevelHeight: data.hourly.sea_level_height?.[timeIndex] || 0,
   };
 }
 
@@ -337,4 +361,114 @@ export function getSportRating(spotType: string, waveHeight: number, windSpeed: 
   }
 
   return { rating, recommendation, recommendationEn };
+}
+
+export function getWeatherDescription(code: number): { pt: string; en: string; icon: string } {
+  const codes: Record<number, { pt: string; en: string; icon: string }> = {
+    0: { pt: 'Céu limpo', en: 'Clear sky', icon: '☀️' },
+    1: { pt: 'Céu limpo', en: 'Mainly clear', icon: '🌤️' },
+    2: { pt: 'Parcialmente nublado', en: 'Partly cloudy', icon: '⛅' },
+    3: { pt: 'Nublado', en: 'Overcast', icon: '☁️' },
+    45: { pt: 'Nevoeiro', en: 'Fog', icon: '🌫️' },
+    48: { pt: 'Nevoeiro', en: 'Depositing rime fog', icon: '🌫️' },
+    51: { pt: 'Chuvisco leve', en: 'Light drizzle', icon: '🌦️' },
+    53: { pt: 'Chuvisco', en: 'Moderate drizzle', icon: '🌦️' },
+    55: { pt: 'Chuvisco intenso', en: 'Dense drizzle', icon: '🌧️' },
+    61: { pt: 'Chuva leve', en: 'Slight rain', icon: '🌦️' },
+    63: { pt: 'Chuva', en: 'Moderate rain', icon: '🌧️' },
+    65: { pt: 'Chuva intensa', en: 'Heavy rain', icon: '⛈️' },
+    71: { pt: 'Neve leve', en: 'Slight snow', icon: '🌨️' },
+    73: { pt: 'Neve', en: 'Moderate snow', icon: '❄️' },
+    75: { pt: 'Neve intensa', en: 'Heavy snow', icon: '❄️' },
+    80: { pt: 'Chuva leve', en: 'Slight rain showers', icon: '🌦️' },
+    81: { pt: 'Chuva', en: 'Moderate rain showers', icon: '🌧️' },
+    82: { pt: 'Chuva intensa', en: 'Violent rain showers', icon: '⛈️' },
+    95: { pt: 'Trovoada', en: 'Thunderstorm', icon: '⛈️' },
+    96: { pt: 'Trovoada com granizo', en: 'Thunderstorm with hail', icon: '⛈️' },
+    99: { pt: 'Trovoada intensa', en: 'Heavy thunderstorm', icon: '⛈️' },
+  };
+  return codes[code] || { pt: 'Desconhecido', en: 'Unknown', icon: '❓' };
+}
+
+export async function fetchWeatherData(lat: number, lon: number): Promise<WeatherData> {
+  const params = new URLSearchParams({
+    latitude: lat.toString(),
+    longitude: lon.toString(),
+    current: 'temperature_2m,weather_code,precipitation,cloudcover_relative,humidity_2m,wind_speed_10m,is_day',
+    timezone: 'Europe/Lisbon',
+  });
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(`${WEATHER_API}?${params}`, {
+      next: { revalidate: 1800 },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      console.warn(`Weather API returned ${response.status}, using defaults`);
+      return { temperature: 20, weatherCode: 0, precipitation: 0, cloudCover: 0, humidity: 60, windSpeed: 10, isDay: true };
+    }
+
+    const data = await response.json();
+
+    if (!data.current) {
+      console.warn('Weather API returned invalid data, using defaults');
+      return { temperature: 20, weatherCode: 0, precipitation: 0, cloudCover: 0, humidity: 60, windSpeed: 10, isDay: true };
+    }
+
+    return {
+      temperature: data.current.temperature_2m || 20,
+      weatherCode: data.current.weather_code || 0,
+      precipitation: data.current.precipitation || 0,
+      cloudCover: data.current.cloudcover_relative || 0,
+      humidity: data.current.humidity_2m || 60,
+      windSpeed: data.current.wind_speed_10m || 10,
+      isDay: data.current.is_day === 1,
+    };
+  } catch (error) {
+    console.warn(`Failed to fetch weather data for ${lat},${lon}:`, error instanceof Error ? error.message : 'Unknown error');
+    return { temperature: 20, weatherCode: 0, precipitation: 0, cloudCover: 0, humidity: 60, windSpeed: 10, isDay: true };
+  }
+}
+
+export function getTideInfo(seaLevelHeight: number): TideInfo {
+  // Open-Meteo sea_level_height_msl is relative to global mean sea level
+  // Positive = above mean (closer to high tide), Negative = below mean (closer to low tide)
+  
+  const threshold = 0.3; // meters
+  
+  if (seaLevelHeight > threshold) {
+    return {
+      height: seaLevelHeight,
+      status: 'high',
+      label: 'Maré Alta',
+      labelEn: 'High Tide',
+    };
+  } else if (seaLevelHeight < -threshold) {
+    return {
+      height: seaLevelHeight,
+      status: 'low',
+      label: 'Maré Baixa',
+      labelEn: 'Low Tide',
+    };
+  } else if (seaLevelHeight > 0) {
+    return {
+      height: seaLevelHeight,
+      status: 'rising',
+      label: 'Maré a Subir',
+      labelEn: 'Rising Tide',
+    };
+  } else {
+    return {
+      height: seaLevelHeight,
+      status: 'falling',
+      label: 'Maré a Descer',
+      labelEn: 'Falling Tide',
+    };
+  }
 }

@@ -53,6 +53,7 @@ export interface MarineData {
     wind_direction_10m: number[];
     wind_gusts_10m: number[];
     water_temperature: number[];
+    sea_level_height?: number[];
   };
   daily: {
     time: string[];
