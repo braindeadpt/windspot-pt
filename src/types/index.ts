@@ -16,6 +16,15 @@ export interface Spot {
   images?: string[];
   facilities: string[];
   hazards: string[];
+  // Water quality / beach flags (optional community data)
+  waterQuality?: 'excelente' | 'boa' | 'razoavel' | 'má';
+  waterQualityEn?: 'excellent' | 'good' | 'fair' | 'poor';
+  blueFlag?: boolean;
+  accessibleBeach?: boolean;
+  goldenQuality?: boolean;
+  // Crowd / secret spot info
+  localSecret?: boolean;
+  secretLevel?: 'known' | 'semi-secret' | 'secret' | 'deep-secret';
 }
 
 export interface MarineData {

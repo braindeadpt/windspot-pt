@@ -48,6 +48,8 @@ export const spots: Spot[] = [
     hazards: ['Correntes na foz', 'Rochas na lagoa']
   },
   {
+        localSecret: true,
+    secretLevel: 'semi-secret',
     id: 'moledo', slug: 'moledo', name: 'Moledo do Minho', nameEn: 'Moledo do Minho',
     region: 'Caminha', regionEn: 'Caminha', lat: 41.848, lon: -8.863,
     type: 'surf', difficulty: 'intermediate', bestWind: 'E, NE', bestSwell: 'W, NW',
@@ -479,6 +481,8 @@ export const spots: Spot[] = [
     hazards: ['Multidão em dias de evento']
   },
   {
+        localSecret: true,
+    secretLevel: 'secret',
     id: 'jardim-mar', slug: 'jardim-mar', name: 'Jardim do Mar', nameEn: 'Jardim do Mar',
     region: 'Madeira', regionEn: 'Madeira', lat: 32.750, lon: -17.217,
     type: 'surf', difficulty: 'advanced', bestWind: 'E, NE', bestSwell: 'W, NW',
@@ -488,6 +492,8 @@ export const spots: Spot[] = [
     hazards: ['Reef raso', 'Acesso por molhe', 'Ondas mortais']
   },
   {
+        localSecret: true,
+    secretLevel: 'deep-secret',
     id: 'paul-mar', slug: 'paul-mar', name: 'Paul do Mar', nameEn: 'Paul do Mar',
     region: 'Madeira', regionEn: 'Madeira', lat: 32.767, lon: -17.233,
     type: 'surf', difficulty: 'advanced', bestWind: 'E, NE', bestSwell: 'W, NW',
@@ -544,6 +550,8 @@ export const spots: Spot[] = [
     hazards: ['Correntes']
   },
   {
+        localSecret: true,
+    secretLevel: 'semi-secret',
     id: 'zambujeira', slug: 'zambujeira', name: 'Zambujeira do Mar', nameEn: 'Zambujeira do Mar',
     region: 'Alentejo', regionEn: 'Alentejo', lat: 37.527, lon: -8.785,
     type: 'surf', difficulty: 'intermediate', bestWind: 'E, NE', bestSwell: 'W, NW',
@@ -553,6 +561,8 @@ export const spots: Spot[] = [
     hazards: ['Ondas pesadas', 'Locals']
   },
   {
+        localSecret: true,
+    secretLevel: 'known',
     id: 'porto-covo', slug: 'porto-covo', name: 'Porto Covo', nameEn: 'Porto Covo',
     region: 'Alentejo', regionEn: 'Alentejo', lat: 37.852, lon: -8.790,
     type: 'surf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'W, NW',
@@ -562,6 +572,8 @@ export const spots: Spot[] = [
     hazards: ['Acesso por trilhos']
   },
   {
+        localSecret: true,
+    secretLevel: 'semi-secret',
     id: 'odeceixe', slug: 'odeceixe', name: 'Odeceixe', nameEn: 'Odeceixe',
     region: 'Alentejo', regionEn: 'Alentejo', lat: 37.440, lon: -8.800,
     type: 'surf', difficulty: 'beginner', bestWind: 'N, NE', bestSwell: 'S, SW',
@@ -571,6 +583,8 @@ export const spots: Spot[] = [
     hazards: ['Correntes de maré']
   },
   {
+        localSecret: true,
+    secretLevel: 'secret',
     id: 'sao-torpes', slug: 'sao-torpes', name: 'São Torpes', nameEn: 'Sao Torpes',
     region: 'Alentejo', regionEn: 'Alentejo', lat: 37.950, lon: -8.800,
     type: 'surf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'W, NW',
@@ -654,6 +668,118 @@ export const spots: Spot[] = [
     descriptionEn: '2.0 cable park on Lagos salt flat. Ramps, rails, kickers and sliders. Mastercraft X-23 for wake boat. Complete park!',
     facilities: ['Estacionamento', 'Cable 2.0', 'Wake Boat', 'Escola', 'Alojamento'],
     hazards: ['Outros riders']
+  },
+
+  // ==================== SPOTS SECRETOS — SECRET SPOTS ====================
+  {
+        localSecret: true,
+    secretLevel: 'semi-secret',
+    id: 'zambujeira', slug: 'zambujeira', name: 'Zambujeira do Mar', nameEn: 'Zambujeira do Mar',
+    region: 'Alentejo', regionEn: 'Alentejo', lat: 37.525, lon: -8.786,
+    type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
+    description: 'Um dos spots mais selvagens de Portugal. Beach break potente com ondas de qualidade e quase ninguém. Costa Vicentina em estado puro. Só para quem sabe o que faz.',
+    descriptionEn: 'One of the wildest spots in Portugal. Powerful beach break with quality waves and almost no one. Pure Costa Vicentina. For experienced surfers only.',
+    facilities: ['Estacionamento', 'Bar de praia (verão)', 'WC'],
+    hazards: ['Rochas submersas', 'Correntes fortes', 'Sem socorro']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'semi-secret',
+    id: 'odeceixe', slug: 'odeceixe', name: 'Odeceixe', nameEn: 'Odeceixe',
+    region: 'Alentejo', regionEn: 'Alentejo', lat: 37.541, lon: -8.794,
+    type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
+    description: 'Foz do rio Seixe — ondas perfeitas num cenário único. Lefts longos e rápidos na foz. Pouco crowd, ambiente bucólico. Um segredo bem guardado da Costa Vicentina.',
+    descriptionEn: 'Seixe river mouth — perfect waves in a unique setting. Long, fast lefts at the river mouth. Low crowd, bucolic atmosphere. A well-kept secret of the Costa Vicentina.',
+    facilities: ['Estacionamento', 'Restaurante', 'WC'],
+    hazards: ['Correntes na foz', 'Rochas']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'secret',
+    id: 'sao-torpes', slug: 'sao-torpes', name: 'São Torpes', nameEn: 'Sao Torpes',
+    region: 'Alentejo', regionEn: 'Alentejo', lat: 37.953, lon: -8.764,
+    type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
+    description: 'Spot pouco conhecido ao sul de Sines. Ondas consistentes com fundo de areia. Água mais quente que o norte. Perfeito para escapar das multidões da Costa Vicentina.',
+    descriptionEn: 'Little-known spot south of Sines. Consistent waves with sand bottom. Warmer water than the north. Perfect to escape the crowds of the Costa Vicentina.',
+    facilities: ['Estacionamento', 'Restaurante', 'WC'],
+    hazards: ['Correntes', 'Ressaca']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'known',
+    id: 'porto-covo', slug: 'porto-covo', name: 'Porto Covo', nameEn: 'Porto Covo',
+    region: 'Alentejo', regionEn: 'Alentejo', lat: 37.852, lon: -8.792,
+    type: 'surf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'W, NW',
+    description: 'Praia grande com ondas suaves — ideal para iniciantes que querem surfar no Alentejo sem stress. Pouco crowd fora do verão. Cenário de postal.',
+    descriptionEn: 'Large beach with gentle waves — ideal for beginners who want to surf in Alentejo without stress. Low crowd outside summer. Postcard scenery.',
+    facilities: ['Estacionamento', 'Restaurantes', 'WC', 'Camping'],
+    hazards: ['Multidão no verão']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'semi-secret',
+    id: 'vilanova-milfontes', slug: 'vilanova-milfontes', name: 'Vila Nova de Milfontes', nameEn: 'Vila Nova de Milfontes',
+    region: 'Alentejo', regionEn: 'Alentejo', lat: 37.723, lon: -8.782,
+    type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
+    description: 'Foz do rio Mira — lefts perfeitos na foz com a maré certa. Spot local com vibe autêntica. Poucos surfistas, muitas ondas.',
+    descriptionEn: 'Mira river mouth — perfect lefts at the mouth with the right tide. Local spot with authentic vibe. Few surfers, many waves.',
+    facilities: ['Estacionamento', 'Restaurantes', 'WC', 'Alojamento'],
+    hazards: ['Correntes na foz', 'Rochas']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'semi-secret',
+    id: 'moledo', slug: 'moledo', name: 'Moledo', nameEn: 'Moledo',
+    region: 'Caminha', regionEn: 'Caminha', lat: 41.850, lon: -8.862,
+    type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
+    description: 'Praia do norte com ondas de qualidade e pouco crowd. Vista para a Espanha. Lefts e rights consistentes. Um spot local pouco divulgado.',
+    descriptionEn: 'Northern beach with quality waves and low crowd. View to Spain. Consistent lefts and rights. A little-publicized local spot.',
+    facilities: ['Estacionamento', 'Restaurante', 'WC'],
+    hazards: ['Correntes', 'Ressaca']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'known',
+    id: 'ancora', slug: 'ancora', name: 'Âncora', nameEn: 'Ancora',
+    region: 'Caminha', regionEn: 'Caminha', lat: 41.815, lon: -8.860,
+    type: 'surf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'W, NW',
+    description: 'Praia familiar com ondas suaves. Perfeita para iniciantes no norte de Portugal. Pouco crowd e água limpa.',
+    descriptionEn: 'Family beach with gentle waves. Perfect for beginners in northern Portugal. Low crowd and clean water.',
+    facilities: ['Estacionamento', 'Restaurantes', 'WC'],
+    hazards: ['Correntes moderadas']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'secret',
+    id: 'ponta-delgada', slug: 'ponta-delgada', name: 'Ponta Delgada (Açores)', nameEn: 'Ponta Delgada (Azores)',
+    region: 'Açores', regionEn: 'Azores', lat: 37.741, lon: -25.669,
+    type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
+    description: 'São Miguel — ondas potentes no meio do Atlântico. Água cristalina, crowd mínimo. Um paraíso escondido para surfistas aventureiros.',
+    descriptionEn: 'São Miguel — powerful waves in the middle of the Atlantic. Crystal clear water, minimal crowd. A hidden paradise for adventurous surfers.',
+    facilities: ['Estacionamento', 'Escola surf', 'Restaurantes', 'WC'],
+    hazards: ['Ondas irregulares', 'Água fria (17-20°C)']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'secret',
+    id: 'jardim-mar', slug: 'jardim-mar', name: 'Jardim do Mar', nameEn: 'Jardim do Mar',
+    region: 'Madeira', regionEn: 'Madeira', lat: 32.740, lon: -17.210,
+    type: 'surf', difficulty: 'advanced', bestWind: 'E, NE', bestSwell: 'W, NW',
+    description: 'Spot épico da Madeira. Rights longos e perfeitos com maré baixa. Um dos melhores spots de Portugal, mas pouco conhecido. Só para experientes.',
+    descriptionEn: 'Epic Madeira spot. Long, perfect rights at low tide. One of the best spots in Portugal, but little known. Experienced surfers only.',
+    facilities: ['Estacionamento', 'Restaurante', 'WC'],
+    hazards: ['Rochas', 'Correntes fortes', 'Ondas pesadas']
+  },
+  {
+        localSecret: true,
+    secretLevel: 'deep-secret',
+    id: 'paul-mar', slug: 'paul-mar', name: 'Paul do Mar', nameEn: 'Paul do Mar',
+    region: 'Madeira', regionEn: 'Madeira', lat: 32.760, lon: -17.225,
+    type: 'surf', difficulty: 'expert', bestWind: 'E, NE', bestSwell: 'W, NW',
+    description: 'Ondas pesadas e tubulares na costa oeste da Madeira. Point break com rights perfeitos. Conhecido entre locals mas pouco divulgado.',
+    descriptionEn: 'Heavy, tubular waves on Madeira\'s west coast. Point break with perfect rights. Known among locals but little publicized.',
+    facilities: ['Estacionamento', 'Restaurante', 'WC'],
+    hazards: ['Rochas', 'Correntes', 'Ondas pesadas', 'Acesso difícil']
   }
 ];
 
