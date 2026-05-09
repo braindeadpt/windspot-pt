@@ -8,3 +8,4 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+// Trigger deploy - workflow verification
