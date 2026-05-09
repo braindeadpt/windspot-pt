@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
 import { SPORT_LABELS, ALL_SPORTS, SportType } from '@/lib/sportRatings';
 import { X } from 'lucide-react';
 
@@ -9,21 +9,53 @@ interface SportSelectorProps {
 }
 
 export default function SportSelector({ locale }: SportSelectorProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentSport = searchParams.get('sport') as SportType | null;
+  const [currentSport, setCurrentSport] = useState<SportType | null>(null);
   const isPT = locale === 'pt';
 
-  const handleSportChange = (sport: SportType | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (sport) {
-      params.set('sport', sport);
-    } else {
-      params.delete('sport');
+  // Read sport from URL on mount (client-side only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const sportParam = params.get('sport') as SportType | null;
+      if (sportParam && ALL_SPORTS.includes(sportParam as SportType)) {
+        setCurrentSport(sportParam as SportType);
+      }
     }
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
+  }, []);
+
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const sportParam = params.get('sport') as SportType | null;
+      if (sportParam && ALL_SPORTS.includes(sportParam as SportType)) {
+        setCurrentSport(sportParam as SportType);
+      } else {
+        setCurrentSport(null);
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleSportChange = useCallback((sport: SportType | null) => {
+    setCurrentSport(sport);
+    
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (sport) {
+        params.set('sport', sport);
+      } else {
+        params.delete('sport');
+      }
+      
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.pushState({}, '', newUrl);
+    }
+  }, []);
 
   return (
     <div className="w-full">
