@@ -35,7 +35,12 @@ jobs:
       - name: Build
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
-        run: npm run build
+        run: |
+          npm run build 2>&1 | tee build.log || {
+            echo "::error::BUILD FAILED - Last 200 lines:"
+            tail -200 build.log
+            exit 1
+          }
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
