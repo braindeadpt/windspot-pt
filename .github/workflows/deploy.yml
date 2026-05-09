@@ -28,9 +28,13 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          npm cache clean --force
+          npm ci
 
       - name: Build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
         run: npm run build
 
       - name: Setup Pages
