@@ -215,7 +215,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
                     </div>
                   </div>
                   <div className={`px-3 py-1 rounded-full text-sm font-bold ${colors.bg} ${colors.text}`}>
-                    {isSportMode ? `${sportRating.rating.toFixed(1)}/10` : `${score.score}/100`}
+                    {isSportMode ? `${sportRating.rating?.toFixed(1) || '—'}/10` : `${score.score || '—'}/100`}
                   </div>
                 </div>
 
@@ -252,7 +252,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
                           className="text-xs px-2 py-0.5 rounded-full bg-slate-700/50 text-slate-300"
                           style={{ borderColor: rating.color }}
                         >
-                          {SPORT_LABELS[sport as SportType].emoji} {rating.rating.toFixed(0)}
+                          {SPORT_LABELS[sport as SportType].emoji} {rating.rating?.toFixed(0) || '—'}
                         </span>
                       ))
                     }
@@ -263,11 +263,11 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 <div className="flex gap-3 text-xs text-white/50">
                   <span className="flex items-center gap-1">
                     <Waves className="w-3 h-3" />
-                    {conditions[spot.id]?.waveHeight.toFixed(1)}m
+                    {conditions[spot.id]?.waveHeight?.toFixed(1) || '—'}m
                   </span>
                   <span className="flex items-center gap-1">
                     <Wind className="w-3 h-3" />
-                    {conditions[spot.id]?.windSpeed.toFixed(0)}km/h
+                    {conditions[spot.id]?.windSpeed?.toFixed(0) || '—'}km/h
                   </span>
                   <span className="flex items-center gap-1">
                     <Users className="w-3 h-3" />
@@ -318,7 +318,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
                     </span>
                     {sportRating && (
                       <span className="text-xs font-bold" style={{ color: sportRating.color }}>
-                        {sportRating.rating.toFixed(1)}
+                        {sportRating.rating?.toFixed(1) || '—'}
                       </span>
                     )}
                     {!sportRating && score && (
@@ -363,9 +363,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
               <div>
                 <p className="text-sm text-white/50">{isPt ? 'Swell' : 'Swell'}</p>
                 <p className="text-xl font-bold">
-                  {bestConditions?.waveHeight.toFixed(1) || '—'}m
+                  {bestConditions?.waveHeight?.toFixed(1) || '—'}m
                   <span className="text-sm text-white/50 font-normal ml-1">
-                    @{bestConditions?.wavePeriod.toFixed(0) || '—'}s
+                    @{bestConditions?.wavePeriod?.toFixed(0) || '—'}s
                   </span>
                 </p>
               </div>
@@ -377,9 +377,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
               <div>
                 <p className="text-sm text-white/50">{isPt ? 'Vento' : 'Wind'}</p>
                 <p className="text-xl font-bold">
-                  {bestConditions?.windSpeed.toFixed(0) || '—'}km/h
+                  {bestConditions?.windSpeed?.toFixed(0) || '—'}km/h
                   <span className="text-sm text-white/50 font-normal ml-1">
-                    {bestConditions?.windGust.toFixed(0) || '—'}kt gust
+                    {bestConditions?.windGust?.toFixed(0) || '—'}kt gust
                   </span>
                 </p>
               </div>
@@ -390,7 +390,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
               </div>
               <div>
                 <p className="text-sm text-white/50">{isPt ? 'Água' : 'Water'}</p>
-                <p className="text-xl font-bold">{bestConditions?.waterTemp.toFixed(1) || '—'}°C</p>
+                <p className="text-xl font-bold">{bestConditions?.waterTemp?.toFixed(1) || '—'}°C</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
