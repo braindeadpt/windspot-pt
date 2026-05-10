@@ -1,5 +1,11 @@
 // Content moderation rules for spot chat
 // Simple, lightweight profanity/spam filter
+// 
+// ⚠️  NOTE: This is CLIENT-SIDE ONLY. Determined abusers can bypass it.
+//     The REAL protection is in supabase-schema.sql RLS policies:
+//     - Content length: 1-280 chars (enforced at DB level)
+//     - Rate limit: max 1 msg per username per 10 seconds (enforced at DB level)
+//     - For production, add Cloudflare Turnstile or Supabase Edge Functions
 
 const BAD_WORDS_PT = [
   'caralho', 'foda', 'merda', 'puta', 'crl', 'fodasse',
@@ -74,7 +80,8 @@ export function moderateMessage(content: string, locale: string = 'pt'): Moderat
   return { allowed: true };
 }
 
-// Rate limiting per user (simple in-memory)
+// Rate limiting per user (simple in-memory — UX helper, NOT real security)
+// ⚠️  Resets on page reload (F5). Real rate limit is enforced by RLS at DB level.
 const userMessageCounts: Record<string, { count: number; lastReset: number }> = {};
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const RATE_LIMIT_MAX = 5; // 5 messages per minute

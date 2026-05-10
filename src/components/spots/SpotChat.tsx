@@ -303,6 +303,9 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
             <Shield className="w-3 h-3" />
             {rateLimitWarning}
           </p>
+          <p className="text-xs text-yellow-300/60 mt-0.5">
+            {isPT ? 'Limite do cliente — o servidor impõe max 1 msg/10s por utilizador' : 'Client limit — server enforces max 1 msg/10s per user'}
+          </p>
         </div>
       )}
 
@@ -391,11 +394,16 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
       {/* Demo mode notice */}
       {!isSupabaseConfigured() && (
         <div className="px-4 pb-3">
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-2.5 text-xs text-yellow-300">
-            {isPT 
-              ? 'Modo demo — Conecta Supabase para chat real.'
-              : 'Demo mode — Connect Supabase for real chat.'
-            }
+          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-2.5">
+            <p className="text-xs text-yellow-300 font-medium">
+              {isPT ? 'Modo demo — Chat local (mensagens não persistem)' : 'Demo mode — Local chat (messages do not persist)'}
+            </p>
+            <p className="text-xs text-yellow-300/60 mt-1">
+              {isPT 
+                ? 'Conecta Supabase para chat real com rate-limiting e moderação automática.'
+                : 'Connect Supabase for real chat with rate-limiting and auto-moderation.'
+              }
+            </p>
           </div>
         </div>
       )}
