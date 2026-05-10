@@ -1,125 +1,137 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Spot } from '@/types';
-import { SportType, SPORT_LABELS } from '@/lib/sportRatings';
+import { SportType } from '@/lib/sportRatings';
 import SpotCard from './SpotCard';
-import { Filter, MapPin } from 'lucide-react';
+import { Filter, MapPin, Wind, Waves, Zap } from 'lucide-react';
 
 interface SpotGridProps {
   spots: Spot[];
   locale: string;
-  conditions?: Record<string, any>;
-  sportRatings?: Record<string, Record<string, any>>;
+  conditions?: Record<string, {
+    waveHeight: number;
+    wavePeriod: number;
+    windSpeed: number;
+    windDirection: number;
+    windGust: number;
+    waterTemp: number;
+  }>;
+  sportScores?: Record<string, Record<SportType, {
+    score: number;
+    rating: string;
+    ratingEn: string;
+    factors: string[];
+    primaryFactor: string;
+  }>>;
   selectedSport?: SportType | null;
 }
 
-type SportFilter = 'all' | 'surf' | 'kitesurf' | 'windsurf' | 'big-wave' | 'foil' | 'wakeboard';
-type RegionFilter = 'all' | 'norte' | 'centro' | 'lisboa' | 'oeste' | 'algarve' | 'alentejo' | 'acores' | 'madeira';
+const SPORTS: { id: SportType | 'all'; label: string; icon: React.ElementType; color: string }[] = [
+  { id: 'all', label: 'Todos', icon: Waves, color: 'text-white' },
+  { id: 'surf', label: 'Surf', icon: Waves, color: 'text-cyan-400' },
+  { id: 'kitesurf', label: 'Kitesurf', icon: Wind, color: 'text-sky-400' },
+  { id: 'windsurf', label: 'Windsurf', icon: Wind, color: 'text-blue-400' },
+  { id: 'bodyboard', label: 'Bodyboard', icon: Waves, color: 'text-teal-400' },
+  { id: 'sup', label: 'SUP', icon: Waves, color: 'text-emerald-400' },
+  { id: 'wakeboard', label: 'Wakeboard', icon: Zap, color: 'text-purple-400' },
+];
 
-export default function SpotGrid({ spots, locale, conditions = {}, sportRatings = {}, selectedSport }: SpotGridProps) {
-  const [sportFilter, setSportFilter] = useState<SportFilter>('all');
-  const [regionFilter, setRegionFilter] = useState<RegionFilter>('all');
+const REGIONS = ['Todos', 'Norte', 'Centro', 'Lisboa', 'Oeste', 'Algarve', 'Alentejo', 'Açores', 'Madeira'];
 
-  const filteredSpots = spots.filter(s => {
-    const sportMatch = sportFilter === 'all' 
-      ? true 
-      : s.type === sportFilter || (sportFilter === 'surf' && s.type === 'big-wave');
+export default function SpotGrid({ spots, locale, conditions = {}, sportScores = {}, selectedSport: initialSport }: SpotGridProps) {
+  const [selectedSport, setSelectedSport] = useState<SportType | 'all'>(initialSport || 'all');
+  const [selectedRegion, setSelectedRegion] = useState('Todos');
+
+  const isPt = locale === 'pt';
+
+  // Filter spots
+  const filteredSpots = useMemo(() => {
+    return spots.filter(spot => {
+      const sportMatch = selectedSport === 'all' || 
+        (sportScores[spot.id]?.[selectedSport]?.score || 0) > 0 ||
+        spot.compatibleSports?.includes(selectedSport);
+      
+      const regionMatch = selectedRegion === 'Todos' || spot.region === selectedRegion;
+      
+      return sportMatch && regionMatch;
+    });
+  }, [spots, selectedSport, selectedRegion, sportScores]);
+
+  // Sort by score for selected sport
+  const sortedSpots = useMemo(() => {
+    if (selectedSport === 'all') return filteredSpots;
     
-    const regionMatch = regionFilter === 'all'
-      ? true
-      : regionFilter === 'norte' 
-        ? ['Porto', 'Viana do Castelo', 'Braga', 'Caminha', 'Norte'].includes(s.region)
-        : regionFilter === 'centro'
-        ? ['Ericeira', 'Peniche', 'Aveiro', 'Oeste'].includes(s.region)
-        : regionFilter === 'lisboa'
-        ? ['Cascais', 'Almada', 'Sesimbra', 'Lisboa'].includes(s.region)
-        : regionFilter === 'oeste'
-        ? ['Nazaré', 'Oeste', 'Peniche'].includes(s.region)
-        : regionFilter === 'algarve'
-        ? s.region === 'Algarve' || ['Sagres', 'Portimão', 'Lagos', 'Faro', 'Tavira'].includes(s.region)
-        : regionFilter === 'alentejo'
-        ? s.region === 'Alentejo'
-        : regionFilter === 'acores'
-        ? ['São Miguel', 'Terceira', 'Faial', 'Santa Maria'].includes(s.region)
-        : regionFilter === 'madeira'
-        ? s.region === 'Madeira'
-        : true;
-    
-    return sportMatch && regionMatch;
-  });
-
-  const sportFilters: { value: SportFilter; label: string }[] = [
-    { value: 'all', label: locale === 'pt' ? 'Todos' : 'All' },
-    { value: 'surf', label: 'Surf' },
-    { value: 'kitesurf', label: 'Kitesurf' },
-    { value: 'windsurf', label: 'Windsurf' },
-    { value: 'big-wave', label: 'Big Wave' },
-    { value: 'foil', label: 'Foil' },
-    { value: 'wakeboard', label: 'Wakeboard' },
-  ];
-
-  const regionFilters: { value: RegionFilter; label: string }[] = [
-    { value: 'all', label: locale === 'pt' ? 'Todas' : 'All Regions' },
-    { value: 'norte', label: 'Norte' },
-    { value: 'centro', label: 'Centro' },
-    { value: 'lisboa', label: 'Lisboa' },
-    { value: 'oeste', label: 'Oeste' },
-    { value: 'algarve', label: 'Algarve' },
-    { value: 'alentejo', label: 'Alentejo' },
-    { value: 'acores', label: 'Açores' },
-    { value: 'madeira', label: 'Madeira' },
-  ];
+    return [...filteredSpots].sort((a, b) => {
+      const scoreA = sportScores[a.id]?.[selectedSport]?.score || 0;
+      const scoreB = sportScores[b.id]?.[selectedSport]?.score || 0;
+      return scoreB - scoreA;
+    });
+  }, [filteredSpots, selectedSport, sportScores]);
 
   return (
     <div className="space-y-6">
-      {/* Sport filters (only show if no selectedSport from URL) */}
-      {!selectedSport && (
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-          <Filter className="w-5 h-5 text-white/50 flex-shrink-0" />
-          {sportFilters.map((f) => (
+      {/* Sport filters */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+        <Filter className="w-4 h-4 text-white/40 shrink-0" />
+        {SPORTS.map((sport) => {
+          const Icon = sport.icon;
+          const isActive = selectedSport === sport.id;
+          return (
             <button
-              key={f.value}
-              onClick={() => setSportFilter(f.value)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                sportFilter === f.value
-                  ? 'bg-ocean-500 text-white shadow-lg shadow-ocean-500/25'
-                  : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+              key={sport.id}
+              onClick={() => setSelectedSport(sport.id as SportType | 'all')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                isActive 
+                  ? 'bg-white/15 text-white border border-white/20' 
+                  : 'bg-white/5 text-white/60 hover:bg-white/10 border border-transparent'
               }`}
             >
-              {f.label}
+              <Icon className={`w-3.5 h-3.5 ${isActive ? sport.color : 'text-white/40'}`} />
+              {sport.label}
             </button>
-          ))}
-        </div>
-      )}
-
-      {/* Region filters */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-        <MapPin className="w-5 h-5 text-white/50 flex-shrink-0" />
-        {regionFilters.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => setRegionFilter(f.value)}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-              regionFilter === f.value
-                ? 'bg-surf-500 text-white shadow-lg shadow-surf-500/25'
-                : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
+          );
+        })}
       </div>
 
+      {/* Region filters */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+        <MapPin className="w-4 h-4 text-white/40 shrink-0" />
+        {REGIONS.map((region) => {
+          const isActive = selectedRegion === region;
+          return (
+            <button
+              key={region}
+              onClick={() => setSelectedRegion(region)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                isActive 
+                  ? 'bg-white/15 text-white border border-white/20' 
+                  : 'bg-white/5 text-white/60 hover:bg-white/10 border border-transparent'
+              }`}
+            >
+              {region === 'Todos' ? (isPt ? 'Todos' : 'All') : region}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Results count */}
+      <div className="text-sm text-white/50">
+        {sortedSpots.length} {isPt ? 'spots encontrados' : 'spots found'}
+        {selectedSport !== 'all' && ` • ${SPORTS.find(s => s.id === selectedSport)?.label}`}
+        {selectedRegion !== 'Todos' && ` • ${selectedRegion}`}
+      </div>
+
+      {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredSpots.map((spot) => (
-          <SpotCard 
-            key={spot.id} 
-            spot={spot} 
-            locale={locale} 
+        {sortedSpots.map((spot) => (
+          <SpotCard
+            key={spot.id}
+            spot={spot}
+            locale={locale}
             conditions={conditions[spot.id]}
-            sportRatings={sportRatings[spot.id]}
-            selectedSport={selectedSport}
+            sportScore={selectedSport !== 'all' ? sportScores[spot.id]?.[selectedSport] : undefined}
+            selectedSport={selectedSport !== 'all' ? selectedSport : undefined}
           />
         ))}
       </div>

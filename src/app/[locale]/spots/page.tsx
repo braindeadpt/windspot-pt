@@ -1,6 +1,8 @@
 import { getTranslation } from '@/lib/i18n'
 import { spots } from '@/lib/spots'
 import { fetchMarineData, getCurrentConditions } from '@/lib/openmeteo'
+import { getAllSportScores } from '@/lib/sportScore'
+import type { SportType } from '@/lib/sportRatings'
 import SpotGrid from '@/components/spots/SpotGrid'
 import type { Metadata } from 'next'
 
@@ -16,26 +18,39 @@ export const metadata: Metadata = {
   },
 }
 
+interface Conditions {
+  waveHeight: number;
+  wavePeriod: number;
+  waveDirection: number;
+  windSpeed: number;
+  windDirection: number;
+  windGust: number;
+  waterTemp: number;
+}
 
 async function getAllConditions() {
-  const conditions: Record<string, any> = {}
+  const conditions: Record<string, Conditions> = {}
+  const sportScores: Record<string, Record<SportType, any>> = {}
+  
   await Promise.all(
     spots.map(async (spot) => {
       try {
         const data = await fetchMarineData(spot.lat, spot.lon)
-        conditions[spot.id] = getCurrentConditions(data)
+        const c = getCurrentConditions(data)
+        conditions[spot.id] = c
+        sportScores[spot.id] = getAllSportScores(spot, c)
       } catch (e) {
         console.error(`Failed to fetch conditions for ${spot.name}`, e)
       }
     })
   )
-  return conditions
+  return { conditions, sportScores }
 }
 
 export default async function SpotsPage({ params }: { params: { locale: string } }) {
   const { locale } = params
   const t = getTranslation(locale as any)
-  const conditions = await getAllConditions()
+  const { conditions, sportScores } = await getAllConditions()
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
@@ -45,7 +60,12 @@ export default async function SpotsPage({ params }: { params: { locale: string }
           {locale === 'pt' ? `${spots.length} spots em Portugal com dados em tempo real` : `${spots.length} spots in Portugal with real-time data`}
         </p>
       </div>
-      <SpotGrid spots={spots} locale={locale} conditions={conditions} />
+      <SpotGrid 
+        spots={spots} 
+        locale={locale} 
+        conditions={conditions} 
+        sportScores={sportScores}
+      />
     </div>
   )
 }
