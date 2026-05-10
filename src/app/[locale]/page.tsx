@@ -380,6 +380,46 @@ export default function HomePage({ params }: { params: { locale: string } }) {
     async function loadData() {
       const results: SpotData[] = [];
       
+      // Try pre-computed conditions first (1 request vs 81)
+      try {
+        const response = await fetch('/data/conditions.json', { 
+          cache: 'no-store',
+          next: { revalidate: 0 } as any
+        });
+        if (response.ok) {
+          const precomputed = await response.json();
+          
+          // Check if data exists and is not empty
+          if (precomputed && Object.keys(precomputed).length > 0) {
+            for (const spot of spots) {
+              const cond = precomputed[spot.id];
+              if (cond) {
+                const conditions = {
+                  waveHeight: cond.waveHeight || 0,
+                  wavePeriod: cond.wavePeriod || 0,
+                  waveDirection: cond.waveDirection || 0,
+                  windSpeed: cond.windSpeed || 0,
+                  windDirection: cond.windDirection || 0,
+                  windGust: cond.windGust || 0,
+                  waterTemp: cond.waterTemp || 0,
+                };
+                const allScores = getAllSportScores(spot, conditions);
+                results.push({ spot, conditions, allScores });
+              }
+            }
+            
+            if (results.length > 0) {
+              setSpotsData(results);
+              setLoading(false);
+              return; // Success! No need for live fetch
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Precomputed conditions not available, falling back to live fetch');
+      }
+      
+      // Fallback: live fetch (81 requests - slow!)
       await Promise.all(
         spots.map(async (spot) => {
           try {

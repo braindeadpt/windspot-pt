@@ -1,13 +1,15 @@
 /**
  * WindSpot - Update Conditions Script
- * Fetches marine data from Open-Meteo for all spots
- * AUTO-GENERATED from src/lib/spots.ts — 79 spots
+ * Fetches marine + weather data from Open-Meteo for all spots
+ * Marine API: waves, sea temp
+ * Weather API: wind, gusts
  */
 
 const fs = require('fs');
 const path = require('path');
 
 const MARINE_API = 'https://marine-api.open-meteo.com/v1/marine';
+const WEATHER_API = 'https://api.open-meteo.com/v1/forecast';
 
 const spots = [
   { id: 'matosinhos', lat: 41.177, lon: -8.692 },
@@ -91,36 +93,54 @@ const spots = [
   { id: 'paul-mar', lat: 32.760, lon: -17.225 },
 ];
 
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function fetchMarineData(lat, lon) {
   const params = new URLSearchParams({
     latitude: lat.toString(),
     longitude: lon.toString(),
-    hourly: 'wave_height,wave_direction,wave_period,wind_speed_10m,wind_direction_10m,wind_gusts_10m,water_temperature',
-    daily: 'wave_height_max,wind_speed_max,water_temperature_max',
-    models: 'meteofrance_wave,ecmwf_wam025,gfs_wave',
+    hourly: 'wave_height,wave_direction,wave_period,sea_surface_temperature',
     timezone: 'Europe/Lisbon',
-    forecast_days: '7',
-    wind_speed_unit: 'ms',
+    forecast_days: '2',
   });
 
   const response = await fetch(`${MARINE_API}?${params}`);
-  if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+  if (!response.ok) throw new Error(`Marine API failed: ${response.status}`);
   return response.json();
 }
 
-function getCurrentConditions(data) {
+async function fetchWeatherData(lat, lon) {
+  const params = new URLSearchParams({
+    latitude: lat.toString(),
+    longitude: lon.toString(),
+    hourly: 'wind_speed_10m,wind_direction_10m,wind_gusts_10m',
+    timezone: 'Europe/Lisbon',
+    forecast_days: '2',
+    wind_speed_unit: 'ms',
+  });
+
+  const response = await fetch(`${WEATHER_API}?${params}`);
+  if (!response.ok) throw new Error(`Weather API failed: ${response.status}`);
+  return response.json();
+}
+
+function getCurrentConditions(marineData, weatherData) {
   const now = new Date();
   const currentHour = now.getHours();
-  const timeIndex = data.hourly.time.findIndex(t => new Date(t).getHours() === currentHour) || 0;
+  
+  const marineTimeIndex = marineData.hourly.time.findIndex(t => new Date(t).getHours() === currentHour) || 0;
+  const weatherTimeIndex = weatherData.hourly.time.findIndex(t => new Date(t).getHours() === currentHour) || 0;
 
   return {
-    waveHeight: data.hourly.wave_height[timeIndex] || 0,
-    wavePeriod: data.hourly.wave_period[timeIndex] || 0,
-    waveDirection: data.hourly.wave_direction[timeIndex] || 0,
-    windSpeed: data.hourly.wind_speed_10m[timeIndex] || 0,
-    windDirection: data.hourly.wind_direction_10m[timeIndex] || 0,
-    windGust: data.hourly.wind_gusts_10m[timeIndex] || 0,
-    waterTemp: data.hourly.water_temperature[timeIndex] || 0,
+    waveHeight: marineData.hourly.wave_height[marineTimeIndex] || 0,
+    wavePeriod: marineData.hourly.wave_period[marineTimeIndex] || 0,
+    waveDirection: marineData.hourly.wave_direction[marineTimeIndex] || 0,
+    windSpeed: weatherData.hourly.wind_speed_10m[weatherTimeIndex] || 0,
+    windDirection: weatherData.hourly.wind_direction_10m[weatherTimeIndex] || 0,
+    windGust: weatherData.hourly.wind_gusts_10m[weatherTimeIndex] || 0,
+    waterTemp: marineData.hourly.sea_surface_temperature[marineTimeIndex] || 0,
   };
 }
 
@@ -131,12 +151,22 @@ async function updateConditions() {
   for (const spot of spots) {
     try {
       console.log(`  Fetching ${spot.id}...`);
-      const data = await fetchMarineData(spot.lat, spot.lon);
+      
+      // Fetch both APIs in parallel
+      const [marineData, weatherData] = await Promise.all([
+        fetchMarineData(spot.lat, spot.lon),
+        fetchWeatherData(spot.lat, spot.lon),
+      ]);
+      
       allConditions[spot.id] = {
-        ...getCurrentConditions(data),
+        ...getCurrentConditions(marineData, weatherData),
         updatedAt: new Date().toISOString(),
       };
+      
       console.log(`  ✓ ${spot.id} updated`);
+      
+      // Rate limiting: wait 100ms between spots
+      await sleep(100);
     } catch (error) {
       console.error(`  ✗ ${spot.id} failed:`, error.message);
     }

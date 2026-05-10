@@ -1,1 +1,712 @@
-{}
+{
+  "ofir": {
+    "waveHeight": 1.9,
+    "wavePeriod": 7.25,
+    "waveDirection": 226,
+    "windSpeed": 3.38,
+    "windDirection": 146,
+    "windGust": 7.8,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:49.839Z"
+  },
+  "povoa-varzim": {
+    "waveHeight": 2.08,
+    "wavePeriod": 7.25,
+    "waveDirection": 230,
+    "windSpeed": 4.52,
+    "windDirection": 155,
+    "windGust": 8.9,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:50.196Z"
+  },
+  "cabedelo": {
+    "waveHeight": 1.7,
+    "wavePeriod": 7.4,
+    "waveDirection": 228,
+    "windSpeed": 4.36,
+    "windDirection": 148,
+    "windGust": 9.5,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:50:50.554Z"
+  },
+  "esposende": {
+    "waveHeight": 1.9,
+    "wavePeriod": 7.25,
+    "waveDirection": 226,
+    "windSpeed": 3.38,
+    "windDirection": 146,
+    "windGust": 7.8,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:50.911Z"
+  },
+  "moledo": {
+    "waveHeight": 1.88,
+    "wavePeriod": 7.6,
+    "waveDirection": 231,
+    "windSpeed": 3.96,
+    "windDirection": 164,
+    "windGust": 9.9,
+    "waterTemp": 15.5,
+    "updatedAt": "2026-05-10T21:51:15.846Z"
+  },
+  "afife": {
+    "waveHeight": 1.84,
+    "wavePeriod": 7.55,
+    "waveDirection": 231,
+    "windSpeed": 5.95,
+    "windDirection": 155,
+    "windGust": 18.2,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:50:51.624Z"
+  },
+  "vila-praia-ancora": {
+    "waveHeight": 1.84,
+    "wavePeriod": 7.55,
+    "waveDirection": 231,
+    "windSpeed": 4.88,
+    "windDirection": 154,
+    "windGust": 16,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:50:51.980Z"
+  },
+  "castelo-neiva": {
+    "waveHeight": 1.66,
+    "wavePeriod": 7.6,
+    "waveDirection": 235,
+    "windSpeed": 3,
+    "windDirection": 154,
+    "windGust": 18.2,
+    "waterTemp": 15.9,
+    "updatedAt": "2026-05-10T21:50:52.336Z"
+  },
+  "amorosa": {
+    "waveHeight": 1.7,
+    "wavePeriod": 7.4,
+    "waveDirection": 228,
+    "windSpeed": 4.36,
+    "windDirection": 148,
+    "windGust": 9.5,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:50:52.692Z"
+  },
+  "apulia": {
+    "waveHeight": 2,
+    "wavePeriod": 7.2,
+    "waveDirection": 229,
+    "windSpeed": 3.38,
+    "windDirection": 146,
+    "windGust": 7.8,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:53.047Z"
+  },
+  "fao": {
+    "waveHeight": 1.9,
+    "wavePeriod": 7.25,
+    "waveDirection": 226,
+    "windSpeed": 3.38,
+    "windDirection": 146,
+    "windGust": 7.8,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:53.403Z"
+  },
+  "espinho": {
+    "waveHeight": 1.62,
+    "wavePeriod": 7.9,
+    "waveDirection": 243,
+    "windSpeed": 4.37,
+    "windDirection": 160,
+    "windGust": 9.9,
+    "waterTemp": 16.5,
+    "updatedAt": "2026-05-10T21:50:53.759Z"
+  },
+  "esmoriz": {
+    "waveHeight": 1.62,
+    "wavePeriod": 7.9,
+    "waveDirection": 243,
+    "windSpeed": 3.85,
+    "windDirection": 152,
+    "windGust": 9.8,
+    "waterTemp": 16.8,
+    "updatedAt": "2026-05-10T21:50:54.115Z"
+  },
+  "cortegaca": {
+    "waveHeight": 1.8,
+    "wavePeriod": 7.7,
+    "waveDirection": 240,
+    "windSpeed": 3.85,
+    "windDirection": 152,
+    "windGust": 9.8,
+    "waterTemp": 16.8,
+    "updatedAt": "2026-05-10T21:50:54.471Z"
+  },
+  "azurara": {
+    "waveHeight": 2.08,
+    "wavePeriod": 7.25,
+    "waveDirection": 230,
+    "windSpeed": 4.52,
+    "windDirection": 155,
+    "windGust": 8.9,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:54.856Z"
+  },
+  "leca-palmeira": {
+    "waveHeight": 1.88,
+    "wavePeriod": 7.45,
+    "waveDirection": 232,
+    "windSpeed": 4.21,
+    "windDirection": 162,
+    "windGust": 9.4,
+    "waterTemp": 16,
+    "updatedAt": "2026-05-10T21:50:55.212Z"
+  },
+  "maceda": {
+    "waveHeight": 1.8,
+    "wavePeriod": 7.7,
+    "waveDirection": 240,
+    "windSpeed": 3.85,
+    "windDirection": 152,
+    "windGust": 9.8,
+    "waterTemp": 16.8,
+    "updatedAt": "2026-05-10T21:50:55.568Z"
+  },
+  "sao-jacinto": {
+    "waveHeight": 1.88,
+    "wavePeriod": 7.85,
+    "waveDirection": 243,
+    "windSpeed": 3.58,
+    "windDirection": 153,
+    "windGust": 8.1,
+    "waterTemp": 16.7,
+    "updatedAt": "2026-05-10T21:50:55.924Z"
+  },
+  "coxos": {
+    "waveHeight": 3.02,
+    "wavePeriod": 8.45,
+    "waveDirection": 250,
+    "windSpeed": 4.37,
+    "windDirection": 200,
+    "windGust": 12.6,
+    "waterTemp": 15.9,
+    "updatedAt": "2026-05-10T21:50:56.280Z"
+  },
+  "foz-lizandro": {
+    "waveHeight": 3.02,
+    "wavePeriod": 8.45,
+    "waveDirection": 250,
+    "windSpeed": 4.66,
+    "windDirection": 203,
+    "windGust": 13,
+    "waterTemp": 15.9,
+    "updatedAt": "2026-05-10T21:50:56.634Z"
+  },
+  "baleal": {
+    "waveHeight": 2.6,
+    "wavePeriod": 8.35,
+    "waveDirection": 250,
+    "windSpeed": 6.48,
+    "windDirection": 197,
+    "windGust": 12.8,
+    "waterTemp": 15.9,
+    "updatedAt": "2026-05-10T21:50:56.990Z"
+  },
+  "carcavelos": {
+    "waveHeight": 2.98,
+    "wavePeriod": 8.15,
+    "waveDirection": 240,
+    "windSpeed": 5.59,
+    "windDirection": 224,
+    "windGust": 13.2,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:50:57.345Z"
+  },
+  "costa-caparica": {
+    "waveHeight": 2.84,
+    "wavePeriod": 8.1,
+    "waveDirection": 242,
+    "windSpeed": 4.6,
+    "windDirection": 222,
+    "windGust": 14.8,
+    "waterTemp": 15.9,
+    "updatedAt": "2026-05-10T21:50:57.701Z"
+  },
+  "fonte-telha": {
+    "waveHeight": 2.98,
+    "wavePeriod": 8.1,
+    "waveDirection": 244,
+    "windSpeed": 5.54,
+    "windDirection": 219,
+    "windGust": 14,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:58.056Z"
+  },
+  "lagoa-albufeira": {
+    "waveHeight": 2.98,
+    "wavePeriod": 8.1,
+    "waveDirection": 244,
+    "windSpeed": 5.25,
+    "windDirection": 220,
+    "windGust": 13.1,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:50:58.411Z"
+  },
+  "costa-nova": {
+    "waveHeight": 1.84,
+    "wavePeriod": 8,
+    "waveDirection": 246,
+    "windSpeed": 3.92,
+    "windDirection": 161,
+    "windGust": 8.4,
+    "waterTemp": 16.6,
+    "updatedAt": "2026-05-10T21:50:58.767Z"
+  },
+  "nazare": {
+    "waveHeight": 2.34,
+    "wavePeriod": 8.75,
+    "waveDirection": 256,
+    "windSpeed": 4.47,
+    "windDirection": 190,
+    "windGust": 11.2,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:59.123Z"
+  },
+  "supertubos": {
+    "waveHeight": 2.6,
+    "wavePeriod": 8.35,
+    "waveDirection": 250,
+    "windSpeed": 6.48,
+    "windDirection": 197,
+    "windGust": 12.8,
+    "waterTemp": 15.9,
+    "updatedAt": "2026-05-10T21:50:59.479Z"
+  },
+  "guincho": {
+    "waveHeight": 3.16,
+    "wavePeriod": 8.25,
+    "waveDirection": 244,
+    "windSpeed": 5.19,
+    "windDirection": 214,
+    "windGust": 13.1,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:50:59.834Z"
+  },
+  "foz-arelho": {
+    "waveHeight": 2.46,
+    "wavePeriod": 8.6,
+    "waveDirection": 260,
+    "windSpeed": 4.34,
+    "windDirection": 195,
+    "windGust": 10.2,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:51:00.190Z"
+  },
+  "arrifana": {
+    "waveHeight": 2.78,
+    "wavePeriod": 8.4,
+    "waveDirection": 258,
+    "windSpeed": 4.13,
+    "windDirection": 212,
+    "windGust": 12.2,
+    "waterTemp": 16.3,
+    "updatedAt": "2026-05-10T21:51:00.548Z"
+  },
+  "alvor": {
+    "waveHeight": 1.62,
+    "wavePeriod": 6.65,
+    "waveDirection": 218,
+    "windSpeed": 4.42,
+    "windDirection": 218,
+    "windGust": 7.6,
+    "waterTemp": 16.1,
+    "updatedAt": "2026-05-10T21:51:00.904Z"
+  },
+  "tonel": {
+    "waveHeight": 2.94,
+    "wavePeriod": 8.15,
+    "waveDirection": 253,
+    "windSpeed": 6.01,
+    "windDirection": 227,
+    "windGust": 13.3,
+    "waterTemp": 16.5,
+    "updatedAt": "2026-05-10T21:51:01.259Z"
+  },
+  "beliche": {
+    "waveHeight": 2.94,
+    "wavePeriod": 8.15,
+    "waveDirection": 253,
+    "windSpeed": 6.01,
+    "windDirection": 227,
+    "windGust": 13.3,
+    "waterTemp": 16.5,
+    "updatedAt": "2026-05-10T21:51:01.615Z"
+  },
+  "zavial": {
+    "waveHeight": 2.94,
+    "wavePeriod": 8.15,
+    "waveDirection": 253,
+    "windSpeed": 6.01,
+    "windDirection": 227,
+    "windGust": 13.3,
+    "waterTemp": 16.5,
+    "updatedAt": "2026-05-10T21:51:01.969Z"
+  },
+  "martinhal": {
+    "waveHeight": 2.94,
+    "wavePeriod": 8.15,
+    "waveDirection": 253,
+    "windSpeed": 6.01,
+    "windDirection": 227,
+    "windGust": 13.3,
+    "waterTemp": 16.5,
+    "updatedAt": "2026-05-10T21:51:02.326Z"
+  },
+  "praia-rocha": {
+    "waveHeight": 1.66,
+    "wavePeriod": 6.7,
+    "waveDirection": 219,
+    "windSpeed": 4.12,
+    "windDirection": 219,
+    "windGust": 8.9,
+    "waterTemp": 16.1,
+    "updatedAt": "2026-05-10T21:51:02.681Z"
+  },
+  "carrapateira": {
+    "waveHeight": 2.54,
+    "wavePeriod": 8.3,
+    "waveDirection": 261,
+    "windSpeed": 4.02,
+    "windDirection": 215,
+    "windGust": 10.9,
+    "waterTemp": 16.1,
+    "updatedAt": "2026-05-10T21:51:03.036Z"
+  },
+  "praia-norte": {
+    "waveHeight": 2.34,
+    "wavePeriod": 8.75,
+    "waveDirection": 256,
+    "windSpeed": 4.47,
+    "windDirection": 190,
+    "windGust": 11.2,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:51:03.392Z"
+  },
+  "lagos": {
+    "waveHeight": 1.62,
+    "wavePeriod": 6.65,
+    "waveDirection": 218,
+    "windSpeed": 4.42,
+    "windDirection": 218,
+    "windGust": 7.6,
+    "waterTemp": 16.1,
+    "updatedAt": "2026-05-10T21:51:03.747Z"
+  },
+  "santa-barbara": {
+    "waveHeight": 2.6,
+    "wavePeriod": 9.4,
+    "waveDirection": 351,
+    "windSpeed": 7.1,
+    "windDirection": 358,
+    "windGust": 17.4,
+    "waterTemp": 16.2,
+    "updatedAt": "2026-05-10T21:51:04.101Z"
+  },
+  "monte-verde": {
+    "waveHeight": 1.48,
+    "wavePeriod": 8.1,
+    "waveDirection": 328,
+    "windSpeed": 5.76,
+    "windDirection": 356,
+    "windGust": 11.2,
+    "waterTemp": 16.2,
+    "updatedAt": "2026-05-10T21:51:04.457Z"
+  },
+  "mosteiros": {
+    "waveHeight": 2.96,
+    "wavePeriod": 9.55,
+    "waveDirection": 351,
+    "windSpeed": 7.8,
+    "windDirection": 2,
+    "windGust": 16.3,
+    "waterTemp": 15.9,
+    "updatedAt": "2026-05-10T21:51:04.815Z"
+  },
+  "milicias": {
+    "waveHeight": 1.48,
+    "wavePeriod": 8.1,
+    "waveDirection": 328,
+    "windSpeed": 5.76,
+    "windDirection": 356,
+    "windGust": 11.2,
+    "waterTemp": 16.3,
+    "updatedAt": "2026-05-10T21:51:05.171Z"
+  },
+  "praia-vitoria": {
+    "waveHeight": 2.54,
+    "wavePeriod": 8.85,
+    "waveDirection": 20,
+    "windSpeed": 6.55,
+    "windDirection": 10,
+    "windGust": 13,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:51:05.527Z"
+  },
+  "santa-catarina-terceira": {
+    "waveHeight": 2.14,
+    "wavePeriod": 8.9,
+    "waveDirection": 8,
+    "windSpeed": 3.2,
+    "windDirection": 10,
+    "windGust": 8.4,
+    "waterTemp": 15.9,
+    "updatedAt": "2026-05-10T21:51:05.883Z"
+  },
+  "almoxarife": {
+    "waveHeight": 1.66,
+    "wavePeriod": 8.75,
+    "waveDirection": 0,
+    "windSpeed": 8.38,
+    "windDirection": 23,
+    "windGust": 11.3,
+    "waterTemp": 16.1,
+    "updatedAt": "2026-05-10T21:51:06.238Z"
+  },
+  "anjos": {
+    "waveHeight": 2.56,
+    "wavePeriod": 8.95,
+    "waveDirection": 353,
+    "windSpeed": 9.15,
+    "windDirection": 338,
+    "windGust": 11.7,
+    "waterTemp": 16.5,
+    "updatedAt": "2026-05-10T21:51:06.593Z"
+  },
+  "porto-da-cruz": {
+    "waveHeight": 1.38,
+    "wavePeriod": 9.15,
+    "waveDirection": 331,
+    "windSpeed": 0.22,
+    "windDirection": 27,
+    "windGust": 2.7,
+    "waterTemp": 18,
+    "updatedAt": "2026-05-10T21:51:06.949Z"
+  },
+  "jardim-mar": {
+    "waveHeight": 2.46,
+    "wavePeriod": 9.35,
+    "waveDirection": 313,
+    "windSpeed": 2.82,
+    "windDirection": 293,
+    "windGust": 10.6,
+    "waterTemp": 18,
+    "updatedAt": "2026-05-10T21:51:16.914Z"
+  },
+  "paul-mar": {
+    "waveHeight": 2.54,
+    "wavePeriod": 9.45,
+    "waveDirection": 314,
+    "windSpeed": 3.26,
+    "windDirection": 259,
+    "windGust": 11.9,
+    "waterTemp": 18,
+    "updatedAt": "2026-05-10T21:51:17.269Z"
+  },
+  "ponta-sao-lourenco": {
+    "waveHeight": 1.04,
+    "wavePeriod": 8.35,
+    "waveDirection": 300,
+    "windSpeed": 1.53,
+    "windDirection": 328,
+    "windGust": 2.3,
+    "waterTemp": 18.2,
+    "updatedAt": "2026-05-10T21:51:08.015Z"
+  },
+  "funchal": {
+    "waveHeight": 1.76,
+    "wavePeriod": 8.6,
+    "waveDirection": 288,
+    "windSpeed": 2.06,
+    "windDirection": 293,
+    "windGust": 5.9,
+    "waterTemp": 17.9,
+    "updatedAt": "2026-05-10T21:51:08.371Z"
+  },
+  "ribeira-brava": {
+    "waveHeight": 1.68,
+    "wavePeriod": 8.8,
+    "waveDirection": 291,
+    "windSpeed": 2.73,
+    "windDirection": 298,
+    "windGust": 8.5,
+    "waterTemp": 17.9,
+    "updatedAt": "2026-05-10T21:51:08.726Z"
+  },
+  "sao-vicente-madeira": {
+    "waveHeight": 1.68,
+    "wavePeriod": 8.8,
+    "waveDirection": 291,
+    "windSpeed": 1.3,
+    "windDirection": 238,
+    "windGust": 3.9,
+    "waterTemp": 17.9,
+    "updatedAt": "2026-05-10T21:51:09.081Z"
+  },
+  "vila-nova-milfontes": {
+    "waveHeight": 2.88,
+    "wavePeriod": 8.25,
+    "waveDirection": 253,
+    "windSpeed": 8.1,
+    "windDirection": 213,
+    "windGust": 14.8,
+    "waterTemp": 16.4,
+    "updatedAt": "2026-05-10T21:51:09.440Z"
+  },
+  "zambujeira": {
+    "waveHeight": 2.76,
+    "wavePeriod": 8.35,
+    "waveDirection": 259,
+    "windSpeed": 5.36,
+    "windDirection": 217,
+    "windGust": 13.4,
+    "waterTemp": 16.4,
+    "updatedAt": "2026-05-10T21:51:14.071Z"
+  },
+  "porto-covo": {
+    "waveHeight": 2.86,
+    "wavePeriod": 8.25,
+    "waveDirection": 254,
+    "windSpeed": 5.41,
+    "windDirection": 214,
+    "windGust": 13.6,
+    "waterTemp": 16.2,
+    "updatedAt": "2026-05-10T21:51:15.136Z"
+  },
+  "odeceixe": {
+    "waveHeight": 2.76,
+    "wavePeriod": 8.35,
+    "waveDirection": 259,
+    "windSpeed": 5.67,
+    "windDirection": 221,
+    "windGust": 12.3,
+    "waterTemp": 16.4,
+    "updatedAt": "2026-05-10T21:51:14.426Z"
+  },
+  "sao-torpes": {
+    "waveHeight": 2.94,
+    "wavePeriod": 8.15,
+    "waveDirection": 249,
+    "windSpeed": 5.63,
+    "windDirection": 213,
+    "windGust": 13,
+    "waterTemp": 16.1,
+    "updatedAt": "2026-05-10T21:51:14.780Z"
+  },
+  "malhao": {
+    "waveHeight": 2.86,
+    "wavePeriod": 8.25,
+    "waveDirection": 254,
+    "windSpeed": 5.69,
+    "windDirection": 214,
+    "windGust": 12.8,
+    "waterTemp": 16.3,
+    "updatedAt": "2026-05-10T21:51:11.223Z"
+  },
+  "foil-lagoa-albufeira": {
+    "waveHeight": 2.98,
+    "wavePeriod": 8.1,
+    "waveDirection": 244,
+    "windSpeed": 5.25,
+    "windDirection": 220,
+    "windGust": 13.1,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:51:11.581Z"
+  },
+  "foil-foz-arelho": {
+    "waveHeight": 2.46,
+    "wavePeriod": 8.6,
+    "waveDirection": 260,
+    "windSpeed": 4.34,
+    "windDirection": 195,
+    "windGust": 10.2,
+    "waterTemp": 15.8,
+    "updatedAt": "2026-05-10T21:51:11.936Z"
+  },
+  "foil-alvor": {
+    "waveHeight": 1.62,
+    "wavePeriod": 6.65,
+    "waveDirection": 218,
+    "windSpeed": 4.42,
+    "windDirection": 218,
+    "windGust": 7.6,
+    "waterTemp": 16.1,
+    "updatedAt": "2026-05-10T21:51:12.292Z"
+  },
+  "foil-cabedelo": {
+    "waveHeight": 1.7,
+    "wavePeriod": 7.4,
+    "waveDirection": 228,
+    "windSpeed": 4.36,
+    "windDirection": 148,
+    "windGust": 9.5,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:51:12.646Z"
+  },
+  "castelo-bode": {
+    "waveHeight": 0,
+    "wavePeriod": 0,
+    "waveDirection": 0,
+    "windSpeed": 3.44,
+    "windDirection": 188,
+    "windGust": 10,
+    "waterTemp": 0,
+    "updatedAt": "2026-05-10T21:51:13.004Z"
+  },
+  "alqueva": {
+    "waveHeight": 0,
+    "wavePeriod": 0,
+    "waveDirection": 0,
+    "windSpeed": 3.24,
+    "windDirection": 189,
+    "windGust": 6.1,
+    "waterTemp": 0,
+    "updatedAt": "2026-05-10T21:51:13.361Z"
+  },
+  "lagos-wakepark": {
+    "waveHeight": 1.66,
+    "wavePeriod": 6.7,
+    "waveDirection": 226,
+    "windSpeed": 4.11,
+    "windDirection": 221,
+    "windGust": 7.8,
+    "waterTemp": 16,
+    "updatedAt": "2026-05-10T21:51:13.716Z"
+  },
+  "vilanova-milfontes": {
+    "waveHeight": 2.88,
+    "wavePeriod": 8.25,
+    "waveDirection": 253,
+    "windSpeed": 8.1,
+    "windDirection": 213,
+    "windGust": 14.8,
+    "waterTemp": 16.4,
+    "updatedAt": "2026-05-10T21:51:15.492Z"
+  },
+  "ancora": {
+    "waveHeight": 1.84,
+    "wavePeriod": 7.55,
+    "waveDirection": 231,
+    "windSpeed": 3.96,
+    "windDirection": 164,
+    "windGust": 9.9,
+    "waterTemp": 15.6,
+    "updatedAt": "2026-05-10T21:51:16.204Z"
+  },
+  "ponta-delgada": {
+    "waveHeight": 1.98,
+    "wavePeriod": 8.7,
+    "waveDirection": 346,
+    "windSpeed": 5.76,
+    "windDirection": 356,
+    "windGust": 11.2,
+    "waterTemp": 16.2,
+    "updatedAt": "2026-05-10T21:51:16.560Z"
+  }
+}
