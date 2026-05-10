@@ -69,9 +69,9 @@ export default function LocaleLayout({
   return (
     <html lang={locale} className="dark">
       <body className="min-h-screen bg-ocean-950">
-        <Header locale={locale} />
+        {/* Header removed for hydration debug */}
         <main className="pt-16">{children}</main>
-        <Footer locale={locale} />
+        {/* Footer removed for hydration debug */}
       </body>
     </html>
   )
