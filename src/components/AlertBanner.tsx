@@ -1,0 +1,168 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Bell, BellOff, Wind, Waves, X } from 'lucide-react';
+
+interface AlertConfig {
+  spotId: string;
+  spotName: string;
+  minScore: number;
+  enabled: boolean;
+}
+
+export function useAlerts() {
+  const [alerts, setAlerts] = useState<AlertConfig[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('windspot-alerts');
+        if (stored) {
+          setAlerts(JSON.parse(stored));
+        }
+      } catch {
+        // ignore
+      }
+      setLoaded(true);
+    }
+  }, []);
+
+  const toggleAlert = (spotId: string, spotName: string) => {
+    setAlerts(prev => {
+      const exists = prev.find(a => a.spotId === spotId);
+      let next;
+      if (exists) {
+        next = prev.filter(a => a.spotId !== spotId);
+      } else {
+        next = [...prev, { spotId, spotName, minScore: 70, enabled: true }];
+      }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('windspot-alerts', JSON.stringify(next));
+      }
+      return next;
+    });
+  };
+
+  const isAlertSet = (spotId: string) => {
+    return alerts.some(a => a.spotId === spotId && a.enabled);
+  };
+
+  return { alerts, toggleAlert, isAlertSet, loaded, count: alerts.length };
+}
+
+interface AlertButtonProps {
+  spotId: string;
+  spotName: string;
+  locale?: string;
+}
+
+export function AlertButton({ spotId, spotName, locale = 'pt' }: AlertButtonProps) {
+  const { isAlertSet, toggleAlert, loaded } = useAlerts();
+  const active = isAlertSet(spotId);
+  const isPt = locale === 'pt';
+
+  if (!loaded) {
+    return <div className="w-5 h-5 animate-pulse bg-white/10 rounded" />;
+  }
+
+  return (
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleAlert(spotId, spotName);
+      }}
+      className={`flex items-center gap-1.5 transition-all hover:scale-110 ${
+        active ? 'text-yellow-400' : 'text-white/40 hover:text-white/70'
+      }`}
+      title={
+        active
+          ? isPt ? `Alerta ativo para ${spotName}` : `Alert active for ${spotName}`
+          : isPt ? `Criar alerta para ${spotName}` : `Create alert for ${spotName}`
+      }
+    >
+      {active ? <Bell className="w-5 h-5 fill-current" /> : <BellOff className="w-5 h-5" />}
+    </button>
+  );
+}
+
+interface ActiveAlert {
+  spotName: string;
+  spotSlug: string;
+  score: number;
+  reason: string;
+}
+
+export function AlertBanner({ locale }: { locale: string }) {
+  const isPt = locale === 'pt';
+  const [activeAlerts, setActiveAlerts] = useState<ActiveAlert[]>([]);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    const checkAlerts = async () => {
+      try {
+        const stored = localStorage.getItem('windspot-alerts');
+        if (!stored) return;
+        
+        const alerts: AlertConfig[] = JSON.parse(stored);
+        if (!alerts.length) return;
+
+        // This is simplified - in real implementation we'd fetch conditions
+        // For now, show demo alerts
+        const demoAlerts: ActiveAlert[] = alerts.slice(0, 2).map((a, i) => ({
+          spotName: a.spotName,
+          spotSlug: a.spotId,
+          score: 75 + i * 8,
+          reason: i === 0 
+            ? (isPt ? 'Ondas boas + offshore' : 'Good waves + offshore')
+            : (isPt ? 'Vento ideal para kite' : 'Ideal wind for kite'),
+        }));
+
+        setActiveAlerts(demoAlerts);
+      } catch {
+        // ignore
+      }
+    };
+
+    checkAlerts();
+  }, [isPt]);
+
+  if (dismissed || !activeAlerts.length) return null;
+
+  return (
+    <div className="glass-card p-4 border-l-4 border-l-yellow-400 bg-yellow-500/5">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-yellow-500/10">
+            <Bell className="w-5 h-5 text-yellow-400 fill-current" />
+          </div>
+          <div>
+            <h4 className="font-bold text-white">
+              {isPt ? '🔔 Alertas Ativos' : '🔔 Active Alerts'}
+            </h4>
+            <div className="space-y-1 mt-1">
+              {activeAlerts.map((alert, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <span className="text-white/80">{alert.spotName}</span>
+                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                    alert.score >= 80 ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {alert.score}/100
+                  </span>
+                  <span className="text-white/50">{alert.reason}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <button 
+          onClick={() => setDismissed(true)}
+          className="text-white/40 hover:text-white/70 transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -1,4 +1,5 @@
 import DawnPatrolBanner from '@/components/DawnPatrolBanner'
+import { AlertBanner } from '@/components/AlertBanner'
 import { getTranslation } from '@/lib/i18n'
 import { spots } from '@/lib/spots'
 import { fetchMarineData, getCurrentConditions, getForecastData } from '@/lib/openmeteo'
@@ -165,6 +166,11 @@ export default async function HomePage({ params }: { params: { locale: string } 
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ALERTS BANNER */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <AlertBanner locale={locale} />
       </section>
 
       {/* DAWN PATROL AI ADVISOR */}

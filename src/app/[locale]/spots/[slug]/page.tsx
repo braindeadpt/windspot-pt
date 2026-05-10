@@ -14,6 +14,9 @@ import { WaterQualityBadge } from '@/components/spots/WaterQualityBadge'
 import { SessionForecastChart } from '@/components/spots/SessionForecastChart'
 import SpotChat from '@/components/spots/SpotChat'
 import MagicWindows from '@/components/MagicWindows'
+import SwellDetective from '@/components/SwellDetective'
+import FavoriteButton from '@/components/FavoriteButton'
+import { AlertButton } from '@/components/AlertBanner'
 import { MapPin, Star, ArrowLeft, CheckCircle, AlertTriangle, Zap, Users, CloudRain, Sun, Droplets } from 'lucide-react'
 import Link from 'next/link'
 
@@ -145,6 +148,8 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-4xl md:text-5xl font-bold text-white/90">{isPt ? spot.name : spot.nameEn}</h1>
+              <FavoriteButton spotId={spot.id} spotName={spot.name} size="lg" showLabel={false} locale={locale} />
+              <AlertButton spotId={spot.id} spotName={spot.name} locale={locale} />
               <span className={`px-3 py-1 rounded-full text-sm font-medium border ${waveRating.className}`}>
                 {spot.type === 'big-wave' ? 'Big Wave' : spot.type.charAt(0).toUpperCase() + spot.type.slice(1)}
               </span>
@@ -378,6 +383,8 @@ export default async function SpotDetailPage({ params }: { params: { locale: str
           </div>
         )}
       </div>
+      <SwellDetective spotSlug={spot.slug} locale={locale} />
+
       {/* Chat por spot */}
       <SpotChat spotSlug={spot.slug} spotName={isPt ? spot.name : spot.nameEn} locale={locale} />
     </div>

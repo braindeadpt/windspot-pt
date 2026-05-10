@@ -5,6 +5,8 @@ import { MapPin, Wind, Waves, Star, Thermometer, Zap } from 'lucide-react';
 import { Spot } from '@/types';
 import { calculateSurfability, getScoreColor } from '@/lib/surfability';
 import { SPORT_LABELS, SportType } from '@/lib/sportRatings';
+import FavoriteButton from '@/components/FavoriteButton'
+import { AlertButton } from '@/components/AlertBanner';
 
 interface SpotCardProps {
   spot: Spot;
@@ -102,11 +104,13 @@ export default function SpotCard({ spot, locale, conditions, sportRatings, selec
               </span>
             )}
           </div>
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 flex items-center gap-2">
             <span className={`flex items-center gap-1 text-xs font-medium ${difficultyColors[spot.difficulty]}`}>
               <Star className="w-3 h-3" />
               {isPt ? diffLabel.pt : diffLabel.en}
             </span>
+            <AlertButton spotId={spot.id} spotName={spot.name} locale={locale} />
+            <FavoriteButton spotId={spot.id} spotName={spot.name} size="sm" locale={locale} />
           </div>
           <div className="absolute bottom-3 left-3 right-3">
             <h3 className="text-xl font-bold text-white drop-shadow-lg">{spot.name}</h3>
