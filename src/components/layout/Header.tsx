@@ -18,10 +18,13 @@ export default function Header({ locale }: HeaderProps) {
     { href: `/${locale}/`, label: isPt ? 'Início' : 'Home' },
     { href: `/${locale}/spots/`, label: 'Spots' },
     { href: `/${locale}/favorites/`, label: isPt ? 'Favs' : 'Favs' },
-    { href: `/${locale}/compare?spots=supertubos,guincho`, label: isPt ? 'VS' : 'VS', special: true },
+    { href: `/${locale}/compare/?spots=supertubos,guincho`, label: isPt ? 'VS' : 'VS', special: true },
     { href: `/${locale}/news/`, label: isPt ? 'Notícias' : 'News' },
     { href: `/${locale}/about/`, label: isPt ? 'Sobre' : 'About' },
   ];
+
+  // pathname does NOT include query string, so strip ? from href for comparison
+  const isActive = (href: string) => pathname === href.split('?')[0];
 
   const switchLocale = isPt ? 'en' : 'pt';
   const switchPath = pathname.replace(`/${locale}`, `/${switchLocale}`);
@@ -43,7 +46,7 @@ export default function Header({ locale }: HeaderProps) {
                 key={item.href}
                 href={item.href}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  pathname === item.href
+                  isActive(item.href)
                     ? 'bg-white/10 text-white'
                     : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`}
@@ -78,7 +81,7 @@ export default function Header({ locale }: HeaderProps) {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  pathname === item.href
+                  isActive(item.href)
                     ? 'bg-white/10 text-white'
                     : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`}

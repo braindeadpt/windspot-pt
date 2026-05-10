@@ -90,8 +90,8 @@ function BattleContent() {
           <h1 className="text-3xl font-bold text-white">Spot vs Spot</h1>
           <p className="text-white/60">
             {isPt 
-              ? 'Escolhe 2-3 spots para comparar. Exemplo: /compare?spots=supertubos,guincho'
-              : 'Pick 2-3 spots to compare. Example: /compare?spots=supertubos,guincho'
+              ? 'Escolhe 2-3 spots para comparar. Exemplo: /compare/?spots=supertubos,guincho'
+              : 'Pick 2-3 spots to compare. Example: /compare/?spots=supertubos,guincho'
             }
           </p>
         </div>
