@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Send, MessageCircle, Users, Trash2, Shield } from 'lucide-react';
+import { Send, MessageCircle, Users, Trash2, Shield, Loader2, ChevronUp } from 'lucide-react';
 import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
 import { moderateMessage, checkRateLimit, CHAT_RULES } from '@/lib/chatModeration';
 
@@ -41,6 +41,9 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
   const [showRules, setShowRules] = useState(false);
   const [moderationWarning, setModerationWarning] = useState<string | null>(null);
   const [rateLimitWarning, setRateLimitWarning] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const MESSAGES_PER_PAGE = 50;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isPT = locale === 'pt';
 
@@ -71,18 +74,21 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
 
     setHasSetup(true);
 
-    // Fetch existing messages
+    // Fetch initial messages (last 50)
     const fetchMessages = async () => {
       const client = getSupabaseClient();
       if (!client) return;
-      const { data } = await client
+      const { data, count } = await client
         .from('messages')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('spot_slug', spotSlug)
         .order('created_at', { ascending: true })
-        .limit(50);
+        .limit(MESSAGES_PER_PAGE);
       
-      if (data) setMessages(data);
+      if (data) {
+        setMessages(data);
+        setHasMore((count || 0) > MESSAGES_PER_PAGE);
+      }
     };
 
     fetchMessages();
@@ -105,6 +111,37 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
       if (channel) getSupabaseClient()?.removeChannel(channel);
     };
   }, [spotSlug]);
+
+  // Load more (older) messages
+  const loadMoreMessages = async () => {
+    if (isLoadingMore || messages.length === 0) return;
+    
+    setIsLoadingMore(true);
+    const oldestMessage = messages[0];
+    
+    const client = getSupabaseClient();
+    if (!client) {
+      setIsLoadingMore(false);
+      return;
+    }
+    
+    const { data, count } = await client
+      .from('messages')
+      .select('*', { count: 'exact' })
+      .eq('spot_slug', spotSlug)
+      .lt('created_at', oldestMessage.created_at)
+      .order('created_at', { ascending: true })
+      .limit(MESSAGES_PER_PAGE);
+    
+    if (data && data.length > 0) {
+      setMessages((prev) => [...data, ...prev]);
+      setHasMore((count || 0) > data.length);
+    } else {
+      setHasMore(false);
+    }
+    
+    setIsLoadingMore(false);
+  };
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -271,6 +308,29 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
 
       {/* Messages */}
       <div className="h-64 overflow-y-auto p-4 space-y-3">
+        {/* Load More Button */}
+        {hasMore && (
+          <div className="text-center pb-2">
+            <button
+              onClick={loadMoreMessages}
+              disabled={isLoadingMore}
+              className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors disabled:opacity-50 flex items-center gap-1 mx-auto"
+            >
+              {isLoadingMore ? (
+                <>
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  {isPT ? 'A carregar...' : 'Loading...'}
+                </>
+              ) : (
+                <>
+                  <ChevronUp className="w-3 h-3" />
+                  {isPT ? 'Carregar mais mensagens' : 'Load more messages'}
+                </>
+              )}
+            </button>
+          </div>
+        )}
+        
         {messages.length === 0 ? (
           <div className="text-center text-slate-500 py-8">
             <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
