@@ -153,7 +153,7 @@ function BattleContent() {
         </div>
 
         {/* Comparison */}
-        <div className={`grid gap-6 ${sorted.length === 2 ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
+        <div className={`grid gap-6 ${sorted.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-3'}`}>
           {sorted.map((data, i) => {
             const Icon = rankIcons[i] || Award;
             const colors = getScoreColor(data.allScores[selectedSport]?.score || 0);

@@ -302,7 +302,7 @@ export default function SpotDetailClient({
 
       {/* 3 Key Stats */}
       <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {stats.map((stat, i) => (
             <StatCard key={i} {...stat} />
           ))}
