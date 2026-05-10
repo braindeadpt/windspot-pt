@@ -1,7 +1,7 @@
 /**
  * WindSpot - Update News Script
- * Fetches RSS feeds and generates news items
- * Uses regex-based RSS parsing with CDATA and HTML entity support
+ * Uses Gemini Flash to generate daily surf conditions briefing
+ * Falls back to RSS feeds if available
  */
 
 const fs = require('fs');
@@ -10,6 +10,7 @@ const path = require('path');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
+// RSS feeds to try (fallback)
 const RSS_FEEDS = [
   'https://surfertoday.com/rss',
   'https://www.windmag.com/rss',
@@ -20,14 +21,12 @@ const RSS_FEEDS = [
  * Extract text from RSS item field, handling CDATA and HTML entities
  */
 function extractField(itemXml, fieldName) {
-  // Try CDATA first: <field><![CDATA[...]]></field>
   const cdataRegex = new RegExp(`<${fieldName}[\\s\\S]*?>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</${fieldName}>`);
   const cdataMatch = itemXml.match(cdataRegex);
   if (cdataMatch) {
     return decodeHtmlEntities(cdataMatch[1].trim());
   }
   
-  // Try regular content: <field>...</field>
   const regularRegex = new RegExp(`<${fieldName}[\\s\\S]*?>([\\s\\S]*?)</${fieldName}>`);
   const regularMatch = itemXml.match(regularRegex);
   if (regularMatch) {
@@ -37,20 +36,17 @@ function extractField(itemXml, fieldName) {
   return '';
 }
 
-/**
- * Decode common HTML entities
- */
 function decodeHtmlEntities(text) {
   if (!text) return '';
   return text
-    .replace(/&#8217;/g, "'")   // Right single quote
-    .replace(/&#8216;/g, "'")   // Left single quote
-    .replace(/&#8220;/g, '"')  // Left double quote
-    .replace(/&#8221;/g, '"')  // Right double quote
-    .replace(/&#8230;/g, '...') // Ellipsis
-    .replace(/&#8211;/g, '-')  // En dash
-    .replace(/&#8212;/g, '--')  // Em dash
-    .replace(/&#038;/g, '&')   // Ampersand
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8216;/g, "'")
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/&#8230;/g, '...')
+    .replace(/&#8211;/g, '-')
+    .replace(/&#8212;/g, '--')
+    .replace(/&#038;/g, '&')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
@@ -61,8 +57,11 @@ function decodeHtmlEntities(text) {
 async function fetchRSSFeed(url) {
   try {
     const response = await fetch(url, { 
-      headers: { 'User-Agent': 'WindSpot-Bot/1.0' },
-      timeout: 10000 
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+      },
+      timeout: 15000 
     });
     if (!response.ok) {
       console.warn(`  ⚠️ RSS feed returned ${response.status}: ${url}`);
@@ -71,8 +70,6 @@ async function fetchRSSFeed(url) {
     
     const xml = await response.text();
     const items = [];
-    
-    // Extract all <item> blocks
     const itemRegex = /<item[\s\S]*?<\/item>/g;
     let match;
     
@@ -84,11 +81,7 @@ async function fetchRSSFeed(url) {
       const link = extractField(item, 'link');
       const pubDate = extractField(item, 'pubDate');
       
-      // Skip items with empty titles or links
-      if (!title || !link) {
-        console.log(`  ⚠️ Skipping item with empty title/link from ${url}`);
-        continue;
-      }
+      if (!title || !link) continue;
       
       items.push({
         title,
@@ -107,23 +100,90 @@ async function fetchRSSFeed(url) {
   }
 }
 
-async function generateSummaryWithGemini(articles, locale) {
+/**
+ * Load conditions data for news generation
+ */
+function loadConditions() {
+  try {
+    const filePath = path.join(__dirname, '../public/data/conditions.json');
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch (e) {
+    console.warn('Failed to load conditions:', e.message);
+  }
+  return {};
+}
+
+/**
+ * Find best spots today based on conditions
+ */
+function findBestSpots(conditions) {
+  const spots = [];
+  
+  for (const [id, cond] of Object.entries(conditions)) {
+    if (!cond) continue;
+    
+    const windKt = (cond.windSpeed || 0) * 1.94384;
+    const waveHeight = cond.waveHeight || 0;
+    
+    // Score for surf: good waves + offshore wind
+    let surfScore = 0;
+    if (waveHeight > 0.5 && waveHeight < 3) surfScore += waveHeight * 20;
+    if (windKt < 15) surfScore += 10;
+    
+    // Score for kitesurf: strong wind
+    let kiteScore = 0;
+    if (windKt > 15 && windKt < 30) kiteScore += windKt * 2;
+    
+    spots.push({
+      id,
+      windKt: Math.round(windKt),
+      waveHeight: waveHeight.toFixed(1),
+      waterTemp: (cond.waterTemp || 0).toFixed(1),
+      surfScore,
+      kiteScore,
+    });
+  }
+  
+  const bestSurf = [...spots].sort((a, b) => b.surfScore - a.surfScore).slice(0, 3);
+  const bestKite = [...spots].sort((a, b) => b.kiteScore - a.kiteScore).slice(0, 3);
+  
+  return { bestSurf, bestKite, allSpots: spots };
+}
+
+/**
+ * Generate daily briefing with Gemini
+ */
+async function generateDailyBriefing(spotData) {
   if (!GEMINI_API_KEY) {
-    console.log('⚠️ No GEMINI_API_KEY found, using original descriptions as summaries');
-    return articles.map(a => ({
-      ...a,
-      summary: a.description,
-      summaryEn: a.description,
-    }));
+    console.log('⚠️ No GEMINI_API_KEY found, using static briefing');
+    return null;
   }
 
-  const prompt = locale === 'pt'
-    ? `Resume as seguintes notícias de desportos náuticos em português europeu, focando em condições de ondas e vento para Portugal. Máximo 2 frases por notícia.
+  const { bestSurf, bestKite, allSpots } = spotData;
+  const avgWind = allSpots.length > 0 
+    ? (allSpots.reduce((sum, s) => sum + s.windKt, 0) / allSpots.length).toFixed(0)
+    : 0;
+  const avgWaves = allSpots.length > 0
+    ? (allSpots.reduce((sum, s) => parseFloat(s.waveHeight) + sum, 0) / allSpots.length).toFixed(1)
+    : 0;
 
-${articles.map((a, i) => `${i + 1}. ${a.title}\n${a.description}`).join('\n\n')}`
-    : `Summarize the following water sports news in English, focusing on wave and wind conditions for Portugal. Max 2 sentences per news item.
+  const prompt = `Cria 3 notícias curtas (2-3 frases cada) sobre condições de desportos náuticos em Portugal para hoje, baseado nestes dados reais:
 
-${articles.map((a, i) => `${i + 1}. ${a.title}\n${a.description}`).join('\n\n')}`;
+MELHORES SPOTS SURF:
+${bestSurf.map((s, i) => `${i+1}. ${s.id}: ${s.waveHeight}m ondas, ${s.windKt}kt vento`).join('\n')}
+
+MELHORES SPOTS KITESURF:
+${bestKite.map((s, i) => `${i+1}. ${s.id}: ${s.windKt}kt vento`).join('\n')}
+
+MÉDIA NACIONAL: ${avgWind}kt vento, ${avgWaves}m ondas
+
+Gera 3 notícias em português europeu com tom entusiástico e coloquial (tipo "brutal", "mesmo isso", "nortada forte"). Formato:
+TÍTULO 1|SUMÁRIO 1
+TÍTULO 2|SUMÁRIO 2
+TÍTULO 3|SUMÁRIO 3`;
 
   try {
     const response = await fetch(`${GEMINI_API}?key=${GEMINI_API_KEY}`, {
@@ -131,113 +191,69 @@ ${articles.map((a, i) => `${i + 1}. ${a.title}\n${a.description}`).join('\n\n')}
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 1024, temperature: 0.3 },
+        generationConfig: { maxOutputTokens: 1024, temperature: 0.7 },
       }),
     });
 
     if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
     const data = await response.json();
-    const summary = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    // Parse numbered summaries from response
-    const summaryLines = summary.split('\n').filter(l => l.trim());
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    return articles.map((a, i) => {
-      // Try to find summary for this article
-      const articleSummary = summaryLines.find(l => 
-        l.includes(`${i + 1}.`) || l.includes(a.title.substring(0, 20))
-      );
-      
-      if (articleSummary) {
-        const cleanSummary = articleSummary.replace(/^\d+\.\s*/, '').trim();
-        return {
-          ...a,
-          summary: cleanSummary,
-          summaryEn: locale === 'pt' ? a.description : cleanSummary,
-        };
-      }
-      
+    // Parse response format: TÍTULO|SUMÁRIO
+    const lines = text.split('\n').filter(l => l.trim() && l.includes('|'));
+    
+    return lines.slice(0, 3).map((line, i) => {
+      const [title, summary] = line.split('|').map(s => s.trim());
       return {
-        ...a,
-        summary: a.description,
-        summaryEn: a.description,
+        id: `news-${Date.now()}-${i}`,
+        title: title || `Notícia ${i+1}`,
+        titleEn: title || `News ${i+1}`,
+        summary: summary || 'Resumo não disponível',
+        summaryEn: summary || 'Summary not available',
+        category: i === 0 ? 'surf' : i === 1 ? 'kitesurf' : 'general',
+        source: 'WindSpot AI',
+        url: 'https://windspot.pt',
+        publishedAt: new Date().toISOString(),
+        tags: ['portugal', 'condicoes', i === 0 ? 'surf' : i === 1 ? 'kitesurf' : 'geral'],
       };
     });
   } catch (e) {
     console.error('Gemini API error:', e.message);
-    return articles.map(a => ({
-      ...a,
-      summary: a.description,
-      summaryEn: a.description,
-    }));
+    return null;
   }
 }
 
-async function updateNews() {
-  console.log('📰 WindSpot - Updating news...');
-
+/**
+ * Generate fallback news from RSS or static content
+ */
+async function generateFallbackNews() {
+  // Try RSS feeds
   const allArticles = [];
   for (const feed of RSS_FEEDS) {
     const articles = await fetchRSSFeed(feed);
     if (articles) allArticles.push(...articles);
   }
 
-  console.log(`\n📊 Total articles found: ${allArticles.length}`);
-
-  if (allArticles.length === 0) {
-    console.warn('⚠️ No articles found! Keeping existing news.json if it exists.');
-    return;
+  if (allArticles.length > 0) {
+    console.log(`📰 Using ${allArticles.length} RSS articles as fallback`);
+    
+    return allArticles.slice(0, 6).map((a, i) => ({
+      id: `news-${Date.now()}-${i}`,
+      title: a.title,
+      titleEn: a.title,
+      summary: a.description.substring(0, 200),
+      summaryEn: a.description.substring(0, 200),
+      category: categorizeNews(a.title),
+      source: a.source,
+      url: a.url,
+      publishedAt: a.publishedAt,
+      tags: extractTags(a.title + ' ' + a.description),
+    }));
   }
-
-  // Remove duplicates by URL
-  const seenUrls = new Set();
-  const uniqueArticles = allArticles.filter(a => {
-    if (seenUrls.has(a.url)) return false;
-    seenUrls.add(a.url);
-    return true;
-  });
-
-  console.log(`📊 Unique articles: ${uniqueArticles.length}`);
-
-  // Take top 6 most recent
-  const recentArticles = uniqueArticles
-    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-    .slice(0, 6);
-
-  // Generate summaries with Gemini (or fallback to descriptions)
-  const ptNews = await generateSummaryWithGemini(recentArticles, 'pt');
-
-  const newsItems = ptNews.map((a, i) => ({
-    id: `news-${Date.now()}-${i}`,
-    title: a.title,
-    titleEn: a.title,
-    summary: a.summary || a.description,
-    summaryEn: a.summaryEn || a.description,
-    category: categorizeNews(a.title),
-    source: a.source,
-    url: a.url,
-    publishedAt: a.publishedAt,
-    tags: extractTags(a.title + ' ' + a.description),
-  }));
-
-  const outputPath = path.join(__dirname, '../public/data/news.json');
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, JSON.stringify(newsItems, null, 2));
-
-  console.log(`\n✅ News saved to ${outputPath}`);
-  console.log(`📰 Generated ${newsItems.length} news items`);
   
-  // Print preview
-  newsItems.forEach((item, i) => {
-    console.log(`\n  ${i + 1}. ${item.title}`);
-    console.log(`     ${item.summary.substring(0, 80)}...`);
-    console.log(`     Source: ${item.source} | Category: ${item.category}`);
-  });
+  return [];
 }
 
-/**
- * Categorize news based on title/content
- */
 function categorizeNews(title) {
   const lower = title.toLowerCase();
   if (lower.includes('competition') || lower.includes('wsl') || lower.includes('championship') || lower.includes('tour')) {
@@ -250,9 +266,6 @@ function categorizeNews(title) {
   return 'general';
 }
 
-/**
- * Extract tags from title and description
- */
 function extractTags(text) {
   const tags = [];
   const lower = text.toLowerCase();
@@ -271,7 +284,65 @@ function extractTags(text) {
     if (lower.includes(keyword)) tags.push(tag);
   }
   
-  return [...new Set(tags)].slice(0, 5); // Max 5 unique tags
+  return [...new Set(tags)].slice(0, 5);
+}
+
+async function updateNews() {
+  console.log('📰 WindSpot - Updating news...');
+
+  // Load conditions data
+  const conditions = loadConditions();
+  let newsItems = [];
+
+  if (Object.keys(conditions).length > 0) {
+    console.log(`📊 Loaded conditions for ${Object.keys(conditions).length} spots`);
+    
+    // Find best spots
+    const spotData = findBestSpots(conditions);
+    console.log(`🏄 Best surf: ${spotData.bestSurf.map(s => s.id).join(', ')}`);
+    console.log(`🪁 Best kite: ${spotData.bestKite.map(s => s.id).join(', ')}`);
+    
+    // Generate briefing with Gemini
+    const briefing = await generateDailyBriefing(spotData);
+    if (briefing && briefing.length > 0) {
+      newsItems = briefing;
+      console.log(`✅ Generated ${briefing.length} AI news items`);
+    }
+  }
+
+  // If Gemini failed or no conditions, try RSS fallback
+  if (newsItems.length === 0) {
+    console.log('🔄 Trying RSS fallback...');
+    const fallback = await generateFallbackNews();
+    if (fallback.length > 0) {
+      newsItems = fallback;
+    }
+  }
+
+  // If everything failed, create a static "no data" placeholder
+  if (newsItems.length === 0) {
+    console.warn('⚠️ No news sources available');
+    // Don't overwrite with empty - keep existing if present
+    const existingPath = path.join(__dirname, '../public/data/news.json');
+    if (fs.existsSync(existingPath)) {
+      console.log('📄 Keeping existing news.json');
+      return;
+    }
+  }
+
+  // Save news
+  const outputPath = path.join(__dirname, '../public/data/news.json');
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, JSON.stringify(newsItems, null, 2));
+
+  console.log(`\n✅ News saved to ${outputPath}`);
+  console.log(`📰 ${newsItems.length} news items`);
+  
+  newsItems.forEach((item, i) => {
+    console.log(`\n  ${i + 1}. [${item.category.toUpperCase()}] ${item.title}`);
+    console.log(`     ${item.summary.substring(0, 80)}...`);
+    console.log(`     Source: ${item.source}`);
+  });
 }
 
 updateNews().catch(e => {
