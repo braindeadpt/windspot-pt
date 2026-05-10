@@ -53,7 +53,7 @@ export default function MagicWindows({ hourly, spotType, spotBestWind, locale }:
       const reasons: string[] = [];
       const reasonsEn: string[] = [];
 
-      // Wave score
+      // Wave score (surf/big-wave)
       if (spotType === 'surf' || spotType === 'big-wave') {
         if (h.waveHeight >= 1.0 && h.waveHeight <= 2.5) {
           score += 25;
@@ -71,21 +71,31 @@ export default function MagicWindows({ hourly, spotType, spotBestWind, locale }:
         }
       }
 
+      // Wind score (kitesurf)
       if (spotType === 'kitesurf') {
         const windKnots = h.windSpeed * 1.94384;
         if (windKnots >= 15 && windKnots <= 28) {
           score += 30;
           reasons.push(`Vento ideal (${Math.round(windKnots)}kt)`);
           reasonsEn.push(`Ideal wind (${Math.round(windKnots)}kt)`);
+        } else if (windKnots >= 10 && windKnots < 15) {
+          score += 15;
+          reasons.push(`Vento leve (${Math.round(windKnots)}kt)`);
+          reasonsEn.push(`Light wind (${Math.round(windKnots)}kt)`);
         }
       }
 
+      // Wind score (windsurf)
       if (spotType === 'windsurf') {
         const windKnots = h.windSpeed * 1.94384;
         if (windKnots >= 12 && windKnots <= 25) {
           score += 30;
           reasons.push(`Vento bom (${Math.round(windKnots)}kt)`);
           reasonsEn.push(`Good wind (${Math.round(windKnots)}kt)`);
+        } else if (windKnots >= 8 && windKnots < 12) {
+          score += 15;
+          reasons.push(`Vento leve (${Math.round(windKnots)}kt)`);
+          reasonsEn.push(`Light wind (${Math.round(windKnots)}kt)`);
         }
       }
 
@@ -104,6 +114,11 @@ export default function MagicWindows({ hourly, spotType, spotBestWind, locale }:
         score += 15;
         reasons.push('Vento fraco');
         reasonsEn.push('Light wind');
+      }
+
+      // Bonus: comfortable water temp
+      if (h.waterTemp >= 18) {
+        score += 5;
       }
 
       return {
@@ -127,7 +142,10 @@ export default function MagicWindows({ hourly, spotType, spotBestWind, locale }:
       } else {
         if (start !== -1 && end - start >= 1) {
           const windowScores = scored.slice(start, end + 1);
-          const avgScore = Math.round(windowScores.reduce((a, b) => a + b.score, 0) / windowScores.length);
+          const avgScore = Math.floor(windowScores.reduce((a, b) => a + b.score, 0) / windowScores.length);
+          // Bonus for longer windows (stability = value)
+          const durationBonus = Math.min((end - start) * 2, 15); // up to +15 for 8h+ windows
+          const finalScore = Math.min(avgScore + durationBonus, 100);
           const allReasons = Array.from(new Set(windowScores.flatMap(s => s.reasons)));
           const allReasonsEn = Array.from(new Set(windowScores.flatMap(s => s.reasonsEn)));
 
@@ -135,7 +153,7 @@ export default function MagicWindows({ hourly, spotType, spotBestWind, locale }:
             start,
             end,
             duration: end - start + 1,
-            score: avgScore,
+            score: finalScore,
             reason: allReasons.slice(0, 3).join(' + '),
             reasonEn: allReasonsEn.slice(0, 3).join(' + '),
           });
@@ -148,7 +166,9 @@ export default function MagicWindows({ hourly, spotType, spotBestWind, locale }:
     // Handle trailing window
     if (start !== -1 && end - start >= 1) {
       const windowScores = scored.slice(start, end + 1);
-      const avgScore = Math.round(windowScores.reduce((a, b) => a + b.score, 0) / windowScores.length);
+      const avgScore = Math.floor(windowScores.reduce((a, b) => a + b.score, 0) / windowScores.length);
+      const durationBonus = Math.min((end - start) * 2, 15);
+      const finalScore = Math.min(avgScore + durationBonus, 100);
       const allReasons = Array.from(new Set(windowScores.flatMap(s => s.reasons)));
       const allReasonsEn = Array.from(new Set(windowScores.flatMap(s => s.reasonsEn)));
 
@@ -156,7 +176,7 @@ export default function MagicWindows({ hourly, spotType, spotBestWind, locale }:
         start,
         end,
         duration: end - start + 1,
-        score: avgScore,
+        score: finalScore,
         reason: allReasons.slice(0, 3).join(' + '),
         reasonEn: allReasonsEn.slice(0, 3).join(' + '),
       });
