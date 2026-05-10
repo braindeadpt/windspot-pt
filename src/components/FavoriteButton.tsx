@@ -61,6 +61,7 @@ export default function FavoriteButton({
   const { isFavorite, toggleFavorite, loaded, mounted } = useFavorites();
   const active = isFavorite(spotId);
   const isPt = locale === 'pt';
+  const [clickEffect, setClickEffect] = useState(false);
 
   const sizeClasses = {
     sm: 'w-4 h-4',
@@ -72,23 +73,27 @@ export default function FavoriteButton({
     return <div className={`${sizeClasses[size]} animate-pulse bg-white/10 rounded`} />;
   }
 
+  const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavorite(spotId);
+    setClickEffect(true);
+    setTimeout(() => setClickEffect(false), 300);
+  };
+
   return (
     <div
       role="button"
       tabIndex={0}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleFavorite(spotId);
-      }}
+      onClick={handleClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleFavorite(spotId);
+          handleClick(e);
         }
       }}
       className={`flex items-center gap-2 transition-all hover:scale-110 cursor-pointer ${
+        clickEffect ? 'scale-125' : ''
+      } ${
         active ? 'text-red-400' : 'text-white/40 hover:text-white/70'
       }`}
       title={

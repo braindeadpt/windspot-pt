@@ -271,6 +271,12 @@ function BattleContent() {
                   <SpotMap lat={data.spot.lat} lon={data.spot.lon} locale={locale} />
                 </div>
 
+                <div className="mt-2 text-center">
+                  <span className={`text-sm font-bold ${colors.text}`}>
+                    {isPt ? data.surfability.rating : data.surfability.ratingEn}
+                  </span>
+                </div>
+
                 <Link
                   href={`/${locale}/spots/${data.spot.slug}`}
                   className="mt-4 block w-full text-center py-3 bg-ocean-500 hover:bg-ocean-600 text-white rounded-xl font-medium transition-all hover:scale-105"
