@@ -41,14 +41,14 @@ export default function SpotMap({ lat, lon, locale = 'pt' }: SpotMapProps) {
 
   if (error) {
     return (
-      <div className="relative w-full h-56 md:h-72 rounded-2xl overflow-hidden shadow-lg shadow-black/20 ring-1 ring-white/10 bg-ocean-900 flex items-center justify-center">
+      <div className="relative w-full h-56 md:h-72 rounded-2xl overflow-hidden shadow-lg shadow-black/20 ring-1 ring-white/10 bg-slate-900 flex items-center justify-center">
         <div className="text-center p-4">
           <p className="text-white/60 text-sm mb-2">{isPt ? 'Mapa não disponível' : 'Map unavailable'}</p>
           <a 
             href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=15/${lat}/${lon}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-ocean-400 hover:text-ocean-300 underline"
+            className="text-xs text-cyan-400 hover:text-cyan-300 underline"
           >
             {isPt ? 'Ver no OpenStreetMap' : 'View on OpenStreetMap'} ↗
           </a>

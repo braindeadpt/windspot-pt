@@ -21,7 +21,7 @@ export default function WindCompass({ direction, speed, size = 64 }: WindCompass
         <text x="6" y="35" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="8">W</text>
         <polygon points="32,8 28,24 32,20 36,24" fill="#38bdf8" className="drop-shadow-lg" />
       </svg>
-      <div className="absolute bottom-0 right-0 bg-ocean-900/80 backdrop-blur text-xs font-bold px-1.5 py-0.5 rounded">
+      <div className="absolute bottom-0 right-0 bg-slate-900/80 backdrop-blur text-xs font-bold px-1.5 py-0.5 rounded">
         {arrow}
       </div>
     </div>

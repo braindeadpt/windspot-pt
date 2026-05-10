@@ -3,10 +3,10 @@ import { MapPin, ArrowLeft, Search } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-ocean-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
       <div className="text-center space-y-6 max-w-md">
-        <div className="p-4 rounded-full bg-ocean-500/10 mx-auto w-fit">
-          <MapPin className="w-8 h-8 text-ocean-400" />
+        <div className="p-4 rounded-full bg-white/5 mx-auto w-fit">
+          <MapPin className="w-8 h-8 text-cyan-400" />
         </div>
         
         <div className="space-y-2">

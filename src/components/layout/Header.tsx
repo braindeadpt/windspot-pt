@@ -27,12 +27,12 @@ export default function Header({ locale }: HeaderProps) {
   const switchPath = pathname.replace(`/${locale}`, `/${switchLocale}`);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-ocean-950/80 backdrop-blur-xl border-b border-white/10">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href={`/${locale}/`} className="flex items-center gap-2 group">
             <div className="relative">
-              <Wind className="w-8 h-8 text-ocean-400 group-hover:text-ocean-300 transition-colors" />
+              <Wind className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
             </div>
             <span className="text-xl font-bold text-gradient">WindSpot</span>
           </Link>
@@ -70,7 +70,7 @@ export default function Header({ locale }: HeaderProps) {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden bg-ocean-950/95 backdrop-blur-xl border-b border-white/10">
+        <div className="md:hidden bg-slate-950/95 backdrop-blur-xl border-b border-white/10">
           <div className="px-4 py-3 space-y-1">
             {navItems.map((item) => (
               <Link
