@@ -2,7 +2,16 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { SPORT_LABELS, ALL_SPORTS, SportType } from '@/lib/sportRatings';
-import { X } from 'lucide-react';
+import { X, Waves, Wind, Sailboat, Anchor, PersonStanding, LifeBuoy } from 'lucide-react';
+
+const SPORT_ICONS: Record<SportType, React.ReactNode> = {
+  surf: <Waves className="w-4 h-4" />,
+  kitesurf: <Wind className="w-4 h-4" />,
+  windsurf: <Sailboat className="w-4 h-4" />,
+  wakeboard: <Anchor className="w-4 h-4" />,
+  bodyboard: <Waves className="w-4 h-4" />,
+  sup: <PersonStanding className="w-4 h-4" />,
+};
 
 interface SportSelectorProps {
   locale: string;
@@ -67,13 +76,14 @@ export default function SportSelector({ locale }: SportSelectorProps) {
         <button
           onClick={() => handleSportChange(null)}
           aria-label={isPT ? 'Mostrar todos os desportos' : 'Show all sports'}
-          className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+          className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 ${
             !currentSport
-              ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/25 scale-105'
+              ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/25 scale-105 ring-2 ring-cyan-400/50'
               : 'bg-slate-700/50 text-slate-300 hover:bg-slate-700 border border-white/5'
           }`}
         >
-          {isPT ? '🌊 Todos' : '🌊 All'}
+          <Waves className="w-4 h-4" />
+          <span>{isPT ? 'Todos' : 'All'}</span>
         </button>
 
         {ALL_SPORTS.map((sport) => {
@@ -87,11 +97,11 @@ export default function SportSelector({ locale }: SportSelectorProps) {
               aria-label={isPT ? `Filtrar por ${label.pt}` : `Filter by ${label.en}`}
               className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 ${
                 isActive
-                  ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/25 scale-105'
+                  ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/25 scale-105 ring-2 ring-cyan-400/50'
                   : 'bg-slate-700/50 text-slate-300 hover:bg-slate-700 border border-white/5'
               }`}
             >
-              <span>{label.emoji}</span>
+              {SPORT_ICONS[sport]}
               <span className="hidden sm:inline">{isPT ? label.pt : label.en}</span>
             </button>
           );
@@ -101,7 +111,8 @@ export default function SportSelector({ locale }: SportSelectorProps) {
       {currentSport && (
         <div className="mt-4 text-center">
           <span className="inline-flex items-center gap-2 bg-cyan-500/10 text-cyan-300 px-4 py-2 rounded-full text-sm">
-            {SPORT_LABELS[currentSport].emoji} {isPT ? 'A mostrar spots para' : 'Showing spots for'}{' '}
+            {SPORT_ICONS[currentSport]}
+            {isPT ? 'A mostrar spots para' : 'Showing spots for'}{' '}
             <strong>{isPT ? SPORT_LABELS[currentSport].pt : SPORT_LABELS[currentSport].en}</strong>
             <button
               onClick={() => handleSportChange(null)}
