@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 import { Trophy, MapPin, Wind, Waves, Clock, Users, ArrowLeft, Zap, Crown, Medal, Award } from 'lucide-react';
 import { spots } from '@/lib/spots';
 import { fetchMarineData, getCurrentConditions } from '@/lib/openmeteo';
@@ -54,12 +54,13 @@ function getDriveTimeFromPorto(region: string): string {
 
 function BattleContent() {
   const searchParams = useSearchParams();
+  const params = useParams();
   const [battleData, setBattleData] = useState<SpotBattleData[]>([]);
   const [loading, setLoading] = useState(true);
   const [baseCity, setBaseCity] = useState<'lisbon' | 'porto'>('lisbon');
 
   const slugs = searchParams.get('spots')?.split(',') || [];
-  const locale = searchParams.get('locale') || 'pt';
+  const locale = (params?.locale as string) || 'pt';
   const isPt = locale === 'pt';
 
   useEffect(() => {

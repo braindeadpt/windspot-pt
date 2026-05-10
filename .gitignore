@@ -22,6 +22,11 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+build_debug.log
+
+# Backups
+*.bak
 
 # IDE
 .vscode/

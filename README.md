@@ -22,7 +22,7 @@ O **WindSpot** é uma plataforma **gratuita e open-source** que fornece condiç�
 - 🌊 **Condições em tempo real** - Ondas, vento, temperatura da água
 - 📊 **Previsão 7 dias** - Gráficos interativos com Recharts
 - 📰 **Notícias automáticas** - Resumidas por IA (Gemini Flash)
-- 🗺️ **10 spots portugueses** - Nazaré, Peniche, Guincho, Algarve, etc.
+- 🗺️ **81 spots portugueses** - Nazaré, Peniche, Guincho, Algarve, Açores, Madeira, Centro, Norte, Sul e mais
 - 🌐 **Bilingue** - Português e Inglês para turistas
 - 📱 **Responsivo** - Funciona em mobile e desktop
 - ⚡ **Atualização automática** - A cada 3 horas via GitHub Actions
@@ -80,7 +80,7 @@ Contribuições são bem-vindas! Abre um PR ou issue no GitHub.
 - 🌊 **Real-time conditions** - Waves, wind, water temperature
 - 📊 **7-day forecast** - Interactive charts with Recharts
 - 📰 **Automated news** - AI-summarized by Gemini Flash
-- 🗺️ **10 Portuguese spots** - Nazaré, Peniche, Guincho, Algarve, etc.
+- 🗺️ **81 Portuguese spots** - Nazaré, Peniche, Guincho, Algarve, Azores, Madeira, and more
 - 🌐 **Bilingual** - Portuguese and English for tourists
 - 📱 **Responsive** - Works on mobile and desktop
 - ⚡ **Auto-updates** - Every 3 hours via GitHub Actions

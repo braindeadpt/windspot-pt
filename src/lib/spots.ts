@@ -674,7 +674,7 @@ export const spots: Spot[] = [
   {
         localSecret: true,
     secretLevel: 'semi-secret',
-    id: 'zambujeira', slug: 'zambujeira', name: 'Zambujeira do Mar', nameEn: 'Zambujeira do Mar',
+    id: 'zambujeira-secret', slug: 'zambujeira-secret', name: 'Zambujeira do Mar (Secret)', nameEn: 'Zambujeira do Mar (Secret)',
     region: 'Alentejo', regionEn: 'Alentejo', lat: 37.525, lon: -8.786,
     type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
     description: 'Um dos spots mais selvagens de Portugal. Beach break potente com ondas de qualidade e quase ninguém. Costa Vicentina em estado puro. Só para quem sabe o que faz.',
@@ -685,7 +685,7 @@ export const spots: Spot[] = [
   {
         localSecret: true,
     secretLevel: 'semi-secret',
-    id: 'odeceixe', slug: 'odeceixe', name: 'Odeceixe', nameEn: 'Odeceixe',
+    id: 'odeceixe-secret', slug: 'odeceixe-secret', name: 'Odeceixe (Foz Secreta)', nameEn: 'Odeceixe (Secret River Mouth)',
     region: 'Alentejo', regionEn: 'Alentejo', lat: 37.541, lon: -8.794,
     type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
     description: 'Foz do rio Seixe — ondas perfeitas num cenário único. Lefts longos e rápidos na foz. Pouco crowd, ambiente bucólico. Um segredo bem guardado da Costa Vicentina.',
@@ -696,7 +696,7 @@ export const spots: Spot[] = [
   {
         localSecret: true,
     secretLevel: 'secret',
-    id: 'sao-torpes', slug: 'sao-torpes', name: 'São Torpes', nameEn: 'Sao Torpes',
+    id: 'sao-torpes-secret', slug: 'sao-torpes-secret', name: 'São Torpes (Secret)', nameEn: 'Sao Torpes (Secret)',
     region: 'Alentejo', regionEn: 'Alentejo', lat: 37.953, lon: -8.764,
     type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
     description: 'Spot pouco conhecido ao sul de Sines. Ondas consistentes com fundo de areia. Água mais quente que o norte. Perfeito para escapar das multidões da Costa Vicentina.',
@@ -707,7 +707,7 @@ export const spots: Spot[] = [
   {
         localSecret: true,
     secretLevel: 'known',
-    id: 'porto-covo', slug: 'porto-covo', name: 'Porto Covo', nameEn: 'Porto Covo',
+    id: 'porto-covo-secret', slug: 'porto-covo-secret', name: 'Porto Covo (Secret)', nameEn: 'Porto Covo (Secret)',
     region: 'Alentejo', regionEn: 'Alentejo', lat: 37.852, lon: -8.792,
     type: 'surf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'W, NW',
     description: 'Praia grande com ondas suaves — ideal para iniciantes que querem surfar no Alentejo sem stress. Pouco crowd fora do verão. Cenário de postal.',
@@ -729,7 +729,7 @@ export const spots: Spot[] = [
   {
         localSecret: true,
     secretLevel: 'semi-secret',
-    id: 'moledo', slug: 'moledo', name: 'Moledo', nameEn: 'Moledo',
+    id: 'moledo-secret', slug: 'moledo-secret', name: 'Moledo (Secret)', nameEn: 'Moledo (Secret)',
     region: 'Caminha', regionEn: 'Caminha', lat: 41.850, lon: -8.862,
     type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
     description: 'Praia do norte com ondas de qualidade e pouco crowd. Vista para a Espanha. Lefts e rights consistentes. Um spot local pouco divulgado.',
@@ -762,7 +762,7 @@ export const spots: Spot[] = [
   {
         localSecret: true,
     secretLevel: 'secret',
-    id: 'jardim-mar', slug: 'jardim-mar', name: 'Jardim do Mar', nameEn: 'Jardim do Mar',
+    id: 'jardim-mar-secret', slug: 'jardim-mar-secret', name: 'Jardim do Mar (Secret)', nameEn: 'Jardim do Mar (Secret)',
     region: 'Madeira', regionEn: 'Madeira', lat: 32.740, lon: -17.210,
     type: 'surf', difficulty: 'advanced', bestWind: 'E, NE', bestSwell: 'W, NW',
     description: 'Spot épico da Madeira. Rights longos e perfeitos com maré baixa. Um dos melhores spots de Portugal, mas pouco conhecido. Só para experientes.',
@@ -773,7 +773,7 @@ export const spots: Spot[] = [
   {
         localSecret: true,
     secretLevel: 'deep-secret',
-    id: 'paul-mar', slug: 'paul-mar', name: 'Paul do Mar', nameEn: 'Paul do Mar',
+    id: 'paul-mar-secret', slug: 'paul-mar-secret', name: 'Paul do Mar (Secret)', nameEn: 'Paul do Mar (Secret)',
     region: 'Madeira', regionEn: 'Madeira', lat: 32.760, lon: -17.225,
     type: 'surf', difficulty: 'expert', bestWind: 'E, NE', bestSwell: 'W, NW',
     description: 'Ondas pesadas e tubulares na costa oeste da Madeira. Point break com rights perfeitos. Conhecido entre locals mas pouco divulgado.',

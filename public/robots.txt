@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://braindeadpt.github.io/windspot-pt/sitemap.xml
