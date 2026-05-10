@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   other: {
     'referrer': 'strict-origin-when-cross-origin',
   },
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/apple-touch-icon.svg',
+  },
+  manifest: '/manifest.json',
 }
 
 export default function RootLayout({
