@@ -1,4 +1,11 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import './globals.css'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#06b6d4',
+}
 
 export const metadata: Metadata = {
   title: 'WindSpot Portugal',
@@ -10,5 +17,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <html lang="pt" className="dark">
+      <body className="min-h-screen bg-ocean-950">
+        {children}
+      </body>
+    </html>
+  )
 }
