@@ -718,17 +718,6 @@ export const spots: Spot[] = [
   {
         localSecret: true,
     secretLevel: 'semi-secret',
-    id: 'vilanova-milfontes', slug: 'vilanova-milfontes', name: 'Vila Nova de Milfontes', nameEn: 'Vila Nova de Milfontes',
-    region: 'Alentejo', regionEn: 'Alentejo', lat: 37.723, lon: -8.782,
-    type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',
-    description: 'Foz do rio Mira — lefts perfeitos na foz com a maré certa. Spot local com vibe autêntica. Poucos surfistas, muitas ondas.',
-    descriptionEn: 'Mira river mouth — perfect lefts at the mouth with the right tide. Local spot with authentic vibe. Few surfers, many waves.',
-    facilities: ['Estacionamento', 'Restaurantes', 'WC', 'Alojamento'],
-    hazards: ['Correntes na foz', 'Rochas']
-  },
-  {
-        localSecret: true,
-    secretLevel: 'semi-secret',
     id: 'moledo-secret', slug: 'moledo-secret', name: 'Moledo (Secret)', nameEn: 'Moledo (Secret)',
     region: 'Caminha', regionEn: 'Caminha', lat: 41.850, lon: -8.862,
     type: 'surf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'W, NW',

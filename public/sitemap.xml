@@ -426,11 +426,6 @@
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://braindeadpt.github.io/windspot-pt/pt/spots/vilanova-milfontes/</loc>
-    <changefreq>hourly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
     <loc>https://braindeadpt.github.io/windspot-pt/pt/spots/moledo-secret/</loc>
     <changefreq>hourly</changefreq>
     <priority>0.85</priority>
@@ -827,11 +822,6 @@
   </url>
   <url>
     <loc>https://braindeadpt.github.io/windspot-pt/en/spots/porto-covo-secret/</loc>
-    <changefreq>hourly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://braindeadpt.github.io/windspot-pt/en/spots/vilanova-milfontes/</loc>
     <changefreq>hourly</changefreq>
     <priority>0.85</priority>
   </url>
