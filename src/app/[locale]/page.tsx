@@ -64,7 +64,7 @@ const SPORTS: { id: SportType | 'all'; label: string; color: string }[] = [
 ];
 
 // ─── Server Component ───
-export default async function HomePage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams?: { sport?: string; region?: string } }) {
+export default async function HomePage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams?: Promise<{ sport?: string; region?: string }> }) {
   const { locale } = await params;
   const isPt = locale === 'pt';
   const t = getTranslation(locale as any);
