@@ -2,36 +2,185 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════
+ *  CSS CUSTOM PROPERTIES
+ *  Defined here so they're available to both Tailwind utilities AND
+ *  inline styles (used by ScoreGauge, WaveShape SVG strokes).
+ * ═══════════════════════════════════════════════════════════════════════ */
+
 @layer base {
+  :root {
+    /* Score color tokens — single source of truth.
+       Pair with Tailwind shadow-glow-{epic,good,fair,poor,closed}. */
+    --score-epic:   52 211 153;   /* emerald-400 */
+    --score-good:   56 189 248;   /* sky-400     */
+    --score-fair:  251 191 36;    /* amber-400   */
+    --score-poor:  249 115 22;    /* orange-500  */
+    --score-closed:244 63 94;     /* rose-500    */
+
+    /* Aliases used by the ScoreGauge SVG and similar.
+       Read via `rgb(var(--score-current) / <alpha>)`. */
+    --score-current: var(--score-good);
+  }
+
+  /* Default surface */
   body {
-    @apply bg-ocean-950 text-white antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Numbers should align in tables and stat strips by default. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ──────────────────────────────────────────────────────────────────
+   *  Focus visibility — apply to any interactive element.
+   *  Uses :focus-visible so mouse clicks don't show a ring.
+   * ────────────────────────────────────────────────────────────────── */
+  *:focus {
+    outline: none;
+  }
+  *:focus-visible {
+    outline: 2px solid rgb(var(--score-good) / 0.8);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Inputs/textarea/select keep a slightly tighter ring */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline-offset: 0;
+  }
+
+  /* ──────────────────────────────────────────────────────────────────
+   *  Reduced motion — disable all animations/transitions for users
+   *  who request it. Override per-element if a transition is essential
+   *  for understanding (e.g. tab content swap).
+   * ────────────────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+ *  COMPONENT UTILITIES
+ *  Small, opinionated patterns used across multiple components.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
 @layer components {
+  /* Card surfaces.
+     Use card-1 for default, card-2 for emphasised, card-hero for major
+     hero surfaces. All can be combined with shadow-card / shadow-card-hover. */
+  .card-1 {
+    @apply bg-surface-1 border border-divider rounded-card backdrop-blur-sm;
+  }
+  .card-2 {
+    @apply bg-surface-2 border border-divider-strong rounded-card backdrop-blur-md;
+  }
+  .card-hero {
+    @apply bg-surface-1 border border-divider-strong rounded-card-lg backdrop-blur-md;
+  }
+
+  /* Pill — used for filter chips, sport selectors, score badges.
+     Adjust active state per component, this is just the base. */
+  .pill {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill text-meta font-medium
+           transition-colors duration-base;
+  }
+  .pill-ghost {
+    @apply bg-surface-1 text-fg-muted hover:bg-surface-2 hover:text-fg border border-transparent;
+  }
+  .pill-active {
+    @apply bg-surface-2 text-fg border border-divider-strong;
+  }
+
+  /* Skeleton shimmer for loading states.
+     Use on a div with explicit width/height. */
+  .skeleton {
+    @apply bg-surface-1 rounded-card overflow-hidden relative;
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.04) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+
+  /* Score badge — uses CSS variable set inline.
+     Usage:
+       <span class="score-badge" style="--score-current: var(--score-good)">87</span>
+  */
+  .score-badge {
+    @apply inline-flex items-center justify-center font-mono font-semibold;
+    color: rgb(var(--score-current));
+    background: rgb(var(--score-current) / 0.12);
+    border: 1px solid rgb(var(--score-current) / 0.25);
+  }
+
+  /* Sport accent text — semantic shortcut.
+     <span class="sport-accent" data-sport="kitesurf">Kite</span> */
+  .sport-accent[data-sport="surf"]      { @apply text-sport-surf; }
+  .sport-accent[data-sport="kitesurf"]  { @apply text-sport-kitesurf; }
+  .sport-accent[data-sport="windsurf"]  { @apply text-sport-windsurf; }
+  .sport-accent[data-sport="bodyboard"] { @apply text-sport-bodyboard; }
+  .sport-accent[data-sport="sup"]       { @apply text-sport-sup; }
+  .sport-accent[data-sport="wakeboard"] { @apply text-sport-wakeboard; }
+
+  /* ──────────────────────────────────────────────────────────────────
+   *  LEGACY (deprecated — kept until Fase 4 migrates all callers)
+   * ────────────────────────────────────────────────────────────────── */
   .glass-card {
     @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
   }
-
   .glass-card-strong {
     @apply bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl;
   }
-
   .text-gradient {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, #38bdf8 0%, #34d399 50%, #fbbf24 100%);
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+ *  RAW UTILITIES
+ *  Things that don't fit Tailwind's @apply pattern.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
 @layer utilities {
+  /* Scrollbar hide — used by horizontal filter rows */
+  .no-scrollbar,
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .no-scrollbar::-webkit-scrollbar,
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Edge fade — for horizontal scroll containers, gives a visual hint
+     that there's more content off-screen. Apply to the wrapper element. */
+  .edge-fade-x {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 24px,
+      black calc(100% - 24px),
+      transparent
+    );
+  }
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -45,23 +194,9 @@
     overflow: hidden;
   }
 
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .animate-marquee {
-    animation: marquee 30s linear infinite;
-  }
-  .animate-marquee:hover {
-    animation-play-state: paused;
-  }
-
-  @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+  /* Number alignment helper — use on any element containing only digits
+     when you need tabular spacing without switching to font-mono. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }

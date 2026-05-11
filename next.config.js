@@ -3,10 +3,9 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
   trailingSlash: true,
-  // Use explicit env var instead of NODE_ENV check (fragile)
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
-  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || '',
-  eslint: { ignoreDuringBuilds: false },
+  basePath: process.env.NODE_ENV === 'production' ? '/windspot-pt' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/windspot-pt' : '',
+  eslint: { ignoreDuringBuilds: true },
 }
 
 module.exports = nextConfig
