@@ -254,6 +254,50 @@ function scoreSUP(spot: Spot, c: Conditions): SportScore {
   }
 }
 
+function scoreFoil(spot: Spot, c: Conditions): SportScore {
+  const factors: string[] = []
+  const windKt = c.windSpeed * 1.94384
+
+  // Foil needs moderate wind (10-25kt ideal) and relatively flat water
+  let score = 0
+
+  // Wind speed (0-60 pts) — moderate wind best
+  if (windKt >= 10 && windKt <= 25) {
+    score += 50
+    factors.push(`${windKt.toFixed(0)}kt vento ideal`)
+  } else if (windKt >= 5 && windKt < 10) {
+    score += 25
+    factors.push('Vento fraco')
+  } else if (windKt > 25 && windKt <= 35) {
+    score += 20
+    factors.push('Vento forte')
+  } else {
+    score += 5
+  }
+
+  // Wave height (0-25 pts) — flatter is better for foil
+  if (c.waveHeight < 0.5) {
+    score += 25
+    factors.push('Água plana')
+  } else if (c.waveHeight < 1.0) {
+    score += 15
+  } else if (c.waveHeight < 1.5) {
+    score += 5
+  }
+
+  // Water temp (0-15 pts)
+  score += Math.min(c.waterTemp * 0.4, 15)
+
+  score = Math.round(Math.min(100, Math.max(0, score)))
+
+  return {
+    score,
+    ...getRatingLabels(score),
+    factors,
+    primaryFactor: windKt >= 10 && windKt <= 25 ? 'Vento ideal' : `${windKt.toFixed(0)}kt`,
+  }
+}
+
 // ─── Helpers ───
 
 function getRatingLabels(score: number): { rating: string; ratingEn: string } {
@@ -275,6 +319,7 @@ export function getSportScore(spot: Spot, sport: SportType, conditions: Conditio
     case 'wakeboard': return scoreWakeboard(spot, conditions)
     case 'bodyboard': return scoreBodyboard(spot, conditions)
     case 'sup': return scoreSUP(spot, conditions)
+    case 'foil': return scoreFoil(spot, conditions)
     default: return { score: 0, rating: 'N/A', ratingEn: 'N/A', factors: [], primaryFactor: 'N/A' }
   }
 }
@@ -288,6 +333,7 @@ export function getAllSportScores(spot: Spot, conditions: Conditions): Record<Sp
     wakeboard: getSportScore(spot, 'wakeboard', conditions),
     bodyboard: getSportScore(spot, 'bodyboard', conditions),
     sup: getSportScore(spot, 'sup', conditions),
+    foil: getSportScore(spot, 'foil', conditions),
   }
 }
 

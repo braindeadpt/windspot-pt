@@ -17,7 +17,7 @@ export interface Spot {
   facilities: string[];
   hazards: string[];
   // Sports compatibility - which sports can be practiced here
-  compatibleSports?: ('surf' | 'kitesurf' | 'windsurf' | 'wakeboard' | 'bodyboard' | 'sup')[];
+  compatibleSports?: ('surf' | 'kitesurf' | 'windsurf' | 'wakeboard' | 'bodyboard' | 'sup' | 'foil')[];
   // Water quality / beach flags (optional community data)
   waterQuality?: 'excelente' | 'boa' | 'razoavel' | 'má';
   waterQualityEn?: 'excellent' | 'good' | 'fair' | 'poor';

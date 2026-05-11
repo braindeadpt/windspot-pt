@@ -3,12 +3,12 @@ import { join } from 'path';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { 
-  Wind, Waves, Thermometer, MapPin, ArrowRight, Zap, 
-  ChevronDown, Filter, Star, TrendingUp
+  MapPin, ArrowRight, Search
 } from 'lucide-react';
 import { spots } from '@/lib/spots';
 import { getAllSportScores, getScoreColor } from '@/lib/sportScore';
 import type { SportType } from '@/lib/sportRatings';
+import { getCompatibleSports } from '@/lib/sportRatings';
 import { getTranslation } from '@/lib/i18n';
 import { getMacroRegion, MACRO_REGIONS } from '@/lib/regions';
 import { SpotGridClient } from '@/components/spots/SpotGridClient';
@@ -39,6 +39,17 @@ interface SpotData {
     waterTemp: number;
   };
   allScores: Record<SportType, any>;
+}
+
+// ─── Load dawn-patrol.json at BUILD TIME ───
+function loadDawnPatrol(): Record<string, any> | null {
+  try {
+    const filePath = join(process.cwd(), 'public', 'data', 'dawn-patrol.json');
+    const data = readFileSync(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (e) {
+    return null;
+  }
 }
 
 // ─── Load conditions at BUILD TIME (Server Component) ───
@@ -97,6 +108,38 @@ export default function HomePage({ params }: { params: { locale: string } }) {
   const bestSpot = spotsData[0];
   const top5 = spotsData.slice(0, 5);
 
+  // "ON" threshold tuned empirically (Fase 4a): score >= 70
+  // restricted to spot's compatibleSports. With current data,
+  // this yields ~51 spots out of 72 with conditions (~71% of active).
+  const ON_THRESHOLD = 70;
+
+  const onCount = spotsData.filter(d => {
+    const compatible = getCompatibleSports(d.spot);
+    return compatible.some(sport => (d.allScores[sport]?.score ?? 0) >= ON_THRESHOLD);
+  }).length;
+
+  // Status bar: freshest and stalest timestamps
+  const now = Date.now();
+  const timestamps = spotsData
+    .map(d => conditions[d.spot.id]?.updatedAt)
+    .filter(Boolean)
+    .map((ts: string) => new Date(ts).getTime());
+  const maxTs = timestamps.length > 0 ? Math.max(...timestamps) : null;
+  const minTs = timestamps.length > 0 ? Math.min(...timestamps) : null;
+  const hoursSinceMin = minTs ? (now - minTs) / 3600000 : Infinity;
+
+  // Dawn Patrol headline for context line
+  const dawnPatrol = loadDawnPatrol();
+  const dawnHeadline = dawnPatrol?.[isPt ? 'pt' : 'en']?.headline || null;
+
+  // Best sport (for sub-line "Top score: X · surf")
+  const bestSportEntry = bestSpot
+    ? Object.entries(bestSpot.allScores)
+        .filter(([, s]) => s.score > 0)
+        .sort(([, a], [, b]) => b.score - a.score)[0]
+    : null;
+  const bestSportId = (bestSportEntry?.[0] as SportType) || 'surf';
+
   return (
     <div className="min-h-screen bg-slate-950">
       {/* SEO H1 - visible to Googlebot */}
@@ -107,105 +150,117 @@ export default function HomePage({ params }: { params: { locale: string } }) {
         }
       </h1>
 
+      {/* Status Bar */}
+      <section role="status" aria-live="polite" className="w-full bg-surface-1 border-b border-divider z-30 sticky top-0">
+        <div className="max-w-7xl mx-auto px-4 h-10 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-meta text-fg-muted">
+            <span
+              className={`w-2 h-2 rounded-full ${
+                hoursSinceMin < 3
+                  ? 'bg-[rgb(var(--score-good))]'
+                  : hoursSinceMin < 12
+                    ? 'bg-[rgb(var(--score-fair))]'
+                    : 'bg-[rgb(var(--score-poor))]'
+              } ${hoursSinceMin < 12 ? 'animate-pulse' : ''}`}
+            />
+            <span>
+              {minTs
+                ? `${isPt ? 'Atualizado às' : 'Updated at'} ${new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date(maxTs!))} · ${spotsData.length} ${isPt ? 'spots monitorizados' : 'spots monitored'}`
+                : isPt ? 'Sem dados de condições' : 'No condition data'}
+            </span>
+          </div>
+        </div>
+      </section>
+
       {/* Dawn Patrol AI Advisor Banner */}
       <DawnPatrolBanner locale={locale} />
 
-      {/* Live Ticker - Top 5 spots */}
-      <div className="w-full bg-slate-900/80 backdrop-blur-md border-b border-white/5 overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap py-2">
-          {[...top5, ...top5].map((data, i) => (
-            <Link
-              key={`${data.spot.id}-${i}`}
-              href={`/${locale}/spots/${data.spot.slug}`}
-              className="inline-flex items-center gap-3 px-6 hover:bg-white/5 transition-colors"
-            >
-              <span className="font-bold text-white/90">{isPt ? data.spot.name : data.spot.nameEn}</span>
-              <span className="flex items-center gap-1 text-xs text-white/50">
-                <Waves className="w-3 h-3" />
-                {data.conditions.waveHeight.toFixed(1)}m
-              </span>
-              <span className="flex items-center gap-1 text-xs text-white/50">
-                <Wind className="w-3 h-3" />
-                {(data.conditions.windSpeed * 1.94384).toFixed(0)}kt
-              </span>
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${getScoreColor(data.allScores['surf']?.score || 0).bg} ${getScoreColor(data.allScores['surf']?.score || 0).text}`}>
-                {data.allScores['surf']?.score || 0}
-              </span>
-            </Link>
-          ))}
+      {/* Live Ticker - Refined */}
+      <div className="w-full bg-surface-1 border-y border-divider overflow-hidden">
+        <div className="flex animate-marquee whitespace-nowrap" style={{ animationDuration: '60s' }}>
+          {[...top5, ...top5].map((data, i) => {
+            const score = data.allScores['surf']?.score || 0;
+            const color = score >= 85 ? 'rgb(var(--score-good))' : score >= 70 ? 'rgb(var(--score-fair))' : score >= 50 ? 'rgb(var(--score-mid))' : 'rgb(var(--score-poor))';
+            return (
+              <Link
+                key={`${data.spot.id}-${i}`}
+                href={`/${locale}/spots/${data.spot.slug}`}
+                className="inline-flex items-center gap-3 px-5 py-1.5 hover:bg-surface-2 transition-colors"
+              >
+                <span className="w-0.5 h-4 rounded-full" style={{ backgroundColor: color }} />
+                <span className="font-sans font-semibold text-sm text-fg">{isPt ? data.spot.name : data.spot.nameEn}</span>
+                <span className="font-mono text-xs text-fg-subtle">{data.conditions.waveHeight.toFixed(1)}m · {(data.conditions.windSpeed * 1.94384).toFixed(0)}kt</span>
+                <span className="font-mono text-xs font-bold tabular-nums" style={{ color }}>{score}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
-      {/* Hero Section - Best Spot */}
+      {/* Hero Compact */}
       {bestSpot && (
-        <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-950" />
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-500/20 via-transparent to-transparent" />
-          </div>
-          
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <section className="relative min-h-[50vh] md:min-h-[40vh] flex items-center justify-center overflow-hidden py-12 md:py-8 bg-bg-base">
+          {/* Subtle radial glow — removed-motion safe */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgb(var(--score-good))_0%,transparent_70%)]" />
           </div>
 
-          <div className="relative z-10 max-w-4xl mx-auto px-4 text-center space-y-8">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${getScoreColor(bestSpot.allScores['surf']?.score || 0).bg} border ${getScoreColor(bestSpot.allScores['surf']?.score || 0).border} animate-pulse`}>
-              <TrendingUp className={`w-4 h-4 ${getScoreColor(bestSpot.allScores['surf']?.score || 0).text}`} />
-              <span className={`font-bold ${getScoreColor(bestSpot.allScores['surf']?.score || 0).text}`}>
-                {isPt ? 'Melhor Spot Hoje' : 'Best Spot Today'}
-              </span>
-              <span className={`text-xl font-bold ${getScoreColor(bestSpot.allScores['surf']?.score || 0).text}`}>{bestSpot.allScores['surf']?.score || 0}/100</span>
-            </div>
-
-            <h2 className="text-5xl md:text-7xl font-black text-white tracking-tight">
-              {isPt ? bestSpot.spot.name : bestSpot.spot.nameEn}
-            </h2>
-
-            <p className="text-xl md:text-2xl text-white/70 max-w-2xl mx-auto">
-              {isPt ? bestSpot.allScores['surf']?.rating : bestSpot.allScores['surf']?.ratingEn}
+          <div className="relative z-10 max-w-3xl mx-auto px-4 text-center space-y-6">
+            {/* Context line */}
+            <p className="text-meta-sm text-fg-subtle font-mono uppercase tracking-wider">
+              {new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date()).replace(/^\w/, c => c.toUpperCase())}
+              {dawnHeadline && ` · ${dawnHeadline.slice(0, 50)}${dawnHeadline.length > 50 ? '…' : ''}`}
             </p>
 
-            <div className="flex items-center justify-center gap-8 md:gap-12">
-              <div className="text-center space-y-1">
-                <Waves className="w-6 h-6 text-cyan-400 mx-auto" />
-                <div className="text-2xl font-bold text-white">{bestSpot.conditions.waveHeight.toFixed(1)}m</div>
-                <div className="text-xs text-white/50">{isPt ? 'Ondas' : 'Waves'}</div>
-              </div>
-              <div className="w-px h-12 bg-white/10" />
-              <div className="text-center space-y-1">
-                <Wind className="w-6 h-6 text-sky-400 mx-auto" />
-                <div className="text-2xl font-bold text-white">{(bestSpot.conditions.windSpeed * 1.94384).toFixed(0)}kt</div>
-                <div className="text-xs text-white/50">{isPt ? 'Vento' : 'Wind'}</div>
-              </div>
-              <div className="w-px h-12 bg-white/10" />
-              <div className="text-center space-y-1">
-                <Thermometer className="w-6 h-6 text-emerald-400 mx-auto" />
-                <div className="text-2xl font-bold text-white">{bestSpot.conditions.waterTemp.toFixed(1)}°C</div>
-                <div className="text-xs text-white/50">{isPt ? 'Água' : 'Water'}</div>
-              </div>
-            </div>
+            {/* Headline */}
+            <h2 className="text-display-xl font-sans text-fg tracking-tight">
+              {onCount === 0
+                ? (isPt ? '0 spots ON hoje — descobre os melhores próximos dias' : '0 spots ON today — discover the best in coming days')
+                : onCount === 1
+                  ? (isPt ? '1 spot ON para ti hoje' : '1 spot ON for you today')
+                  : (isPt ? `${onCount} spots ON para ti hoje` : `${onCount} spots ON for you today`)}
+            </h2>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            {/* Sub-line */}
+            <p className="text-h3 text-fg-muted">
+              {isPt ? 'Top score' : 'Top score'}: {isPt ? bestSpot.spot.name : bestSpot.spot.nameEn}{' '}
+              <span className="font-mono tabular-nums">{bestSpot.allScores[bestSportId]?.score || 0}/100</span>
+              {' · '}
+              <span className="sport-accent" data-sport={bestSportId}>
+                {bestSportId === 'surf' ? 'Surf' : bestSportId === 'kitesurf' ? 'Kitesurf' : bestSportId === 'windsurf' ? 'Windsurf' : bestSportId === 'bodyboard' ? 'Bodyboard' : bestSportId === 'sup' ? 'SUP' : 'Wakeboard'}
+              </span>
+            </p>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link
-                href={`/${locale}/spots/${bestSpot.spot.slug}`}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white rounded-xl font-bold text-lg transition-all hover:scale-105 shadow-lg shadow-cyan-500/25"
+                href={`/${locale}/spots/`}
+                className="inline-flex items-center gap-2 w-full sm:w-auto h-12 px-4 bg-surface-1 border border-divider hover:border-divider-strong rounded-lg text-fg-subtle transition-colors"
               >
-                <Zap className="w-5 h-5" />
-                {isPt ? 'Ver Condições ao Vivo' : 'Live Conditions'}
+                <Search className="w-4 h-4 text-fg-muted" />
+                <span>{isPt ? 'Procurar spot...' : 'Search spot...'}</span>
               </Link>
               <Link
                 href={`/${locale}/spots/`}
-                className="inline-flex items-center gap-2 px-6 py-4 bg-white/5 hover:bg-white/10 text-white/80 rounded-xl font-medium transition-all border border-white/10"
+                className="inline-flex items-center justify-center gap-2 h-12 px-6 border border-divider rounded-full text-fg hover:bg-surface-2 transition-colors font-medium"
               >
-                {isPt ? 'Explorar todos os spots' : 'Explore all spots'}
-                <ArrowRight className="w-4 h-4" />
+                {isPt ? 'Ver todos' : 'View all'}
               </Link>
             </div>
-          </div>
 
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <ChevronDown className="w-6 h-6 text-white/30" />
+            {/* Sport Pills */}
+            <div className="flex items-center justify-center gap-2 pt-2 overflow-x-auto no-scrollbar">
+              {SPORTS.filter(s => s.id !== 'all').map(sport => (
+                <Link
+                  key={sport.id}
+                  href={`/${locale}/spots/?sport=${sport.id}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border border-divider bg-surface-1 hover:bg-surface-2 transition-colors whitespace-nowrap"
+                >
+                  <span className="sport-accent" data-sport={sport.id}>●</span>
+                  {sport.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}

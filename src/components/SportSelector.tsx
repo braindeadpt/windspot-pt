@@ -11,6 +11,7 @@ const SPORT_ICONS: Record<SportType, React.ReactNode> = {
   wakeboard: <Anchor className="w-4 h-4" />,
   bodyboard: <Waves className="w-4 h-4" />,
   sup: <PersonStanding className="w-4 h-4" />,
+  foil: <LifeBuoy className="w-4 h-4" />,
 };
 
 interface SportSelectorProps {
