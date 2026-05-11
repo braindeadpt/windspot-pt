@@ -19,6 +19,7 @@ const spots = [
   { id: 'esposende', lat: 41.536, lon: -8.783 },
   { id: 'moledo', lat: 41.848, lon: -8.863 },
   { id: 'afife', lat: 41.780, lon: -8.860 },
+  { id: 'ancora', lat: 41.815, lon: -8.860 },
   { id: 'vila-praia-ancora', lat: 41.817, lon: -8.850 },
   { id: 'castelo-neiva', lat: 41.750, lon: -8.820 },
   { id: 'amorosa', lat: 41.700, lon: -8.850 },
@@ -81,16 +82,7 @@ const spots = [
   { id: 'castelo-bode', lat: 39.600, lon: -8.300 },
   { id: 'alqueva', lat: 38.200, lon: -7.500 },
   { id: 'lagos-wakepark', lat: 37.100, lon: -8.670 },
-  { id: 'zambujeira', lat: 37.525, lon: -8.786 },
-  { id: 'odeceixe', lat: 37.541, lon: -8.794 },
-  { id: 'sao-torpes', lat: 37.953, lon: -8.764 },
-  { id: 'porto-covo', lat: 37.852, lon: -8.792 },
-  { id: 'vilanova-milfontes', lat: 37.723, lon: -8.782 },
-  { id: 'moledo', lat: 41.850, lon: -8.862 },
-  { id: 'ancora', lat: 41.815, lon: -8.860 },
   { id: 'ponta-delgada', lat: 37.741, lon: -25.669 },
-  { id: 'jardim-mar', lat: 32.740, lon: -17.210 },
-  { id: 'paul-mar', lat: 32.760, lon: -17.225 },
 ];
 
 async function sleep(ms) {
