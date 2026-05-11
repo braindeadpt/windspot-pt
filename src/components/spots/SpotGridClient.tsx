@@ -139,7 +139,7 @@ export function SpotGridClient({
     setMounted(true);
 
     // Resolve sport: URL > localStorage > default
-    const urlSport = initialSport || nextSearch.get('sport');
+    const urlSport = initialSport || nextSearch?.get('sport');
     const lsSport = typeof window !== 'undefined' ? localStorage.getItem(LS_SPORT_KEY) : null;
     const resolvedSport = (urlSport as SportType | 'all') || (lsSport as SportType | 'all') || 'all';
     if (SPORTS.some(s => s.id === resolvedSport)) {
@@ -147,7 +147,7 @@ export function SpotGridClient({
     }
 
     // Resolve region: URL > localStorage > default
-    const urlRegion = initialRegion || nextSearch.get('region');
+    const urlRegion = initialRegion || nextSearch?.get('region');
     const lsRegion = typeof window !== 'undefined' ? localStorage.getItem(LS_REGION_KEY) : null;
     const resolvedRegion = urlRegion || lsRegion || 'Todos';
     if (regions.includes(resolvedRegion)) {

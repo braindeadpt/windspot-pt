@@ -44,7 +44,7 @@ function BattleContent() {
   const [selectedSport, setSelectedSport] = useState<SportType>('surf');
   const [baseCity, setBaseCity] = useState<'lisbon' | 'porto'>('lisbon');
 
-  const slugs = searchParams.get('spots')?.split(',') || [];
+  const slugs = searchParams?.get('spots')?.split(',') || [];
   const locale = (params?.locale as string) || 'pt';
   const isPt = locale === 'pt';
 

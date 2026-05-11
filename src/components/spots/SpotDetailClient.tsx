@@ -203,7 +203,7 @@ export default function SpotDetailClient({
   locale: string;
 }) {
   const searchParams = useSearchParams();
-  const sportFromUrl = searchParams.get('sport') as SportType | null;
+  const sportFromUrl = searchParams?.get('sport') as SportType | null;
 
   const isPt = locale === 'pt';
   const t = getTranslation(locale as 'pt' | 'en');
