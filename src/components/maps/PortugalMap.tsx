@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-
 // ─── Types ───
 interface SpotData {
   spot: {
@@ -57,16 +55,6 @@ function getZone(lat: number, lon: number): 'continental' | 'acores' | 'madeira'
   return null;
 }
 
-// ─── Simplified Portugal path (continental) ───
-const PORTUGAL_PATH =
-  'M130,10 C170,5 220,8 270,15 C320,22 360,35 395,55 ' +
-  'C425,75 445,100 455,130 C460,160 455,190 445,220 ' +
-  'C435,250 420,280 400,310 C380,340 355,365 325,380 ' +
-  'C295,395 260,400 225,398 C190,395 155,385 125,370 ' +
-  'C100,355 80,335 65,310 C50,285 40,255 35,225 ' +
-  'C30,195 28,165 27,135 C26,105 28,80 32,60 ' +
-  'C36,40 45,25 60,18 C75,12 95,9 115,9 Z';
-
 // ─── Component ───
 export default function PortugalMap({ spotsData, selectedSport = 'all', locale }: PortugalMapProps) {
   const isPt = locale === 'pt';
@@ -96,21 +84,22 @@ export default function PortugalMap({ spotsData, selectedSport = 'all', locale }
     const spotName = isPt ? data.spot.name : data.spot.nameEn;
 
     return (
-      <g key={data.spot.id}>
-        {/* Glow ring */}
+      <g key={data.spot.id} className="group">
+        {/* Glow ring — hidden by default, shown on hover */}
         <circle
           cx={x} cy={y} r={12}
           fill={`rgb(var(${varName}) / 0.2)`}
+          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           style={{ pointerEvents: 'none' }}
         />
         {/* Marker */}
-        <Link href={`/${locale}/spots/${data.spot.slug}`}>
+        <a href={`/${locale}/spots/${data.spot.slug}`}>
           <circle
             cx={x} cy={y} r={5}
             fill={`rgb(var(${varName}) / 0.85)`}
             stroke={`rgb(var(${varName}))`}
             strokeWidth={1.5}
-            className="cursor-pointer transition-all duration-200 hover:r-7"
+            className="cursor-pointer transition-all duration-200"
             filter="drop-shadow(0 1px 2px rgb(0 0 0 / 0.4))"
             style={{ transition: 'r 200ms ease-out' }}
             onMouseEnter={(e) => {
@@ -126,7 +115,7 @@ export default function PortugalMap({ spotsData, selectedSport = 'all', locale }
           >
             <title>{`${spotName}: ${score}/100`}</title>
           </circle>
-        </Link>
+        </a>
       </g>
     );
   }
@@ -134,17 +123,17 @@ export default function PortugalMap({ spotsData, selectedSport = 'all', locale }
   return (
     <div className="relative w-full">
       <svg viewBox="0 0 720 420" className="w-full h-auto" preserveAspectRatio="xMidYMid meet" aria-label={isPt ? 'Mapa de spots em Portugal' : 'Map of spots in Portugal'}>
+        <defs>
+          <linearGradient id="coastGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgb(var(--data-water) / 0.10)" />
+            <stop offset="100%" stopColor="rgb(255 255 255 / 0.02)" />
+          </linearGradient>
+        </defs>
+
         {/* ─── Continental Portugal ─── */}
         <g>
-          {/* Water background */}
-          <rect x={BOUNDS.continental.x} y={BOUNDS.continental.y} width={BOUNDS.continental.w} height={BOUNDS.continental.h} fill="rgb(var(--data-water) / 0.04)" rx={8} />
-          {/* Land path */}
-          <path
-            d={PORTUGAL_PATH}
-            fill="rgb(255 255 255 / 0.03)"
-            stroke="rgb(255 255 255 / 0.12)"
-            strokeWidth={1}
-          />
+          {/* Water background with W→E gradient (ocean west → land east) */}
+          <rect x={BOUNDS.continental.x} y={BOUNDS.continental.y} width={BOUNDS.continental.w} height={BOUNDS.continental.h} fill="url(#coastGradient)" stroke="rgb(255 255 255 / 0.08)" strokeWidth={1} rx={12} />
           {/* Label */}
           <text x={BOUNDS.continental.x + 10} y={BOUNDS.continental.y + 18} className="fill-current text-meta-sm text-fg-subtle font-medium" aria-hidden="true">
             {isPt ? 'Portugal Continental' : 'Mainland Portugal'}
@@ -193,3 +182,6 @@ export default function PortugalMap({ spotsData, selectedSport = 'all', locale }
     </div>
   );
 }
+
+// TODO Fase 5: importar SVG path real de Portugal (Wikipedia tem CC0 disponível)
+// para substituir o rectângulo gradient por forma reconhecível do país.
