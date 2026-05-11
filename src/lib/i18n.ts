@@ -43,7 +43,6 @@ export const translations = {
       statusNoData: 'Sem dados',
       spotsMonitored: 'spots monitorizados',
       contextSeparator: '·',
-      mapTitle: 'Mapa dos Spots',
     },
     spots: {
       title: 'Spots', filter: 'Filtrar por', all: 'Todos',
@@ -144,7 +143,6 @@ export const translations = {
       statusNoData: 'No data',
       spotsMonitored: 'spots monitored',
       contextSeparator: '·',
-      mapTitle: 'Spots Map',
     },
     spots: {
       title: 'Spots', filter: 'Filter by', all: 'All',

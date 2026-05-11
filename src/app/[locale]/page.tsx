@@ -11,8 +11,6 @@ import { getCompatibleSports } from '@/lib/sportRatings';
 import { getTranslation } from '@/lib/i18n';
 import { getMacroRegion, MACRO_REGIONS } from '@/lib/regions';
 import { SpotGridClient } from '@/components/spots/SpotGridClient';
-import PortugalMap from '@/components/maps/PortugalMap';
-
 import DawnPatrolBanner from '@/components/DawnPatrolBannerWrapper';
 
 // ─── Types ───
@@ -263,29 +261,6 @@ export default async function HomePage({ params, searchParams }: { params: Promi
         initialSport={undefined}
         initialRegion={undefined}
       />
-
-      {/* Interactive Portugal Map */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-h1 text-fg">
-              {isPt ? (t as any).hero.mapTitle || 'Mapa dos Spots' : 'Spots Map'}
-            </h2>
-            <p className="text-meta text-fg-muted mt-1">
-              {isPt
-                ? `${spotsData.length} spots em Portugal, Açores e Madeira`
-                : `${spotsData.length} spots in Portugal, Azores and Madeira`}
-            </p>
-          </div>
-        </div>
-        <div className="card-1 p-4 rounded-card">
-          <PortugalMap
-            spotsData={spotsData}
-            locale={locale}
-            selectedSport="all"
-          />
-        </div>
-      </section>
 
       {/* Footer Stats — Semantic Refresh */}
       <section className="border-t border-divider py-12">
