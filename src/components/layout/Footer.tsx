@@ -18,7 +18,7 @@ export default function Footer({ locale }: FooterProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Wind className="w-6 h-6 text-cyan-400" />
-              <span className="text-lg font-bold text-fg">Ven</span><span className="text-lg font-bold text-data-waves">Tu</span>
+              <span className="text-lg font-bold text-fg">Ven<span className="text-data-waves">Tu</span></span>
             </div>
             <p className="text-sm text-white/50 leading-relaxed">
               {isPt 

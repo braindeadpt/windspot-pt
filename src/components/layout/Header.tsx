@@ -37,7 +37,7 @@ export default function Header({ locale }: HeaderProps) {
             <div className="relative">
               <Wind className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
             </div>
-            <span className="text-xl font-bold text-fg">Ven</span><span className="text-xl font-bold text-data-waves">Tu</span>
+            <span className="text-xl font-bold text-fg">Ven<span className="text-data-waves">Tu</span></span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
