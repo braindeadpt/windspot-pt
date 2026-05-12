@@ -9,10 +9,7 @@ function getInitialTheme(): boolean {
   if (typeof window === 'undefined') return false;
   try {
     const stored = localStorage.getItem(THEME_KEY);
-    if (stored === 'coast') return true;
-    if (stored === 'dark') return false;
-    // First visit: respect system preference
-    return window.matchMedia('(prefers-color-scheme: light)').matches;
+    return stored === 'coast';
   } catch {
     return false;
   }

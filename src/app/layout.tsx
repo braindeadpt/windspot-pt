@@ -39,7 +39,7 @@ const themeScript = `
   (function() {
     try {
       var t = localStorage.getItem('windspot:theme');
-      if (t === 'coast' || (t === null && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      if (t === 'coast') {
         document.documentElement.classList.add('theme-coast');
       }
     } catch (e) {}
