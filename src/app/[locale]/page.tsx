@@ -51,18 +51,6 @@ function loadConditions(): Record<string, any> {
   }
 }
 
-// ─── Sport Config (used only in server component) ───
-const SPORTS: { id: SportType | 'all'; label: string; color: string }[] = [
-  { id: 'all', label: 'Todos', color: 'text-fg' },
-  { id: 'surf', label: 'Surf', color: 'text-data-waves' },
-  { id: 'bodyboard', label: 'Bodyboard', color: 'text-data-waves' },
-  { id: 'kitesurf', label: 'Kitesurf', color: 'text-data-waves' },
-  { id: 'windsurf', label: 'Windsurf', color: 'text-data-waves' },
-  { id: 'foil', label: 'Foil', color: 'text-sport-foil' },
-  { id: 'sup', label: 'SUP', color: 'text-data-waves' },
-  { id: 'wakeboard', label: 'Wakeboard', color: 'text-data-waves' },
-];
-
 // ─── Server Component ───
 export default async function HomePage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams?: Promise<{ sport?: string; region?: string }> }) {
   const { locale } = await params;
@@ -236,19 +224,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
               </Link>
             </div>
 
-            {/* Sport Pills */}
-            <div className="flex items-center justify-center gap-2 pt-2 overflow-x-auto no-scrollbar">
-              {SPORTS.filter(s => s.id !== 'all').map(sport => (
-                <Link
-                  key={sport.id}
-                  href={`/${locale}/spots/?sport=${sport.id}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border border-divider bg-surface-1 hover:bg-surface-2 transition-colors whitespace-nowrap"
-                >
-                  <span className="sport-accent" data-sport={sport.id}>●</span>
-                  {sport.label}
-                </Link>
-              ))}
-            </div>
+            {/* Quick links removed — sport filters now live in SpotGridClient below */}
           </div>
         </section>
       )}
