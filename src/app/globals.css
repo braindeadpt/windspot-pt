@@ -66,6 +66,56 @@
     --score-current: var(--score-good);
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+   * THEME COAST — Fase 7.2
+   * Paleta clara "final de tarde na praia portuguesa".
+   * Aplica-se ao elemento <html> com class="theme-coast".
+   * Toggle manual via DevTools (Fase 7.3 adiciona controlo UI).
+   * ═══════════════════════════════════════════════════════════════ */
+  .theme-coast {
+    /* ───── Surfaces & backgrounds ───── */
+    --bg-base:       250 246 239;      /* #faf6ef — bege cremoso */
+    --bg-elevated:  255 252 246;       /* #fffcf6 — off-white */
+    --surface-1:    26 43 58 / 0.05;   /* navy a 5% */
+    --surface-2:    26 43 58 / 0.08;   /* navy a 8% */
+    --surface-3:    26 43 58 / 0.12;   /* navy a 12% */
+    --divider:      26 43 58 / 0.10;
+    --divider-strong: 26 43 58 / 0.18;
+
+    /* ───── Foreground / text ───── */
+    --fg:           26 43 58 / 0.95;   /* navy escuro */
+    --fg-muted:     26 43 58 / 0.70;
+    --fg-subtle:    26 43 58 / 0.50;
+    --fg-disabled:  26 43 58 / 0.30;
+
+    /* ───── Data viz (mais saturados para fundo claro) ───── */
+    --data-waves:    37 99 235;        /* blue-600 */
+    --data-wind:    217 119 6;         /* amber-600 */
+    --data-water:    13 148 136;       /* teal-600 */
+    --data-period:  124 58 237;        /* violet-600 */
+
+    /* ───── Sport accents ───── */
+    --sport-surf:        8 145 178;     /* cyan-600 */
+    --sport-kitesurf:  147 51 234;      /* purple-600 */
+    --sport-windsurf:  234 88 12;       /* orange-600 */
+    --sport-bodyboard:  13 148 136;     /* teal-600 */
+    --sport-sup:         5 150 105;     /* emerald-600 */
+    --sport-wakeboard: 192 38 211;      /* fuchsia-600 */
+    --sport-foil:      202 138 4;       /* yellow-600 */
+
+    /* ───── Wind direction ───── */
+    --windDir-offshore:  22 163 74;     /* green-600 */
+    --windDir-onshore:  220 38 38;      /* red-600 */
+    --windDir-cross:   100 116 139;     /* slate-500 */
+
+    /* ───── Score colors (mais saturados para fundo claro) ───── */
+    --score-epic:      5 150 105;       /* emerald-600 */
+    --score-good:     37 99 235;        /* blue-600 */
+    --score-fair:    217 119 6;         /* amber-600 */
+    --score-poor:    234 88 12;         /* orange-600 */
+    --score-closed:  220 38 38;         /* red-600 */
+  }
+
   /* Default surface */
   body {
     -webkit-font-smoothing: antialiased;

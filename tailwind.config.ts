@@ -197,12 +197,13 @@ const config: Config = {
         'card-hover':   '0 8px 24px -4px rgb(0 0 0 / 0.3), 0 4px 8px -2px rgb(0 0 0 / 0.2)',
         'inset-divider':'inset 0 -1px 0 0 rgb(255 255 255 / 0.06)',
 
-        // Score glows for badges, gauges, hero CTAs
-        'glow-epic':   '0 0 32px -4px rgb(52 211 153 / 0.45)',  // emerald
-        'glow-good':   '0 0 32px -4px rgb(56 189 248 / 0.40)',  // sky
-        'glow-fair':   '0 0 24px -4px rgb(251 191 36 / 0.35)',  // amber
-        'glow-poor':   '0 0 24px -4px rgb(249 115 22 / 0.30)',  // orange
-        'glow-closed': '0 0 16px -4px rgb(244 63 94 / 0.25)',   // rose
+        // Score glows for badges, gauges, hero CTAs.
+        // Fase 7.2: convertido para CSS variables — agora respeitam o tema.
+        'glow-epic':   '0 0 32px -4px rgb(var(--score-epic) / 0.45)',
+        'glow-good':   '0 0 32px -4px rgb(var(--score-good) / 0.40)',
+        'glow-fair':   '0 0 24px -4px rgb(var(--score-fair) / 0.35)',
+        'glow-poor':   '0 0 24px -4px rgb(var(--score-poor) / 0.30)',
+        'glow-closed': '0 0 16px -4px rgb(var(--score-closed) / 0.25)',
       },
 
       // ═══════════════════════════════════════════════════════════
