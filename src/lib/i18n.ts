@@ -80,6 +80,7 @@ export const translations = {
       forCommunity: 'para a comunidade',
     },
     common: { loading: 'A carregar...', error: 'Erro ao carregar dados', refresh: 'Atualizar', today: 'Hoje', tomorrow: 'Amanhã', now: 'Agora' },
+    theme: { toggle: 'Alternar tema', toggleDark: 'Alternar para tema escuro', toggleCoast: 'Alternar para tema claro' },
     forecastTable: {
       caption: 'Previsão horária para as próximas {hours} horas',
       waves: 'Ondas (m)',
@@ -180,6 +181,7 @@ export const translations = {
       forCommunity: 'for the community',
     },
     common: { loading: 'Loading...', error: 'Error loading data', refresh: 'Refresh', today: 'Today', tomorrow: 'Tomorrow', now: 'Now' },
+    theme: { toggle: 'Switch theme', toggleDark: 'Switch to dark theme', toggleCoast: 'Switch to light theme' },
     forecastTable: {
       caption: 'Hourly forecast for the next {hours} hours',
       waves: 'Waves (m)',
