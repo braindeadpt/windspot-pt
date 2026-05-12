@@ -43,8 +43,8 @@ O **VenTu** é uma plataforma **gratuita e open-source** que fornece condições
 
 ```bash
 # Clone o repositório
-git clone https://github.com/braindeadpt/windspot-pt.git
-cd windspot-pt
+git clone https://github.com/braindeadpt/ventu.git
+cd ventu
 
 # Instalar dependências
 npm install
@@ -101,8 +101,8 @@ Contribuições são bem-vindas! Abre um PR ou issue no GitHub.
 
 ```bash
 # Clone the repository
-git clone https://github.com/braindeadpt/windspot-pt.git
-cd windspot-pt
+git clone https://github.com/braindeadpt/ventu.git
+cd ventu
 
 # Install dependencies
 npm install

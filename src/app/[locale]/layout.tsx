@@ -25,10 +25,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       ? 'Condições em tempo real para surf, kitesurf, windsurf e big wave em Portugal. Dados de ondas, vento e temperatura da água.'
       : 'Real-time conditions for surf, kitesurf, windsurf and big wave in Portugal. Wave, wind and water temperature data.',
     keywords: ['surf', 'kitesurf', 'windsurf', 'Portugal', 'ondas', 'vento', 'Nazaré', 'Peniche', 'big wave'],
-    manifest: '/windspot-pt/manifest.json',
+    manifest: '/manifest.json',
     icons: {
-      icon: '/windspot-pt/favicon.svg',
-      apple: '/windspot-pt/apple-touch-icon.svg',
+      icon: '/favicon.svg',
+      apple: '/apple-touch-icon.svg',
     },
     openGraph: {
       title: 'VenTu',
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         : 'Real-time conditions for water sports in Portugal',
       type: 'website',
       locale: isPt ? 'pt_PT' : 'en_US',
-      url: 'https://braindeadpt.github.io/windspot-pt',
+      url: 'https://ventu.surf',
       siteName: 'VenTu',
     },
     twitter: {
