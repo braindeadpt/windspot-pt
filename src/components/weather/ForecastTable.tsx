@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 
 import type { SportType } from '@/lib/sportRatings';
 import { SPORT_LABELS } from '@/lib/sportRatings';
@@ -237,8 +237,8 @@ export default function ForecastTable({
     );
   }
 
-  /* ── slice data (raw — all hours) ── */
-  const rawVisible = useMemo(() => {
+  /* ── slice data ── */
+  const visible = useMemo(() => {
     let startIndex = 0;
     if (startTime) {
       startIndex = hourly.findIndex((h) => {
@@ -250,24 +250,7 @@ export default function ForecastTable({
     return hourly.slice(startIndex, startIndex + visibleCount);
   }, [hourly, startTime, visibleCount]);
 
-  /* ── day groups from raw (for tabs) ── */
-  const allDayGroups = useMemo(
-    () => groupHoursByDay(rawVisible, locale),
-    [rawVisible, locale],
-  );
-
-  /* ── day filter state ── */
-  const [filterDayIndex, setFilterDayIndex] = useState<number | null>(null);
-
-  /* ── filtered visible hours ── */
-  const visible = useMemo(() => {
-    if (filterDayIndex === null) return rawVisible;
-    const group = allDayGroups[filterDayIndex];
-    if (!group) return rawVisible;
-    return rawVisible.slice(group.startIndex, group.startIndex + group.count);
-  }, [rawVisible, allDayGroups, filterDayIndex]);
-
-  /* ── day groups from filtered (for table header) ── */
+  /* ── day groups ── */
   const dayGroups = useMemo(
     () => groupHoursByDay(visible, locale),
     [visible, locale],
@@ -280,13 +263,56 @@ export default function ForecastTable({
     return map;
   }, [dayGroups]);
 
-  /* ── day click handler (toggle filter) ── */
-  const handleDayClick = useCallback(
+  /* ── scroll container ref + snap logic ── */
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScroll = useRef(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /* ── active day + scroll ── */
+  const [activeDay, setActiveDay] = useState(0);
+
+  const scrollToDay = useCallback(
     (dayIndex: number) => {
-      setFilterDayIndex((prev) => (prev === dayIndex ? null : dayIndex));
+      setActiveDay(dayIndex);
+      const el = document.getElementById(`ft-day-${dayIndex}`);
+      if (!el || !scrollRef.current) return;
+      isProgrammaticScroll.current = true;
+      el.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      setTimeout(() => { isProgrammaticScroll.current = false; }, 600);
     },
     [],
   );
+
+  /* ── scroll-snap: when user scroll stops, snap to nearest day boundary ── */
+  const handleScroll = useCallback(() => {
+    if (isProgrammaticScroll.current) return;
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = setTimeout(() => {
+      const container = scrollRef.current;
+      if (!container || dayGroups.length <= 1) return;
+
+      let closestDay = 0;
+      let minDistance = Infinity;
+
+      for (let i = 0; i < dayGroups.length; i++) {
+        const el = document.getElementById(`ft-day-${i}`);
+        if (!el) continue;
+        const distance = Math.abs(el.offsetLeft - container.scrollLeft);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestDay = i;
+        }
+      }
+
+      const el = document.getElementById(`ft-day-${closestDay}`);
+      if (el) {
+        isProgrammaticScroll.current = true;
+        el.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+        setActiveDay(closestDay);
+        setTimeout(() => { isProgrammaticScroll.current = false; }, 600);
+      }
+    }, 200);
+  }, [dayGroups.length]);
 
   /* ── current hour ref ── */
   const now = useMemo(() => new Date(), []);
@@ -318,16 +344,16 @@ export default function ForecastTable({
       {/* ═══════════════════════════════════════════════════════════════
           DAY PICKER TABS
           ═══════════════════════════════════════════════════════════════ */}
-      {allDayGroups.length > 1 && (
+      {dayGroups.length > 1 && (
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-          {allDayGroups.map((group, i) => (
+          {dayGroups.map((group, i) => (
             <button
               key={i}
-              onClick={() => handleDayClick(i)}
+              onClick={() => scrollToDay(i)}
               className={`
                 px-3 py-1.5 sm:px-4 sm:py-2 rounded-pill text-meta-sm font-medium whitespace-nowrap
                 transition-all duration-fast
-                ${filterDayIndex === i
+                ${activeDay === i
                   ? 'bg-surface-3 text-fg ring-1 ring-divider-strong'
                   : 'bg-surface-1 text-fg-muted hover:bg-surface-2 hover:text-fg'
                 }
@@ -343,14 +369,6 @@ export default function ForecastTable({
               )}
             </button>
           ))}
-          {filterDayIndex !== null && (
-            <button
-              onClick={() => setFilterDayIndex(null)}
-              className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-pill text-meta-sm font-medium whitespace-nowrap transition-all duration-fast bg-surface-1 text-fg-muted hover:bg-surface-2 hover:text-fg border border-dashed border-divider"
-            >
-              {isPt ? 'Todas' : 'All'}
-            </button>
-          )}
         </div>
       )}
 
@@ -358,10 +376,12 @@ export default function ForecastTable({
           TABLE
           ═══════════════════════════════════════════════════════════════ */}
       <div
+        ref={scrollRef}
+        onScroll={handleScroll}
         className="overflow-x-auto no-scrollbar rounded-card-lg border border-divider bg-bg-base"
         tabIndex={0}
         role="region"
-        aria-label={t.caption.replace('{hours}', String(visibleCount))}
+        aria-label={t.caption.replace('{hours}', String(visible.length))}
       >
         <table className="w-full border-separate border-spacing-x-[2px] border-spacing-y-[1px] text-center">
           {/* Caption for screen readers */}
