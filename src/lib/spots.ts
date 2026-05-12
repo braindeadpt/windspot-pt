@@ -741,6 +741,47 @@ export const spots: Spot[] = [
     hazards: ['Outros riders']
   },
 
+  {
+    id: 'vila-real-santo-antonio', slug: 'vila-real-santo-antonio', name: 'Vila Real de Santo António', nameEn: 'Vila Real de Santo Antonio',
+    region: 'Algarve', regionEn: 'Algarve', lat: 37.200, lon: -7.418,
+    coastOrientation: 180,
+    type: 'kitesurf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'Ria Formosa',
+    description: 'Água plana na Ria Formosa com vento de leste térmico consistente. Um dos spots mais fiáveis do Algarve para kitesurf. Praia extensa e segura.',
+    descriptionEn: 'Flat water in Ria Formosa with consistent east thermal wind. One of the most reliable spots in the Algarve for kitesurfing. Long and safe beach.',
+    facilities: ['Estacionamento', 'Escolas kite', 'Aluguer', 'Restaurantes', 'WC'],
+    hazards: ['Tráfego de barcos na ria']
+  },
+  {
+    id: 'monte-gordo', slug: 'monte-gordo', name: 'Monte Gordo', nameEn: 'Monte Gordo',
+    region: 'Algarve', regionEn: 'Algarve', lat: 37.183, lon: -7.450,
+    coastOrientation: 180,
+    type: 'kitesurf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'S, SE',
+    description: 'Praia dourada extensa com água morna e vento de leste épico. Kitesurf perfeito para todos os níveis. Uma das melhores praias do Sotavento.',
+    descriptionEn: 'Long golden beach with warm water and epic east wind. Perfect kitesurfing for all levels. One of the best beaches in the Sotavento.',
+    facilities: ['Estacionamento', 'Escolas kite', 'Restaurantes', 'WC'],
+    hazards: ['Multidão no verão']
+  },
+  {
+    id: 'praia-verde', slug: 'praia-verde', name: 'Praia Verde', nameEn: 'Praia Verde',
+    region: 'Algarve', regionEn: 'Algarve', lat: 37.183, lon: -7.500,
+    coastOrientation: 180,
+    type: 'kitesurf', difficulty: 'intermediate', bestWind: 'E, SE', bestSwell: 'S, SE',
+    description: 'Praia selvagem entre VRSA e Monte Gordo. Menos crowd, ondas mais organizadas. Kitesurf com vento de leste e ondas de Sotavento.',
+    descriptionEn: 'Wild beach between VRSA and Monte Gordo. Less crowded, more organized waves. Kitesurfing with east wind and Sotavento waves.',
+    facilities: ['Estacionamento', 'Bar de praia (verão)'],
+    hazards: ['Correntes', 'Sem vigilância']
+  },
+  {
+    id: 'barrinha-faro', slug: 'barrinha-faro', name: 'Barrinha de Faro', nameEn: 'Barrinha de Faro',
+    region: 'Algarve', regionEn: 'Algarve', lat: 37.016, lon: -7.933,
+    coastOrientation: 180,
+    type: 'kitesurf', difficulty: 'beginner', bestWind: 'E, SE', bestSwell: 'Ria Formosa',
+    description: 'Lagoa da Ria Formosa com água plana e vento de leste. Spot perfeito para iniciantes e freestyle. Barra de acesso com barco típico.',
+    descriptionEn: 'Ria Formosa lagoon with flat water and east wind. Perfect spot for beginners and freestyle. Access via traditional boat.',
+    facilities: ['Estacionamento', 'Barco-táxi', 'Escolas kite', 'Restaurantes'],
+    hazards: ['Tráfego de barcos', 'Maré']
+  },
+
   // ==================== SPOTS SECRETOS — SECRET SPOTS ====================
   {
         localSecret: true,
