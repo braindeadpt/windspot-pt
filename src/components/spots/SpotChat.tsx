@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, Users, Trash2, Shield, Loader2, ChevronUp } from 'lucide-react';
 import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase';
-import { moderateMessage, moderateUsername, checkRateLimit, CHAT_RULES } from '@/lib/chatModeration';
+import { moderateMessage, moderateUsername, checkRateLimit, CHAT_RULES, sanitizeContent, validateUsername } from '@/lib/chatModeration';
 
 interface ChatMessage {
   id: string;
@@ -167,7 +167,19 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
     setModerationWarning(null);
     setRateLimitWarning(null);
 
-    // Validate username
+    // Validate username format (defense in depth — server also validates)
+    const usernameValidation = validateUsername(username);
+    if (!usernameValidation.valid) {
+      setModerationWarning(
+        isPT
+          ? `Username inválido: ${usernameValidation.reason}. Geração de novo nome...`
+          : `Invalid username: ${usernameValidation.reason}. Generating new one...`
+      );
+      generateNewUsername();
+      return;
+    }
+
+    // Moderate username content
     const usernameModeration = moderateUsername(username, locale);
     if (!usernameModeration.allowed) {
       setModerationWarning(
@@ -190,14 +202,23 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
       return;
     }
 
+    // Sanitize content (defense in depth — server also sanitizes)
+    const rawContent = newMessage.trim();
+    const sanitizedContent = sanitizeContent(rawContent);
+
+    if (sanitizedContent.length < 1) {
+      setModerationWarning(isPT ? 'Mensagem vazia após sanitização' : 'Message empty after sanitization');
+      return;
+    }
+
     // Moderate content
-    const moderation = moderateMessage(newMessage.trim(), locale);
+    const moderation = moderateMessage(sanitizedContent, locale);
     if (!moderation.allowed) {
       setModerationWarning(moderation.reason || (isPT ? 'Mensagem bloqueada' : 'Message blocked'));
       return;
     }
 
-    const contentToSend = moderation.sanitized || newMessage.trim();
+    const contentToSend = moderation.sanitized || sanitizedContent;
 
     if (!isSupabaseConfigured()) {
       // Mock send - just add locally
