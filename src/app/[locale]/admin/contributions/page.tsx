@@ -39,7 +39,7 @@ export default function AdminContributionsPage() {
   const [password, setPassword] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
 
-  const ADMIN_PASSWORD = 'ventu-admin-2026'; // Simples proteção — altera se necessário
+  const ADMIN_PASSWORD = 'Ventu2026'; // Simples proteção — altera se necessário
 
   useEffect(() => {
     if (!authenticated) return;
