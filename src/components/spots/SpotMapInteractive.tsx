@@ -67,10 +67,25 @@ export default function SpotMapInteractive({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const leafletRef = useRef<any>(null);
+  const tileLayerRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const [isReady, setIsReady] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const isPt = locale === 'pt';
   const t = getTranslation(locale as any);
+
+  // Detect theme
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const checkTheme = () => {
+      const hasCoast = document.documentElement.classList.contains('theme-coast');
+      setIsDark(!hasCoast);
+    };
+    checkTheme();
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Initialize map
   useEffect(() => {
@@ -92,16 +107,16 @@ export default function SpotMapInteractive({
         attributionControl: false,
       });
 
-      // CARTO Dark Matter tiles
-      L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19,
-        }
-      ).addTo(map);
+      // CARTO tiles: Positron (light) or Dark Matter (dark)
+      const tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+      tileLayerRef.current = L.tileLayer(tileUrl, {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }).addTo(map);
 
       // Custom zoom control (positioned nicely)
       L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -125,6 +140,19 @@ export default function SpotMapInteractive({
       }
     };
   }, []);
+
+  // Switch tiles when theme changes
+  useEffect(() => {
+    if (!isReady || !mapInstanceRef.current || !tileLayerRef.current) return;
+    const L = leafletRef.current;
+    if (!L) return;
+
+    const newUrl = isDark
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+    tileLayerRef.current.setUrl(newUrl);
+  }, [isDark, isReady]);
 
   // Add/update markers when data or filters change
   useEffect(() => {
@@ -178,16 +206,27 @@ export default function SpotMapInteractive({
 
       const marker = L.marker([spot.lat, spot.lon], { icon }).addTo(map);
 
-      // Popup content
+      // Popup content — theme-aware colors
+      const popupBg = isDark ? 'rgb(24 24 27)' : '#fffcf6';
+      const popupBorder = isDark ? 'rgb(63 63 70)' : 'rgba(26,43,58,0.15)';
+      const popupText = isDark ? '#e4e4e7' : '#1a2b3a';
+      const popupTitle = isDark ? '#fafafa' : '#1a2b3a';
+      const popupMuted = isDark ? '#a1a1aa' : 'rgba(26,43,58,0.55)';
+      const popupSubtle = isDark ? '#71717a' : 'rgba(26,43,58,0.45)';
+      const popupLink = isDark ? '#22d3ee' : '#0891b2';
+      const popupStatBg = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(26,43,58,0.05)';
+      const popupStatBgHover = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(26,43,58,0.10)';
+
       const popupContent = document.createElement('div');
       popupContent.style.cssText = `
-        background: rgb(24 24 27);
-        border: 1px solid rgb(63 63 70);
+        background: ${popupBg};
+        border: 1px solid ${popupBorder};
         border-radius: 12px;
         padding: 12px;
         min-width: 200px;
-        color: #e4e4e7;
+        color: ${popupText};
         font-family: system-ui, -apple-system, sans-serif;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
       `;
 
       const windKnots = conditions?.windSpeed ? (conditions.windSpeed * 1.94384).toFixed(0) : '—';
@@ -197,8 +236,8 @@ export default function SpotMapInteractive({
       popupContent.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
           <div>
-            <div style="font-weight:700;font-size:14px;color:#fafafa;">${spot.name}</div>
-            <div style="font-size:11px;color:#a1a1aa;">${spot.region}</div>
+            <div style="font-weight:700;font-size:14px;color:${popupTitle};">${spot.name}</div>
+            <div style="font-size:11px;color:${popupMuted};">${spot.region}</div>
           </div>
           <div style="
             width:36px;height:36px;border-radius:50%;
@@ -210,25 +249,25 @@ export default function SpotMapInteractive({
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;font-size:11px;">
-          <div style="text-align:center;background:rgba(255,255,255,0.05);border-radius:6px;padding:6px;">
-            <div style="color:#71717a;margin-bottom:2px;">🌊</div>
+          <div style="text-align:center;background:${popupStatBg};border-radius:6px;padding:6px;">
+            <div style="color:${popupSubtle};margin-bottom:2px;">🌊</div>
             <div style="font-weight:600;">${waveH}m</div>
           </div>
-          <div style="text-align:center;background:rgba(255,255,255,0.05);border-radius:6px;padding:6px;">
-            <div style="color:#71717a;margin-bottom:2px;">💨</div>
+          <div style="text-align:center;background:${popupStatBg};border-radius:6px;padding:6px;">
+            <div style="color:${popupSubtle};margin-bottom:2px;">💨</div>
             <div style="font-weight:600;">${windKnots}kt</div>
           </div>
-          <div style="text-align:center;background:rgba(255,255,255,0.05);border-radius:6px;padding:6px;">
-            <div style="color:#71717a;margin-bottom:2px;">🌡️</div>
+          <div style="text-align:center;background:${popupStatBg};border-radius:6px;padding:6px;">
+            <div style="color:${popupSubtle};margin-bottom:2px;">🌡️</div>
             <div style="font-weight:600;">${waterT}°C</div>
           </div>
         </div>
         <a href="/${locale}/spots/${spot.slug}" style="
           display:block;width:100%;text-align:center;
-          padding:8px 0;background:rgba(255,255,255,0.08);
-          border-radius:8px;color:#22d3ee;font-size:12px;font-weight:600;
+          padding:8px 0;background:${popupStatBg};
+          border-radius:8px;color:${popupLink};font-size:12px;font-weight:600;
           text-decoration:none;transition:background 0.2s;
-        " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+        " onmouseover="this.style.background='${popupStatBgHover}'" onmouseout="this.style.background='${popupStatBg}'">
           ${isPt ? 'Ver spot →' : 'View spot →'}
         </a>
       `;

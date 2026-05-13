@@ -3,8 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 // useSearchParams removed — using window.location.search for static export safety
 import Link from 'next/link';
-import { Wind, Waves, Zap, Filter, Star, X, RotateCcw, ArrowRight } from 'lucide-react';
-import SpotCard from './SpotCard';
+import { Wind, Waves, Zap, Filter, Star, RotateCcw, ArrowRight } from 'lucide-react';
 import SpotMapInteractive from './SpotMapInteractive';
 import { getMacroRegion, type MacroRegion } from '@/lib/regions';
 import { getCompatibleSports, type SportType } from '@/lib/sportRatings';
@@ -353,85 +352,8 @@ export function SpotGridClient({
         />
       </div>
 
-      {/* ─── Top 3 para ti ─── */}
-      {top3Count > 0 && selectedSport !== 'all' && (
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <span className={`${sportColor}`}>{sportIcon}</span>
-            <h2 className="text-h2 text-fg">
-              {top3Count === 1
-                ? `${isPt ? t.hero.top3One : t.hero.top3One} ${sportLabel}`
-                : `${isPt ? t.hero.top3 : t.hero.top3} ${sportLabel}`}
-              {selectedRegion !== 'Todos' && (
-                <span className="text-fg-muted"> {isPt ? 'em' : 'in'} {selectedRegion}</span>
-              )}
-              {' · '}
-              <span className="text-meta text-fg-muted">
-                {top3Count === 1
-                  ? (isPt ? t.hero.top3OneSub : t.hero.top3OneSub)
-                  : (isPt ? t.hero.top3Sub : t.hero.top3Sub)}
-              </span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {top3.map((data, idx) => {
-              // Bug F fix: pass the score of the SELECTED sport, not primaryScore
-              const scoreToShow = data.allScores[selectedSport];
-              return (
-                <SpotCard
-                  key={`top3-${data.spot.id}`}
-                  spot={data.spot}
-                  conditions={data.conditions}
-                  sportScore={scoreToShow}
-                  locale={locale}
-                />
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ─── Section heading for grid ─── */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-h2 text-fg">
-          {isPt ? t.hero.filteredSpots : t.hero.filteredSpots}
-          {selectedSport !== 'all' && (
-            <span className="text-fg-muted"> · {sportLabel}</span>
-          )}
-          {selectedRegion !== 'Todos' && (
-            <span className="text-fg-muted"> {isPt ? 'em' : 'in'} {selectedRegion}</span>
-          )}
-        </h2>
-        <span className="text-meta text-fg-muted">
-          {isPt ? t.hero.sortedByScore : t.hero.sortedByScore}
-        </span>
-      </div>
-
-      {/* ─── Grid ─── */}
-      {sorted.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sorted.map((data, idx) => {
-            // Bug F fix: pass the score of the SELECTED sport, not primaryScore
-            const scoreToShow = selectedSport === 'all'
-              ? data.allScores[Object.keys(data.allScores).reduce((a, b) =>
-                  (data.allScores[a as SportType]?.score || 0) > (data.allScores[b as SportType]?.score || 0) ? a : b
-                ) as SportType]
-              : data.allScores[selectedSport];
-
-            return (
-              <SpotCard
-                key={data.spot.id}
-                spot={data.spot}
-                conditions={data.conditions}
-                sportScore={scoreToShow}
-                locale={locale}
-              />
-            );
-          })}
-        </div>
-      ) : (
-        /* ─── Empty state ─── */
+      {/* ─── Empty state (when no spots match filters) ─── */}
+      {sorted.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="w-16 h-16 rounded-2xl bg-surface-1 border border-divider flex items-center justify-center mb-4">
             <Filter className="w-8 h-8 text-fg-muted" />
