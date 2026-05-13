@@ -22,6 +22,8 @@ const MUNICIPALITY_TO_REGION: Record<string, MacroRegion> = {
   'Nazaré': 'Centro',
   'Oeste': 'Centro',
   'Santarém': 'Centro',
+  'Figueira da Foz': 'Centro',
+  'Óbidos': 'Centro',
   
   // Lisboa
   'Cascais': 'Lisboa',
@@ -29,15 +31,25 @@ const MUNICIPALITY_TO_REGION: Record<string, MacroRegion> = {
   'Peniche': 'Lisboa',
   'Almada': 'Lisboa',
   'Sesimbra': 'Lisboa',
+  'Sintra': 'Lisboa',
+  'Torres Vedras': 'Lisboa',
+  'Costa da Caparica': 'Lisboa',
   
   // Alentejo
   'Alentejo': 'Alentejo',
+  'Zambujeira do Mar': 'Alentejo',
   
   // Algarve
   'Algarve': 'Algarve',
   'Sagres': 'Algarve',
   'Portimão': 'Algarve',
   'Lagos': 'Algarve',
+  'Aljezur': 'Algarve',
+  'Faro': 'Algarve',
+  'Lagoa': 'Algarve',
+  'Olhão': 'Algarve',
+  'Tavira': 'Algarve',
+  'Vila do Bispo': 'Algarve',
   
   // Açores
   'São Miguel': 'Açores',

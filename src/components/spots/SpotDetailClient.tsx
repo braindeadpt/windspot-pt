@@ -336,11 +336,28 @@ export default function SpotDetailClient({
     });
   }, []);
 
-  /* ── Loading ── */
+  /* ── Loading skeleton ── */
   if (loading || !spotData) {
     return (
-      <div className="min-h-screen bg-bg-base flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent" />
+      <div className="min-h-screen bg-bg-base p-4 space-y-6 animate-pulse">
+        {/* Header skeleton */}
+        <div className="max-w-5xl mx-auto space-y-4">
+          <div className="h-8 bg-surface-1 rounded w-3/4" />
+          <div className="h-4 bg-surface-1 rounded w-1/2" />
+        </div>
+        
+        {/* Stats grid skeleton */}
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-24 bg-surface-1 rounded-lg" />
+          ))}
+        </div>
+        
+        {/* Forecast skeleton */}
+        <div className="max-w-5xl mx-auto h-64 bg-surface-1 rounded-lg" />
+        
+        {/* Chat skeleton */}
+        <div className="max-w-5xl mx-auto h-48 bg-surface-1 rounded-lg" />
       </div>
     );
   }

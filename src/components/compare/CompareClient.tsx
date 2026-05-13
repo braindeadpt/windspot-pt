@@ -103,8 +103,11 @@ export default function CompareClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-base flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-data-waves" />
+      <div className="min-h-screen bg-bg-base p-4 space-y-6 animate-pulse">
+        <div className="max-w-4xl mx-auto space-y-4 pt-8">
+          <div className="h-10 w-48 bg-surface-1 rounded mx-auto" />
+          <div className="h-64 bg-surface-1 rounded-lg" />
+        </div>
       </div>
     );
   }
