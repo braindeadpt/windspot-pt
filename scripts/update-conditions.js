@@ -42,6 +42,17 @@ function parseSpotsFromFile() {
 
 const spots = parseSpotsFromFile();
 
+// Safety check: ensure we parsed a reasonable number of spots
+const MIN_SPOTS = 50;
+if (spots.length < MIN_SPOTS) {
+  console.error(`\n❌ ERROR: Only ${spots.length} spots parsed from spots.ts (expected at least ${MIN_SPOTS}).`);
+  console.error('   The regex parser may have failed due to a format change in spots.ts.');
+  console.error('   Please check that spots.ts still contains id/lat/lon in the expected format.\n');
+  process.exit(1);
+}
+
+console.log(`📋 Parsed ${spots.length} spots from src/lib/spots.ts\n`);
+
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
