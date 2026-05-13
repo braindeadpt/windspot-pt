@@ -154,9 +154,11 @@ export default function SpotChat({ spotSlug, spotName, locale }: SpotChatProps) 
     setIsLoadingMore(false);
   };
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom on new messages (skip on mount when empty)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
   const sendMessage = async (e: React.FormEvent) => {

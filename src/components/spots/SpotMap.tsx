@@ -24,6 +24,7 @@ export default function SpotMap({ lat, lon, locale = 'pt' }: SpotMapProps) {
     iframe.loading = 'lazy';
     iframe.allowFullscreen = true;
     iframe.title = isPt ? `Mapa do spot` : `Spot map`;
+    iframe.tabIndex = -1; // prevent focus steal / auto-scroll
     
     const url = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.015}%2C${lat-0.015}%2C${lon+0.015}%2C${lat+0.015}&layer=mapnik&marker=${lat}%2C${lon}`;
     iframe.src = url;

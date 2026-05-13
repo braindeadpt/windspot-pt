@@ -266,7 +266,6 @@ export default function ForecastTable({
   /* ── scroll container ref + snap logic ── */
   const scrollRef = useRef<HTMLDivElement>(null);
   const isProgrammaticScroll = useRef(false);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /* ── active day + scroll ── */
   const [activeDay, setActiveDay] = useState(0);
@@ -283,35 +282,29 @@ export default function ForecastTable({
     [],
   );
 
-  /* ── scroll-snap: when user scroll stops, snap to nearest day boundary ── */
+  /* ── track active day from scroll position (no auto-snap) ── */
   const handleScroll = useCallback(() => {
     if (isProgrammaticScroll.current) return;
-    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    scrollTimeoutRef.current = setTimeout(() => {
-      const container = scrollRef.current;
-      if (!container || dayGroups.length <= 1) return;
+    if (dayGroups.length <= 1) return;
 
-      let closestDay = 0;
-      let minDistance = Infinity;
+    const container = scrollRef.current;
+    if (!container) return;
 
-      for (let i = 0; i < dayGroups.length; i++) {
-        const el = document.getElementById(`ft-day-${i}`);
-        if (!el) continue;
-        const distance = Math.abs(el.offsetLeft - container.scrollLeft);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestDay = i;
-        }
+    // Find which day is most visible
+    let closestDay = 0;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < dayGroups.length; i++) {
+      const el = document.getElementById(`ft-day-${i}`);
+      if (!el) continue;
+      const distance = Math.abs(el.offsetLeft - container.scrollLeft);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestDay = i;
       }
+    }
 
-      const el = document.getElementById(`ft-day-${closestDay}`);
-      if (el) {
-        isProgrammaticScroll.current = true;
-        el.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-        setActiveDay(closestDay);
-        setTimeout(() => { isProgrammaticScroll.current = false; }, 600);
-      }
-    }, 200);
+    setActiveDay(closestDay);
   }, [dayGroups.length]);
 
   /* ── current hour ref ── */
@@ -379,7 +372,7 @@ export default function ForecastTable({
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="overflow-x-auto no-scrollbar rounded-card-lg border border-divider bg-bg-base"
+          className="overflow-x-auto no-scrollbar rounded-card-lg border border-divider bg-bg-base snap-x snap-proximity"
           tabIndex={0}
           role="region"
           aria-label={t.caption.replace('{hours}', String(visible.length))}
@@ -436,7 +429,7 @@ export default function ForecastTable({
                       current
                         ? 'bg-surface-2 text-fg border-b-2 border-score-good'
                         : 'bg-bg-base text-fg-muted'
-                    } ${boundaryClass(i)} transition-colors duration-fast`}
+                    } ${boundaryClass(i)} transition-colors duration-fast ${dayIdx !== undefined ? 'snap-start' : ''}`}
                     aria-current={current ? 'time' : undefined}
                   >
                     {parseHourLabel(h.time)}
