@@ -57,6 +57,25 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function fetchWithRetry(url, retries = 3, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url);
+      if (response.ok) return response.json();
+      if (response.status === 429) {
+        console.log(`  ⏳ Rate limited, waiting ${delay * (i + 1)}ms...`);
+        await sleep(delay * (i + 1));
+        continue;
+      }
+      throw new Error(`HTTP ${response.status}`);
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await sleep(delay * (i + 1));
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 async function fetchMarineData(lat, lon) {
   const params = new URLSearchParams({
     latitude: lat.toString(),
@@ -66,9 +85,8 @@ async function fetchMarineData(lat, lon) {
     forecast_days: '2',
   });
 
-  const response = await fetch(`${MARINE_API}?${params}`);
-  if (!response.ok) throw new Error(`Marine API failed: ${response.status}`);
-  return response.json();
+  const data = await fetchWithRetry(`${MARINE_API}?${params}`);
+  return data;
 }
 
 async function fetchWeatherData(lat, lon) {
@@ -81,9 +99,8 @@ async function fetchWeatherData(lat, lon) {
     wind_speed_unit: 'ms',
   });
 
-  const response = await fetch(`${WEATHER_API}?${params}`);
-  if (!response.ok) throw new Error(`Weather API failed: ${response.status}`);
-  return response.json();
+  const data = await fetchWithRetry(`${WEATHER_API}?${params}`);
+  return data;
 }
 
 function getCurrentConditions(marineData, weatherData) {
@@ -125,8 +142,9 @@ async function updateConditions() {
       
       console.log(`  ✓ ${spot.id} updated`);
       
-      // Rate limiting: wait 100ms between spots
-      await sleep(100);
+      // Rate limiting: wait 250ms between spots to avoid Open-Meteo limits
+      // Open-Meteo free tier: ~10,000 calls/day, but burst limiting applies
+      await sleep(250);
     } catch (error) {
       console.error(`  ✗ ${spot.id} failed:`, error.message);
     }
@@ -134,10 +152,24 @@ async function updateConditions() {
 
   const outputPath = path.join(__dirname, '../public/data/conditions.json');
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  
+  // Validate we have data before writing
+  const spotCount = Object.keys(allConditions).length;
+  if (spotCount === 0) {
+    console.error('\n❌ ERROR: No conditions fetched! Not writing empty file.');
+    process.exit(1);
+  }
+  
+  // Backup existing file before overwriting
+  const backupPath = outputPath + '.backup';
+  if (fs.existsSync(outputPath)) {
+    fs.copyFileSync(outputPath, backupPath);
+  }
+  
   fs.writeFileSync(outputPath, JSON.stringify(allConditions, null, 2));
 
   console.log(`\n✅ Conditions saved to ${outputPath}`);
-  console.log(`📊 Updated ${Object.keys(allConditions).length} spots`);
+  console.log(`📊 Updated ${spotCount} spots`);
 }
 
 updateConditions().catch(console.error);
