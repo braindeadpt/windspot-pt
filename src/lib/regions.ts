@@ -50,6 +50,7 @@ const MUNICIPALITY_TO_REGION: Record<string, MacroRegion> = {
   'Olhão': 'Algarve',
   'Tavira': 'Algarve',
   'Vila do Bispo': 'Algarve',
+  'Carrapateira': 'Algarve',
   
   // Açores
   'São Miguel': 'Açores',
@@ -63,5 +64,5 @@ const MUNICIPALITY_TO_REGION: Record<string, MacroRegion> = {
 };
 
 export function getMacroRegion(municipality: string): string {
-  return MUNICIPALITY_TO_REGION[municipality] || municipality;
+  return MUNICIPALITY_TO_REGION[municipality] || 'Lisboa';
 }
