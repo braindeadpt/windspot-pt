@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Wind, Waves, Zap, Filter, Star, X, RotateCcw, ArrowRight } from 'lucide-react';
 import SpotCard from './SpotCard';
+import SpotMapInteractive from './SpotMapInteractive';
 import { getMacroRegion, type MacroRegion } from '@/lib/regions';
 import { getCompatibleSports, type SportType } from '@/lib/sportRatings';
 import { getTranslation } from '@/lib/i18n';
@@ -340,6 +341,16 @@ export function SpotGridClient({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ─── Interactive Map ─── */}
+      <div className="mb-8">
+        <SpotMapInteractive
+          spotsData={filtered}
+          selectedSport={selectedSport}
+          selectedRegion={selectedRegion}
+          locale={locale}
+        />
       </div>
 
       {/* ─── Top 3 para ti ─── */}
