@@ -83,6 +83,10 @@ const spots = [
   { id: 'alqueva', lat: 38.200, lon: -7.500 },
   { id: 'lagos-wakepark', lat: 37.100, lon: -8.670 },
   { id: 'ponta-delgada', lat: 37.741, lon: -25.669 },
+  { id: 'vila-real-santo-antonio', lat: 37.200, lon: -7.418 },
+  { id: 'monte-gordo', lat: 37.183, lon: -7.450 },
+  { id: 'praia-verde', lat: 37.183, lon: -7.500 },
+  { id: 'barrinha-faro', lat: 37.016, lon: -7.933 },
 ];
 
 async function sleep(ms) {
