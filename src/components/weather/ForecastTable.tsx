@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState, useCallback, useRef } from 'react';
+import { useMemo, useState, useCallback, useRef, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import type { SportType } from '@/lib/sportRatings';
 import { SPORT_LABELS } from '@/lib/sportRatings';
@@ -263,9 +264,24 @@ export default function ForecastTable({
     return map;
   }, [dayGroups]);
 
-  /* ── scroll container ref + snap logic ── */
+  /* ── scroll container ref + nav logic ── */
   const scrollRef = useRef<HTMLDivElement>(null);
   const isProgrammaticScroll = useRef(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollButtons = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+  }, []);
+
+  const scrollByAmount = useCallback((amount: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: amount, behavior: 'smooth' });
+  }, []);
 
   /* ── active day + scroll ── */
   const [activeDay, setActiveDay] = useState(0);
@@ -282,8 +298,9 @@ export default function ForecastTable({
     [],
   );
 
-  /* ── track active day from scroll position (no auto-snap) ── */
+  /* ── track active day + scroll buttons from scroll position ── */
   const handleScroll = useCallback(() => {
+    updateScrollButtons();
     if (isProgrammaticScroll.current) return;
     if (dayGroups.length <= 1) return;
 
@@ -305,7 +322,19 @@ export default function ForecastTable({
     }
 
     setActiveDay(closestDay);
-  }, [dayGroups.length]);
+  }, [dayGroups.length, updateScrollButtons]);
+
+  /* ── init scroll buttons on mount / resize ── */
+  useEffect(() => {
+    // Wait for table layout to settle before checking scrollability
+    const timer = setTimeout(() => updateScrollButtons(), 100);
+    const onResize = () => updateScrollButtons();
+    window.addEventListener('resize', onResize);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [updateScrollButtons, visible.length]);
 
   /* ── current hour ref ── */
   const now = useMemo(() => new Date(), []);
@@ -372,12 +401,12 @@ export default function ForecastTable({
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="overflow-x-auto no-scrollbar rounded-card-lg border border-divider bg-bg-base snap-x snap-proximity"
+          className="overflow-x-auto rounded-card-lg border border-divider bg-bg-base"
           tabIndex={0}
           role="region"
           aria-label={t.caption.replace('{hours}', String(visible.length))}
         >
-        <table className="w-full border-separate border-spacing-x-[2px] border-spacing-y-[1px] text-center">
+        <table className="w-max border-separate border-spacing-x-[2px] border-spacing-y-[1px] text-center">
           {/* Caption for screen readers */}
           <caption className="sr-only">
             {t.caption.replace('{hours}', String(visibleCount))}
@@ -429,7 +458,7 @@ export default function ForecastTable({
                       current
                         ? 'bg-surface-2 text-fg border-b-2 border-score-good'
                         : 'bg-bg-base text-fg-muted'
-                    } ${boundaryClass(i)} transition-colors duration-fast ${dayIdx !== undefined ? 'snap-start' : ''}`}
+                    } ${boundaryClass(i)} transition-colors duration-fast`}
                     aria-current={current ? 'time' : undefined}
                   >
                     {parseHourLabel(h.time)}
@@ -639,6 +668,28 @@ export default function ForecastTable({
       </div>
       {/* Scroll hint — gradient fade on right edge */}
       <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-bg-base to-transparent pointer-events-none z-10" aria-hidden="true" />
+
+      {/* Desktop nav arrows */}
+      {canScrollLeft && (
+        <button
+          type="button"
+          onClick={() => scrollByAmount(-300)}
+          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 items-center justify-center w-8 h-8 rounded-full bg-surface-1 border border-divider shadow-md text-fg-muted hover:text-fg hover:bg-surface-2 transition-colors z-20"
+          aria-label={isPt ? 'Scrollar para a esquerda' : 'Scroll left'}
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+      )}
+      {canScrollRight && (
+        <button
+          type="button"
+          onClick={() => scrollByAmount(300)}
+          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 items-center justify-center w-8 h-8 rounded-full bg-surface-1 border border-divider shadow-md text-fg-muted hover:text-fg hover:bg-surface-2 transition-colors z-20"
+          aria-label={isPt ? 'Scrollar para a direita' : 'Scroll right'}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      )}
     </div>
   </div>
   );
