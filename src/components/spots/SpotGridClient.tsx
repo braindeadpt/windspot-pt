@@ -3,11 +3,12 @@
 import { useState, useEffect, useMemo } from 'react';
 // useSearchParams removed — using window.location.search for static export safety
 import Link from 'next/link';
-import { Wind, Waves, Zap, Filter, Star, RotateCcw, ArrowRight } from 'lucide-react';
+import { Wind, Waves, Zap, Filter, Star, RotateCcw, ArrowRight, MapPin, Navigation } from 'lucide-react';
 import SpotMapInteractive from './SpotMapInteractive';
 import { getMacroRegion, type MacroRegion } from '@/lib/regions';
 import { getCompatibleSports, type SportType } from '@/lib/sportRatings';
 import { getTranslation } from '@/lib/i18n';
+import { useGeolocation, calculateDistance, formatDistance } from '@/lib/geolocation';
 import type { Spot } from '@/types';
 
 // ─── Types ───
@@ -39,6 +40,8 @@ const SPORTS: { id: SportType | 'all'; labelPt: string; labelEn: string; icon: R
 
 const LS_SPORT_KEY = 'windspot:sport';
 const LS_REGION_KEY = 'windspot:region';
+
+type SortOption = 'score' | 'distance';
 
 /**
  * Minimum score to consider a spot "playable" for a specific sport.
@@ -144,7 +147,9 @@ export function SpotGridClient({
   // Priority: URL query param > localStorage > default
   const [selectedSport, setSelectedSport] = useState<SportType | 'all'>('all');
   const [selectedRegion, setSelectedRegion] = useState<string>('Todos');
+  const [sortBy, setSortBy] = useState<SortOption>('score');
   const [mounted, setMounted] = useState(false);
+  const { latitude, longitude, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
 
   useEffect(() => {
     setMounted(true);
@@ -183,9 +188,16 @@ export function SpotGridClient({
     );
   }, [spotsData, selectedSport, selectedRegion]);
 
-  // Sort by score of selected sport (descending)
+  // Sort by score of selected sport (descending) or by distance
   const sorted = useMemo(() => {
-    return [...filtered].sort((a, b) => {
+    const sortedSpots = [...filtered].sort((a, b) => {
+      if (sortBy === 'distance' && latitude && longitude) {
+        const distA = calculateDistance(latitude, longitude, a.spot.lat, a.spot.lon);
+        const distB = calculateDistance(latitude, longitude, b.spot.lat, b.spot.lon);
+        return distA - distB;
+      }
+      
+      // Sort by score
       if (selectedSport === 'all') {
         // For 'all', sort by best overall score across any sport
         const bestA = Math.max(...Object.values(a.allScores).map((s: any) => s.score || 0));
@@ -196,7 +208,8 @@ export function SpotGridClient({
       const scoreB = b.allScores[selectedSport]?.score || 0;
       return scoreB - scoreA;
     });
-  }, [filtered, selectedSport]);
+    return sortedSpots;
+  }, [filtered, selectedSport, sortBy, latitude, longitude]);
 
   // ─── Derived: counts ───
   const onCount = sorted.filter(d => {
@@ -308,8 +321,38 @@ export function SpotGridClient({
               })}
             </div>
 
-            {/* Count + reset */}
-            <div className="flex items-center gap-3 shrink-0">
+            {/* Sort + Count + reset */}
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setSortBy(sortBy === 'score' ? 'distance' : 'score')}
+                disabled={sortBy === 'distance' && !latitude}
+                className={[
+                  'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm min-h-[40px]',
+                  'transition-all duration-200',
+                  sortBy === 'distance' && latitude
+                    ? 'bg-surface-2 border border-divider-strong text-fg font-medium'
+                    : 'bg-transparent border border-transparent text-fg-subtle hover:text-fg hover:bg-surface-1',
+                  sortBy === 'distance' && !latitude ? 'opacity-50 cursor-not-allowed' : '',
+                ].join(' ')}
+                title={sortBy === 'distance' && !latitude ? (isPt ? 'Ative a localização para ordenar por distância' : 'Enable location to sort by distance') : ''}
+              >
+                {sortBy === 'distance' ? <Navigation className="w-3.5 h-3.5" /> : <Star className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline">
+                  {sortBy === 'score' ? (isPt ? 'Score' : 'Score') : (isPt ? 'Distância' : 'Distance')}
+                </span>
+              </button>
+              
+              {sortBy === 'distance' && !latitude && (
+                <button
+                  onClick={requestLocation}
+                  disabled={geoLoading}
+                  className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-sm min-h-[40px] bg-data-waves/10 text-data-waves hover:bg-data-waves/20 transition-colors"
+                >
+                  <MapPin className={`w-3.5 h-3.5 ${geoLoading ? 'animate-pulse' : ''}`} />
+                  <span className="hidden sm:inline">{isPt ? 'Usar minha localização' : 'Use my location'}</span>
+                </button>
+              )}
+
               <span className="text-meta-sm text-fg-muted">
                 <span className="font-mono tabular-nums text-fg">{sorted.length}</span>
                 {' '}{isPt ? t.hero.spotsCount : t.hero.spotsCount}

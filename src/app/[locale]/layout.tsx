@@ -4,6 +4,7 @@ import { locales, getTranslation } from '@/lib/i18n'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import HtmlLang from '@/components/HtmlLang'
+import ClientProviders from '@/components/layout/ClientProviders'
 import '../globals.css'
 
 export const viewport: Viewport = {
@@ -68,11 +69,11 @@ export default async function LocaleLayout({
   }
 
   return (
-    <>
+    <ClientProviders>
       <HtmlLang locale={locale} />
       <Header locale={locale} />
       <main className="pt-16">{children}</main>
       <Footer locale={locale} />
-    </>
+    </ClientProviders>
   )
 }

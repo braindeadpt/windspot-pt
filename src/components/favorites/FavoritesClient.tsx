@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { Heart, MapPin, ArrowLeft, Wind, Waves, Thermometer } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { Heart, MapPin, ArrowLeft, Wind, Waves, Thermometer, Share2, Check } from 'lucide-react';
 import { spots } from '@/lib/spots';
 import { fetchMarineData, getCurrentConditions } from '@/lib/openmeteo';
 import { getSportScore, getScoreColor } from '@/lib/sportScore';
@@ -24,18 +24,65 @@ interface SpotConditions {
 
 export default function FavoritesClient() {
   const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = (params?.locale as string) || 'pt';
   const isPt = locale === 'pt';
   const [favorites, setFavorites] = useState<string[]>([]);
   const [conditions, setConditions] = useState<Record<string, SpotConditions>>({});
   const [sportScores, setSportScores] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const initFavorites = useCallback(() => {
+    const urlFavs = searchParams.get('favs');
+    if (urlFavs) {
+      const parsed = urlFavs.split(',').filter(Boolean);
+      if (parsed.length > 0) {
+        return parsed;
+      }
+    }
+    const stored = localStorage.getItem('windspot-favorites');
+    return stored ? JSON.parse(stored) : [];
+  }, [searchParams]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('windspot-favorites');
-    if (stored) setFavorites(JSON.parse(stored));
+    const favs = initFavorites();
+    setFavorites(favs);
+    localStorage.setItem('windspot-favorites', JSON.stringify(favs));
     setLoading(false);
-  }, []);
+  }, [initFavorites]);
+
+  const updateUrl = useCallback((favs: string[]) => {
+    const url = new URL(window.location.href);
+    if (favs.length > 0) {
+      url.searchParams.set('favs', favs.join(','));
+    } else {
+      url.searchParams.delete('favs');
+    }
+    router.replace(url.pathname + url.search, { scroll: false });
+  }, [router]);
+
+  const handleRemoveFavorite = (spotId: string) => {
+    const newFavs = favorites.filter(id => id !== spotId);
+    setFavorites(newFavs);
+    localStorage.setItem('windspot-favorites', JSON.stringify(newFavs));
+    updateUrl(newFavs);
+  };
+
+  const handleShare = async () => {
+    const url = new URL(window.location.href);
+    if (favorites.length > 0) {
+      url.searchParams.set('favs', favorites.join(','));
+    }
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      prompt('Copy this link:', url.toString());
+    }
+  };
 
   useEffect(() => {
     if (!favorites.length) return;
@@ -134,10 +181,23 @@ export default function FavoritesClient() {
           
           <div className="flex items-center gap-3">
             <Heart className="w-8 h-8 text-windDir-onshore fill-current" />
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl font-bold text-fg">{isPt ? 'Meus Favoritos' : 'My Favorites'}</h1>
               <p className="text-fg-muted">{favoriteSpots.length} {isPt ? 'spots' : 'spots'}</p>
             </div>
+            {favoriteSpots.length > 0 && (
+              <button
+                onClick={handleShare}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  shareCopied
+                    ? 'bg-score-good/20 text-score-good border border-score-good/30'
+                    : 'bg-surface-2 text-fg-subtle hover:text-fg border border-divider'
+                }`}
+              >
+                {shareCopied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                {shareCopied ? (isPt ? 'Copiado!' : 'Copied!') : (isPt ? 'Partilhar' : 'Share')}
+              </button>
+            )}
           </div>
         </div>
 

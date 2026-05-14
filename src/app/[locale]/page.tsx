@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import Link from 'next/link';
 import { 
-  MapPin, ArrowRight, Search
+  MapPin, ArrowRight
 } from 'lucide-react';
 import { spots } from '@/lib/spots';
 import { getAllSportScores, getScoreColor } from '@/lib/sportScore';
@@ -12,6 +12,7 @@ import { getTranslation } from '@/lib/i18n';
 import { getMacroRegion, MACRO_REGIONS } from '@/lib/regions';
 import { SpotGridClient } from '@/components/spots/SpotGridClient';
 import DawnPatrolBanner from '@/components/DawnPatrolBannerWrapper';
+import HomepageSearch from '@/components/ui/HomepageSearch';
 
 // ─── Types ───
 interface SpotData {
@@ -209,13 +210,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Link
-                href={`/${locale}/spots/`}
-                className="inline-flex items-center gap-2 w-full sm:w-auto h-12 px-4 bg-surface-1 border border-divider hover:border-divider-strong rounded-lg text-fg-subtle transition-colors"
-              >
-                <Search className="w-4 h-4 text-fg-muted" />
-                <span>{isPt ? 'Procurar spot...' : 'Search spot...'}</span>
-              </Link>
+              <HomepageSearch locale={locale} />
               <Link
                 href={`/${locale}/spots/`}
                 className="inline-flex items-center justify-center gap-2 h-12 px-6 border border-divider rounded-full text-fg hover:bg-surface-2 transition-colors font-medium"
