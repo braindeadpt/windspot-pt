@@ -303,7 +303,7 @@ export default function ForecastTable({
 
 <div
         ref={scrollRef}
-className="overflow-x-auto rounded-card border border-divider bg-bg-base min-w-[800px] relative"
+className="overflow-x-auto rounded-card border border-divider bg-bg-base min-w-[600px] md:min-w-[800px] relative"
         tabIndex={0}
         role="region"
         aria-label={t.caption.replace('{hours}', String(visibleCount))}
@@ -313,7 +313,7 @@ className="overflow-x-auto rounded-card border border-divider bg-bg-base min-w-[
         }}
       >
         <div className="absolute inset-y-0 left-0 w-8 bg-bg-base/95 backdrop-blur-[2px] pointer-events-none z-10 border-r border-divider" />
-        <table className="w-full border-collapse text-center min-w-[800px] relative z-0">
+        <table className="w-full border-collapse text-center min-w-[600px] md:min-w-[800px] relative z-0">
           {/* Caption for screen readers */}
           <caption className="sr-only">
             {t.caption.replace('{hours}', String(visibleCount))}
