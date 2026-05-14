@@ -7,16 +7,35 @@ import type { SportType } from '@/lib/sportRatings'
 import SpotGrid from '@/components/spots/SpotGrid'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = {
-  title: 'All Spots — VenTu',
-  description: 'Browse all 81 surf, kitesurf and windsurf spots in Portugal with real-time conditions.',
-  openGraph: {
-    title: 'All Spots — VenTu',
-    description: 'Browse all 81 surf, kitesurf and windsurf spots in Portugal.',
-    url: 'https://ventu.surf/spots',
-    siteName: 'VenTu',
-    type: 'website',
-  },
+// FIX SEO1: Locale-aware metadata
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const isPt = locale === 'pt'
+  
+  const title = isPt ? `Todos os Spots — VenTu` : `All Spots — VenTu`
+  const description = isPt 
+    ? `Explora os ${spots.length} spots de surf, kitesurf e windsurf em Portugal com condições em tempo real.`
+    : `Browse all ${spots.length} surf, kitesurf and windsurf spots in Portugal with real-time conditions.`
+  
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://ventu.surf/${locale}/spots`,
+      siteName: 'VenTu',
+      type: 'website',
+      locale: isPt ? 'pt_PT' : 'en_US',
+    },
+    alternates: {
+      canonical: `/${locale}/spots`,
+      languages: {
+        'pt': '/pt/spots',
+        'en': '/en/spots',
+      },
+    },
+  }
 }
 
 // ─── Load conditions at BUILD TIME from precomputed JSON ───

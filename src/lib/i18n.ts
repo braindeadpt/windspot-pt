@@ -1,5 +1,14 @@
 export const defaultLocale = 'pt';
 export const locales = ['pt', 'en'] as const;
+export type Locale = typeof locales[number];
+
+export function isValidLocale(locale: string): locale is Locale {
+  return locales.includes(locale as Locale);
+}
+
+export function validateLocale(locale: string): Locale {
+  return isValidLocale(locale) ? locale : defaultLocale;
+}
 
 export const translations = {
   pt: {

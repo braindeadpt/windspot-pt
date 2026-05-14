@@ -54,6 +54,7 @@ export interface TideInfo {
 }
 
 // Generate realistic mock data based on spot characteristics and season
+// FIX C1: Made deterministic using lat/lon as seed
 function generateMockData(lat: number, lon: number): MarineData {
   const now = new Date();
   const month = now.getMonth(); // 0-11
@@ -74,10 +75,20 @@ function generateMockData(lat: number, lon: number): MarineData {
   if (isSummer) {
     baseWaveHeight = 0.6;
     baseWindSpeed = 12; // Nortada thermal wind
-    baseWaterTemp = 19 + Math.random() * 3;
+    baseWaterTemp = 19 + 1.5; // Fixed base + 1.5 (was Math.random() * 3, now deterministic)
   }
   
   baseWaveHeight *= northFactor;
+
+  // Deterministic pseudo-random generator using lat/lon as seed
+  // Each lat/lon combination produces the same sequence of values
+  const seed = Math.abs((lat * 1000 + lon * 100) % 2147483647);
+  let rngState = seed;
+  const pseudoRandom = () => {
+    rngState = (rngState * 16807) % 2147483647;
+    return (rngState - 1) / 2147483646;
+  };
+  const rangeRandom = (min: number, max: number) => min + pseudoRandom() * (max - min);
 
   const hourlyTime: string[] = [];
   const hourlyWaveHeight: number[] = [];
@@ -96,19 +107,19 @@ function generateMockData(lat: number, lon: number): MarineData {
     const hourTime = new Date(startOfDay.getTime() + i * 60 * 60 * 1000);
     hourlyTime.push(hourTime.toISOString());
     
-    // Add some realistic variation
+    // Add some realistic variation (deterministic)
     const hourOfDay = hourTime.getHours();
     const dayVariation = Math.sin((hourOfDay - 6) * Math.PI / 12) * 0.3; // wind picks up during day
     const tideVariation = Math.sin(i * Math.PI / 6.2) * 0.5; // ~12.4h tidal cycle
     
-    hourlyWaveHeight.push(Math.max(0.1, baseWaveHeight + (Math.random() - 0.5) * 0.8));
-    hourlyWaveDirection.push(270 + (Math.random() - 0.5) * 30); // W swell
-    hourlyWavePeriod.push(8 + (Math.random() - 0.5) * 4);
-    hourlyWindSpeed.push(Math.max(2, baseWindSpeed + dayVariation * 8 + (Math.random() - 0.5) * 6));
-    hourlyWindDirection.push(330 + (Math.random() - 0.5) * 40); // N/NW wind
-    hourlyWindGusts.push(Math.max(3, baseWindSpeed + dayVariation * 10 + (Math.random() - 0.5) * 8));
-    hourlyWaterTemp.push(baseWaterTemp + (Math.random() - 0.5) * 2);
-    hourlySeaLevel.push(tideVariation + (Math.random() - 0.5) * 0.1);
+    hourlyWaveHeight.push(Math.max(0.1, baseWaveHeight + (rangeRandom(-0.4, 0.4))));
+    hourlyWaveDirection.push(270 + rangeRandom(-15, 15)); // W swell
+    hourlyWavePeriod.push(8 + rangeRandom(-2, 2));
+    hourlyWindSpeed.push(Math.max(2, baseWindSpeed + dayVariation * 8 + rangeRandom(-3, 3)));
+    hourlyWindDirection.push(330 + rangeRandom(-20, 20)); // N/NW wind
+    hourlyWindGusts.push(Math.max(3, baseWindSpeed + dayVariation * 10 + rangeRandom(-4, 4)));
+    hourlyWaterTemp.push(baseWaterTemp + rangeRandom(-1, 1));
+    hourlySeaLevel.push(tideVariation + rangeRandom(-0.05, 0.05));
   }
 
   const dailyTime: string[] = [];
@@ -148,7 +159,35 @@ function generateMockData(lat: number, lon: number): MarineData {
   };
 }
 
+export function isValidCoordinate(lat: number, lon: number): boolean {
+  return (
+    typeof lat === 'number' && 
+    typeof lon === 'number' && 
+    !isNaN(lat) && 
+    !isNaN(lon) && 
+    lat >= -90 && 
+    lat <= 90 && 
+    lon >= -180 && 
+    lon <= 180
+  );
+}
+
+export function getCoordValidationError(lat: number, lon: number): string | null {
+  if (isNaN(lat) || isNaN(lon)) return 'Coordinates must be valid numbers';
+  if (lat < -90 || lat > 90) return `Latitude ${lat} out of range (-90 to 90)`;
+  if (lon < -180 || lon > 180) return `Longitude ${lon} out of range (-180 to 180)`;
+  return null;
+}
+
 export async function fetchMarineData(lat: number, lon: number): Promise<FetchResult> {
+  // FIX A2: Coordinate validation
+  const coordError = getCoordValidationError(lat, lon);
+  if (coordError) {
+    console.warn(`Invalid coordinates (${lat}, ${lon}): ${coordError}`);
+    const mock = generateMockData(lat, lon);
+    return { data: mock, source: 'mock' as const };
+  }
+
   const cacheKey = `${lat.toFixed(3)},${lon.toFixed(3)}`;
   const cached = cache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {

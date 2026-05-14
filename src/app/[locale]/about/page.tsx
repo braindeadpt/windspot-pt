@@ -1,5 +1,25 @@
 import { getTranslation } from '@/lib/i18n'
 import { Wind, Waves, Database, Brain, Code, Heart, Globe, Zap, Shield } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const isPt = locale === 'pt'
+  
+  return {
+    title: isPt ? 'Sobre — VenTu' : 'About — VenTu',
+    description: isPt
+      ? 'Conheça a missão do VenTu, uma plataforma open-source para desportos náuticos em Portugal.'
+      : 'Learn about VenTu\'s mission, an open-source platform for water sports in Portugal.',
+    alternates: {
+      canonical: `/${locale}/about`,
+      languages: {
+        'pt': '/pt/about',
+        'en': '/en/about',
+      },
+    },
+  }
+}
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params

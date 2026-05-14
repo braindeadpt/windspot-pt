@@ -1,7 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { Share2, Check, Copy, Facebook, Twitter, Linkedin, Mail } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Share2, Check, Copy, Facebook, Twitter, Linkedin, Mail, X } from 'lucide-react';
+
+interface ToastState {
+  show: boolean;
+  message: string;
+  type: 'success' | 'error';
+}
 
 interface SocialShareProps {
   title: string;
@@ -13,7 +19,13 @@ interface SocialShareProps {
 export default function SocialShare({ title, text, url, locale = 'pt' }: SocialShareProps) {
   const [copied, setCopied] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [toast, setToast] = useState<ToastState>({ show: false, message: '', type: 'success' });
   const isPt = locale === 'pt';
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast(t => ({ ...t, show: false })), 2500);
+  };
 
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
   const shareText = text || title;
@@ -38,7 +50,8 @@ export default function SocialShare({ title, text, url, locale = 'pt' }: SocialS
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      showToast(isPt ? 'Link copiado!' : 'Link copied!');
+      setTimeout(() => setCopied(false), 2500);
     } catch {
       // Fallback
       const input = document.createElement('input');
@@ -48,7 +61,8 @@ export default function SocialShare({ title, text, url, locale = 'pt' }: SocialS
       document.execCommand('copy');
       document.body.removeChild(input);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      showToast(isPt ? 'Link copiado!' : 'Link copied!');
+      setTimeout(() => setCopied(false), 2500);
     }
   };
 
@@ -81,6 +95,20 @@ export default function SocialShare({ title, text, url, locale = 'pt' }: SocialS
 
   return (
     <div className="relative flex items-center gap-2">
+      {/* FIX U2: Toast notification */}
+      {toast.show && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 animate-fade-up">
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-lg ${
+            toast.type === 'success' 
+              ? 'bg-score-good/20 text-score-good border border-score-good/30' 
+              : 'bg-score-poor/20 text-score-poor border border-score-poor/30'
+          }`}>
+            {toast.type === 'success' ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+            {toast.message}
+          </div>
+        </div>
+      )}
+
       {/* Main Share Button */}
       <button
         onClick={handleNativeShare}

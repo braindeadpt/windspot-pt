@@ -85,6 +85,13 @@ export default async function HomePage({ params, searchParams }: { params: Promi
   const bestSpot = spotsData[0];
   const top5 = spotsData.slice(0, 5);
 
+  // FIX U1: Fallback spots for ticker when no conditions data
+  const tickerSpots = top5.length > 0 ? top5 : (spots.slice(0, 5) as typeof spots).map(spot => ({
+    spot,
+    conditions: { waveHeight: 1.2, wavePeriod: 8, waveDirection: 270, windSpeed: 12, windDirection: 330, windGust: 18, waterTemp: 17 },
+    allScores: { surf: { score: 70 }, kitesurf: { score: 65 }, windsurf: { score: 60 } } as Record<string, { score: number }>
+  }));
+
   // "ON" threshold tuned empirically (Fase 4a): score >= 70
   // restricted to spot's compatibleSports. With current data,
   // this yields ~51 spots out of 72 with conditions (~71% of active).
@@ -152,11 +159,12 @@ export default async function HomePage({ params, searchParams }: { params: Promi
       {/* Dawn Patrol AI Advisor Banner */}
       <DawnPatrolBanner locale={locale} />
 
-      {/* Live Ticker - Refined */}
-      <div className="w-full bg-surface-1 border-y border-divider overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap" style={{ animationDuration: '60s' }}>
-          {[...top5, ...top5].map((data, i) => {
-            const score = data.allScores['surf']?.score || 0;
+      {/* Live Ticker - FIX U1: with fallback */}
+      {tickerSpots.length > 0 ? (
+        <div className="w-full bg-surface-1 border-y border-divider overflow-hidden">
+          <div className="flex animate-marquee whitespace-nowrap" style={{ animationDuration: '60s' }}>
+            {[...tickerSpots, ...tickerSpots].map((data, i) => {
+              const score = data.allScores?.['surf']?.score || 0;
             const color = score >= 85 ? 'rgb(var(--score-good))' : score >= 70 ? 'rgb(var(--score-fair))' : score >= 50 ? 'rgb(var(--score-mid))' : 'rgb(var(--score-poor))';
             return (
               <Link
@@ -172,7 +180,12 @@ export default async function HomePage({ params, searchParams }: { params: Promi
             );
           })}
         </div>
-      </div>
+        </div>
+      ) : (
+        <div className="w-full bg-surface-1 border-y border-divider px-4 py-2 text-center text-meta text-fg-muted">
+          {isPt ? 'A carregar condições...' : 'Loading conditions...'}
+        </div>
+      )}
 
       {/* Hero Compact */}
       {bestSpot && (

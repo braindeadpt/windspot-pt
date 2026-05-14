@@ -402,7 +402,9 @@ export default function SpotDetailClient({
           url: `https://ventu.surf/${locale}/spots/${spot.slug}/`,
           sportActivityLocation: {
             '@type': 'SportsActivityLocation',
-            name: SPORT_LABELS[spot.type]?.[isPt ? 'pt' : 'en'] || spot.type,
+            name: (spot.compatibleSports?.[0] && SPORT_LABELS[spot.compatibleSports[0] as keyof typeof SPORT_LABELS])
+              ? SPORT_LABELS[spot.compatibleSports[0] as keyof typeof SPORT_LABELS][isPt ? 'pt' : 'en']
+              : spot.type,
           },
         }}
       />

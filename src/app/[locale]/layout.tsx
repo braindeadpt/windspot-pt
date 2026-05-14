@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
-import { locales, getTranslation } from '@/lib/i18n'
+import { locales, validateLocale } from '@/lib/i18n'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import HtmlLang from '@/components/HtmlLang'
 import ClientProviders from '@/components/layout/ClientProviders'
+import CSPMeta from '@/components/CSPMeta'
 import '../globals.css'
 
 export const viewport: Viewport = {
@@ -64,12 +65,14 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  if (!locales.includes(locale as any)) {
+  const validLocale = validateLocale(locale)
+  if (validLocale !== locale) {
     notFound()
   }
 
   return (
     <ClientProviders>
+      <CSPMeta />
       <HtmlLang locale={locale} />
       <Header locale={locale} />
       <main className="pt-16">{children}</main>

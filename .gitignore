@@ -40,3 +40,9 @@ Thumbs.db
 tsconfig.tsbuildinfo
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+
+# Auto-generated data files (updated by GitHub Actions)
+# Keep the directory structure but ignore contents
+public/data/
+# Exception: keep .gitkeep to preserve directory
+!public/data/.gitkeep
