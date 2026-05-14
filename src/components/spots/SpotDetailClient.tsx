@@ -28,6 +28,8 @@ import { getTranslation } from '@/lib/i18n';
 
 import ScoreGauge from '@/components/ui/ScoreGauge';
 import WaveShape from '@/components/ui/WaveShape';
+import SocialShare from '@/components/ui/SocialShare';
+import SeoHead from '@/components/SeoHead';
 import SwellRadar from '@/components/ui/SwellRadar';
 import ForecastTable from '@/components/weather/ForecastTable';
 import type { ForecastHour } from '@/components/weather/ForecastTable';
@@ -375,7 +377,45 @@ export default function SpotDetailClient({
   const windDir = getCardinalLabel(conditions.windDirection);
 
   return (
-    <div className="min-h-screen bg-bg-base pb-20">
+    <>
+      {/* SEO: JSON-LD for structured data */}
+      <SeoHead
+        title={`${isPt ? spot.name : spot.nameEn} - ${spot.region}${isPt ? ', ' : ', '}${spot.regionEn}`}
+        description={isPt ? spot.description : spot.descriptionEn}
+        image="/og-image.svg"
+        type="article"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Beach',
+          name: isPt ? spot.name : spot.nameEn,
+          description: isPt ? spot.description : spot.descriptionEn,
+          address: {
+            '@type': 'PostalAddress',
+            addressRegion: spot.region,
+            addressCountry: 'PT',
+          },
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: spot.lat,
+            longitude: spot.lon,
+          },
+          url: `https://ventu.surf/${locale}/spots/${spot.slug}/`,
+          sportActivityLocation: {
+            '@type': 'SportsActivityLocation',
+            name: SPORT_LABELS[spot.type]?.[isPt ? 'pt' : 'en'] || spot.type,
+          },
+        }}
+      />
+
+      {/* Social Share Buttons */}
+      <div className="fixed bottom-6 right-6 z-40 md:hidden">
+        <SocialShare 
+          title={`${isPt ? spot.name : spot.nameEn} - ${spot.region}`}
+          locale={locale}
+        />
+      </div>
+
+      <div className="min-h-screen bg-bg-base pb-20">
       {/* ═══════════════════════════════════════════════════════════════
           HEADER / HERO
           ═══════════════════════════════════════════════════════════════ */}
@@ -426,19 +466,10 @@ export default function SpotDetailClient({
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={handleShare}
-              className="p-3 rounded-button bg-surface-1 border border-divider text-fg-muted hover:text-fg hover:bg-surface-2 transition-colors duration-fast relative min-w-[44px] min-h-[44px]"
-              aria-label={td.share}
-              title={td.share}
-            >
-              <Share2 className="w-5 h-5" />
-              {copyToast && (
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-meta-sm text-score-good bg-surface-2 px-2 py-1 rounded whitespace-nowrap border border-divider shadow-sm">
-                  {td.copyLink}
-                </span>
-              )}
-            </button>
+            <SocialShare 
+              title={`${isPt ? spot.name : spot.nameEn} - ${spot.region}`}
+              locale={locale}
+            />
             <FavoriteButton spotId={spot.id} spotName={spot.name} size="lg" locale={locale} />
           </div>
         </div>
@@ -709,6 +740,7 @@ export default function SpotDetailClient({
         </div>
       </section>
     </div>
+    </>
   );
 }
 
