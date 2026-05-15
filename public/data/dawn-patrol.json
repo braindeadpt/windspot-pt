@@ -1,22 +1,30 @@
 {
-  "date": "2026-05-14",
-  "topSpot": "Carcavelos",
-  "topSpotSlug": "carcavelos",
+  "date": "2026-05-15",
+  "topSpot": "Arrifana",
+  "topSpotSlug": "arrifana",
   "pt": {
-    "headline": "Hoje é dia de Carcavelos! 🌊",
-    "advice": "Melhor janela: 6:00h. Ondas de 2.1m com 9 nós de vento.",
+    "headline": "Hoje é dia de Arrifana! 🌊",
+    "advice": "Melhor janela: 6:00h. Ondas de 2.1m com 8 nós de vento.",
     "bestTime": "6:00",
     "wetsuit": "3/2mm",
     "crowdTip": "Chega cedo para evitar crowd!"
   },
   "en": {
-    "headline": "Today is Carcavelos day! 🌊",
-    "advice": "Best window: 6:00. 2.1m waves with 9 knot wind.",
+    "headline": "Today is Arrifana day! 🌊",
+    "advice": "Best window: 6:00. 2.1m waves with 8 knot wind.",
     "bestTime": "6:00",
     "wetsuit": "3/2mm",
     "crowdTip": "Get there early to beat the crowd!"
   },
   "spots": [
+    {
+      "name": "Arrifana",
+      "slug": "arrifana",
+      "score": 83,
+      "verdict": "go",
+      "ptReason": "Condições excelentes",
+      "enReason": "Excellent conditions"
+    },
     {
       "name": "Carcavelos",
       "slug": "carcavelos",
@@ -26,33 +34,17 @@
       "enReason": "Excellent conditions"
     },
     {
-      "name": "Nazaré",
-      "slug": "nazare",
-      "score": 78,
-      "verdict": "go",
-      "ptReason": "Condições excelentes",
-      "enReason": "Excellent conditions"
-    },
-    {
-      "name": "Arrifana",
-      "slug": "arrifana",
-      "score": 78,
-      "verdict": "go",
-      "ptReason": "Condições excelentes",
-      "enReason": "Excellent conditions"
-    },
-    {
       "name": "Guincho",
       "slug": "guincho",
-      "score": 74,
+      "score": 79,
       "verdict": "go",
       "ptReason": "Condições excelentes",
       "enReason": "Excellent conditions"
     },
     {
-      "name": "Supertubos",
-      "slug": "supertubos",
-      "score": 73,
+      "name": "Nazaré",
+      "slug": "nazare",
+      "score": 77,
       "verdict": "go",
       "ptReason": "Condições excelentes",
       "enReason": "Excellent conditions"
@@ -66,9 +58,17 @@
       "enReason": "Excellent conditions"
     },
     {
+      "name": "Supertubos",
+      "slug": "supertubos",
+      "score": 70,
+      "verdict": "go",
+      "ptReason": "Condições excelentes",
+      "enReason": "Excellent conditions"
+    },
+    {
       "name": "Ribeira d'Ilhas",
       "slug": "ribeira-dilhas",
-      "score": 66,
+      "score": 65,
       "verdict": "maybe",
       "ptReason": "Condições razoáveis",
       "enReason": "Fair conditions"
