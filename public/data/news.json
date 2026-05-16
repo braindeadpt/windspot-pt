@@ -1,14 +1,14 @@
 [
   {
-    "id": "news-1778838037804-surf",
+    "id": "news-1778921144152-surf",
     "title": "Ondas brutais em coxos hoje!",
     "titleEn": "Great waves at coxos today!",
-    "summary": "Com 3.0m de ondas e apenas 10kt de vento, as condições estão mesmo boas para surf. Água a 16.0°C — leva a wetsuit!",
-    "summaryEn": "With 3.0m waves and only 10kt wind, conditions are great for surfing. Water at 16.0°C — bring your wetsuit!",
+    "summary": "Com 2.5m de ondas e apenas 9kt de vento, as condições estão mesmo boas para surf. Água a 15.6°C — leva a wetsuit!",
+    "summaryEn": "With 2.5m waves and only 9kt wind, conditions are great for surfing. Water at 15.6°C — bring your wetsuit!",
     "category": "surf",
     "source": "VenTu AI",
     "url": "https://ventu.surf/pt/spots/coxos",
-    "publishedAt": "2026-05-15T09:40:37.804Z",
+    "publishedAt": "2026-05-16T08:45:44.152Z",
     "tags": [
       "coxos",
       "surf",
@@ -17,15 +17,15 @@
     ]
   },
   {
-    "id": "news-1778838037805-kite",
+    "id": "news-1778921144153-kite",
     "title": "Nortada forte em ponta sao lourenco! 🪁",
     "titleEn": "Strong wind at ponta sao lourenco! 🪁",
-    "summary": "18kt de vento steady — perfeito para kitesurf! As condições estão mesmo a dar para uma sessão épica.",
-    "summaryEn": "18kt steady wind — perfect for kitesurfing! Conditions are epic for a great session.",
+    "summary": "16kt de vento steady — perfeito para kitesurf! As condições estão mesmo a dar para uma sessão épica.",
+    "summaryEn": "16kt steady wind — perfect for kitesurfing! Conditions are epic for a great session.",
     "category": "kitesurf",
     "source": "VenTu AI",
     "url": "https://ventu.surf/pt/spots/ponta-sao-lourenco",
-    "publishedAt": "2026-05-15T09:40:37.805Z",
+    "publishedAt": "2026-05-16T08:45:44.153Z",
     "tags": [
       "ponta-sao-lourenco",
       "kitesurf",
@@ -34,15 +34,15 @@
     ]
   },
   {
-    "id": "news-1778838037805-summary",
-    "title": "Resumo nacional: média de 10kt de vento",
-    "titleEn": "National summary: 10kt average wind",
-    "summary": "Hoje temos condições variadas em Portugal. Melhores spots de surf: coxos, ribeira ilhas, empa. Para kitesurf: ponta sao lourenco, vila nova milfontes, anjos.",
-    "summaryEn": "Today we have varied conditions in Portugal. Best surf spots: coxos, ribeira ilhas, empa. For kitesurf: ponta sao lourenco, vila nova milfontes, anjos.",
+    "id": "news-1778921144153-summary",
+    "title": "Resumo nacional: média de 7kt de vento",
+    "titleEn": "National summary: 7kt average wind",
+    "summary": "Hoje temos condições variadas em Portugal. Melhores spots de surf: coxos, ribeira ilhas, empa. Para kitesurf: ponta sao lourenco, barriga, castelejo.",
+    "summaryEn": "Today we have varied conditions in Portugal. Best surf spots: coxos, ribeira ilhas, empa. For kitesurf: ponta sao lourenco, barriga, castelejo.",
     "category": "general",
     "source": "VenTu AI",
     "url": "https://ventu.surf",
-    "publishedAt": "2026-05-15T09:40:37.805Z",
+    "publishedAt": "2026-05-16T08:45:44.153Z",
     "tags": [
       "portugal",
       "resumo",
