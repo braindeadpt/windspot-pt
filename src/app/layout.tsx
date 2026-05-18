@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import './globals.css'
 
 /**
@@ -19,7 +22,7 @@ import './globals.css'
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#09090b',
+  themeColor: '#0F172A',
 }
 
 export const metadata: Metadata = {
@@ -40,7 +43,7 @@ const themeScript = `
     try {
       var t = localStorage.getItem('windspot:theme');
       if (t === 'dark') {
-        document.documentElement.classList.remove('theme-coast');
+        document.documentElement.classList.remove('theme-ocean');
       }
     } catch (e) {}
   })();
@@ -54,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-PT"
-      className={`${GeistSans.variable} ${GeistMono.variable} theme-coast`}
+      className={`${GeistSans.variable} ${GeistMono.variable} theme-ocean`}
       suppressHydrationWarning
     >
       <head>

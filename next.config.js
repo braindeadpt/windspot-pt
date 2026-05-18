@@ -3,7 +3,7 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
   trailingSlash: true,
-  transpilePackages: ['geist'],
+  transpilePackages: ['geist', 'leaflet'],
   reactStrictMode: true,
 }
 

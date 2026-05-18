@@ -1,15 +1,15 @@
-# Fase 7.2 — Coast Theme Palette
+# Fase 7.2 — Ocean Theme Palette (renamed from Coast)
 
 ## Estado
-- `.theme-coast` definida em `globals.css` com paleta warm/golden.
+- `.theme-ocean` definida em `globals.css` com paleta white-sand (#FAFAF7).
 - Shadow-glow-* convertidos para CSS variables em `tailwind.config.ts`.
-- **Não ativado automaticamente** — aplica-se via DevTools manual.
+- **Ativado por omissão no `<html>`** via `layout.tsx`.
 
 ## Teste manual
 1. `npm run dev`
 2. Abrir `http://localhost:3000/pt/`
-3. DevTools → Elements → `<html>` → adicionar classe `theme-coast`
-4. Site deve ficar com fundo bege (`#faf6ef`), texto navy (`#1a2b3a`)
+3. DevTools → Elements → `<html>` → verificar classe `theme-ocean`
+4. Site deve ficar com fundo white-sand (`#FAFAF7`), texto slate-800 (`#1E293B`)
 
 ## Problemas visuais conhecidos para Fase 7.3
 

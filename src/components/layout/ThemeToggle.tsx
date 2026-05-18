@@ -11,21 +11,21 @@ interface ThemeToggleProps {
 
 export default function ThemeToggle({ locale }: ThemeToggleProps) {
   const isPt = locale === 'pt';
-  // Coast is default (theme-coast class present). Dark is the alternative.
+  // Coast is default (theme-ocean class present). Dark is the alternative.
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   // Sync with DOM after mount (SSR-safe: reads actual class applied by pre-hydration script)
   useEffect(() => {
-    setIsDark(!document.documentElement.classList.contains('theme-coast'));
+    setIsDark(!document.documentElement.classList.contains('theme-ocean'));
     setMounted(true);
   }, []);
 
   const toggle = () => {
     const next = !isDark;
-    document.documentElement.classList.toggle('theme-coast', !next);
+    document.documentElement.classList.toggle('theme-ocean', !next);
     try {
-      localStorage.setItem(THEME_KEY, next ? 'dark' : 'coast');
+      localStorage.setItem(THEME_KEY, next ? 'dark' : 'ocean');
     } catch {
       /* ignore */
     }

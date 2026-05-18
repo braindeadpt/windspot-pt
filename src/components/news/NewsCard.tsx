@@ -1,34 +1,80 @@
 'use client';
 
 import { NewsItem } from '@/types';
-import { ExternalLink, Clock, Sparkles } from 'lucide-react';
+import { ExternalLink, Clock, Sparkles, Waves, Wind, Trophy, Shield, Newspaper } from 'lucide-react';
 
 interface NewsCardProps {
   news: NewsItem;
   locale: string;
+  variant?: 'grid' | 'compact';
 }
 
-export default function NewsCard({ news, locale }: NewsCardProps) {
-  const isPt = locale === 'pt';
+const categoryColors: Record<string, string> = {
+  surf:       'bg-data-waves/12 text-data-waves border border-data-waves/25',
+  kitesurf:   'bg-data-wind/12 text-data-wind border border-data-wind/25',
+  windsurf:   'bg-data-waves/12 text-data-waves border border-data-waves/25',
+  competition:'bg-data-period/12 text-data-period border border-data-period/25',
+  safety:     'bg-windDir-onshore/12 text-windDir-onshore border border-windDir-onshore/25',
+  general:    'bg-data-water/12 text-data-water border border-data-water/25',
+};
 
-  /* Badge tokens — theme-aware (solid text + tinted background + subtle border).
-     Works in both dark (pastel-on-dark) and coast (saturated-on-light). */
-  const categoryColors: Record<string, string> = {
-    surf:       'bg-data-waves/12 text-data-waves border border-data-waves/25',
-    kitesurf:   'bg-data-wind/12 text-data-wind border border-data-wind/25',
-    windsurf:   'bg-data-waves/12 text-data-waves border border-data-waves/25',
-    competition:'bg-data-period/12 text-data-period border border-data-period/25',
-    safety:     'bg-windDir-onshore/12 text-windDir-onshore border border-windDir-onshore/25',
-    general:    'bg-data-water/12 text-data-water border border-data-water/25',
-  };
+const categoryIcons: Record<string, React.ReactNode> = {
+  surf:        <Waves className="w-4 h-4" />,
+  kitesurf:    <Wind className="w-4 h-4" />,
+  windsurf:    <Wind className="w-4 h-4" />,
+  competition: <Trophy className="w-4 h-4" />,
+  safety:      <Shield className="w-4 h-4" />,
+  general:     <Newspaper className="w-4 h-4" />,
+};
+
+export default function NewsCard({ news, locale, variant = 'grid' }: NewsCardProps) {
+  const isPt = locale === 'pt';
+  const catColor = categoryColors[news.category] || categoryColors.general;
+  const catIcon = categoryIcons[news.category] || null;
+
+  if (variant === 'compact') {
+    return (
+      <article className="flex items-start gap-3 py-3 border-b border-divider last:border-b-0">
+        <span className={`mt-0.5 shrink-0 ${catColor.split(' ')[1]}`}>
+          {catIcon}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h4 className="text-sm font-medium text-fg line-clamp-1 leading-snug">
+            {isPt ? news.title : news.titleEn}
+          </h4>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-xs text-fg-subtle">
+              {new Date(news.publishedAt).toLocaleDateString(isPt ? 'pt-PT' : 'en-GB', { day: 'numeric', month: 'short' })}
+            </span>
+            <span className="flex items-center gap-1 text-xs text-fg-subtle/80">
+              <Sparkles className="w-2.5 h-2.5" />
+              {isPt ? 'IA' : 'AI'}
+            </span>
+          </div>
+        </div>
+        <a
+          href={news.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 text-data-waves hover:text-data-waves/80 transition-colors"
+          aria-label={isPt ? 'Ler artigo' : 'Read article'}
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      </article>
+    );
+  }
 
   return (
     <article className="glass-card overflow-hidden hover:bg-surface-2 transition-all duration-300 group">
       <div className="p-5 space-y-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${categoryColors[news.category] || categoryColors.general}`}>
-            {news.category}
-          </span>
+          <div className="flex items-center gap-1">
+            <span className={`${catColor.split(' ')[1]}`}>{catIcon}</span>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${catColor}`}>
+              {news.category}
+            </span>
+          </div>
           <span className="flex items-center gap-1 text-xs text-fg-subtle">
             <Clock className="w-3 h-3" />
             {new Date(news.publishedAt).toLocaleDateString(isPt ? 'pt-PT' : 'en-GB')}
@@ -49,9 +95,9 @@ export default function NewsCard({ news, locale }: NewsCardProps) {
 
         <div className="flex items-center justify-between pt-2">
           <span className="text-xs text-fg-subtle">{news.source}</span>
-          <a 
-            href={news.url} 
-            target="_blank" 
+          <a
+            href={news.url}
+            target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-sm text-data-waves hover:text-data-waves/80 transition-colors"
           >

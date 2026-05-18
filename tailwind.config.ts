@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import plugin from 'tailwindcss/plugin'
 
 /** Safelist — classes referenced dynamically that Tailwind JIT can't detect. */
 const SCORE_GLOW_SAFELIST = [
@@ -10,33 +11,17 @@ const SCORE_GLOW_SAFELIST = [
 ]
 
 /**
- * WindSpot Tailwind Config
+ * VenTu Tailwind Config — Design System v2.0
  *
- * Design system organized around three layers:
+ * Ocean-tech sério. Dados são protagonistas.
  *
- * 1. SEMANTIC TOKENS (use these in new code)
- *    - bg-surface-1 / bg-surface-2: card backgrounds
- *    - text-fg / text-fg-muted / text-fg-subtle: text hierarchy
- *    - border-divider: subtle separators
- *    - Score colors via CSS vars (see globals.css):
- *      use `text-score-epic` / `bg-score-epic/10` / `shadow-glow-epic` etc.
- *      where the suffix is one of: epic, good, fair, poor, closed
- *
- * 2. DATA-VIZ COLORS (use for charts, gauges, condition icons)
- *    - text-data-waves, text-data-wind, text-data-water, text-data-period
- *
- * 3. SPORT ACCENTS (use ONLY for sport identification — icons, badges, tabs)
- *    Never as primary background or border.
- *    - text-sport-surf, text-sport-kitesurf, text-sport-windsurf,
- *      text-sport-bodyboard, text-sport-sup, text-sport-wakeboard
- *
- * LEGACY (deprecated, kept for backward compat):
- * - ocean / surf / wave / wind 50-900 palettes are still defined but should be
- *   migrated to the semantic tokens above as components are redesigned.
- *
- * Typography: use semantic tokens (text-h1, text-body, text-num) instead of
- * raw sizes (text-3xl, text-base). Tailwind defaults remain available for
- * one-off cases.
+ * Semantic tokens (use these in new code):
+ * - bg-surface-1 / bg-surface-2: card backgrounds
+ * - text-fg / text-fg-muted / text-fg-subtle: text hierarchy
+ * - border-divider: subtle separators
+ * - text-score-epic / bg-score-epic/10 / shadow-glow-epic etc.
+ * - text-data-waves / text-data-wind / text-data-water / text-data-period
+ * - text-sport-{surf,kitesurf,windsurf,...}
  */
 
 const config: Config = {
@@ -53,8 +38,6 @@ const config: Config = {
         //  SEMANTIC SURFACE / TEXT TOKENS
         // ═══════════════════════════════════════════════════════════
 
-        // Backgrounds (use these for app shell + cards)
-        // Fase 7.1: valores agora vêm de CSS variables em globals.css
         bg: {
           base:     'rgb(var(--bg-base) / <alpha-value>)',
           elevated: 'rgb(var(--bg-elevated) / <alpha-value>)',
@@ -68,8 +51,6 @@ const config: Config = {
           DEFAULT: 'rgb(var(--divider))',
           strong:  'rgb(var(--divider-strong))',
         },
-
-        // Foreground text (semantic hierarchy)
         fg: {
           DEFAULT:  'rgb(var(--fg))',
           muted:    'rgb(var(--fg-muted))',
@@ -79,7 +60,6 @@ const config: Config = {
 
         // ═══════════════════════════════════════════════════════════
         //  DATA VISUALIZATION COLORS
-        //  (use for chart series, condition icons, gauges)
         // ═══════════════════════════════════════════════════════════
         data: {
           waves:  'rgb(var(--data-waves) / <alpha-value>)',
@@ -90,9 +70,6 @@ const config: Config = {
 
         // ═══════════════════════════════════════════════════════════
         //  SPORT ACCENTS
-        //  Used only for sport identification (icons, badges, tabs).
-        //  Chosen to be visually distinct from each other AND from
-        //  score colors. Never use as card background or primary border.
         // ═══════════════════════════════════════════════════════════
         sport: {
           surf:      'rgb(var(--sport-surf) / <alpha-value>)',
@@ -105,22 +82,19 @@ const config: Config = {
         },
 
         // ═══════════════════════════════════════════════════════════
-        //  SCORE COLORS — theme-aware via CSS variables
-        //  Use for badges, gauges, and score indicators.
+        //  SCORE COLORS
         // ═══════════════════════════════════════════════════════════
         score: {
           epic:   'rgb(var(--score-epic) / <alpha-value>)',
           good:   'rgb(var(--score-good) / <alpha-value>)',
           fair:   'rgb(var(--score-fair) / <alpha-value>)',
+          mid:    'rgb(var(--score-mid, var(--score-fair)) / <alpha-value>)',
           poor:   'rgb(var(--score-poor) / <alpha-value>)',
           closed: 'rgb(var(--score-closed) / <alpha-value>)',
         },
 
         // ═══════════════════════════════════════════════════════════
-        //  WIND DIRECTION TINT (offshore vs onshore)
-        //  Use as subtle background or border tint, not dominant color.
-        //  NOTE: namespaced under windDir/ to avoid collision with the
-        //        legacy `wind` palette below.
+        //  WIND DIRECTION TINT
         // ═══════════════════════════════════════════════════════════
         windDir: {
           offshore: 'rgb(var(--windDir-offshore) / <alpha-value>)',
@@ -129,9 +103,7 @@ const config: Config = {
         },
 
         // ═══════════════════════════════════════════════════════════
-        //  LEGACY PALETTES (deprecated — migrate to semantic tokens)
-        //  Kept to avoid breaking 15 files that currently use them.
-        //  TODO: remove once Fase 4 component migration is complete.
+        //  LEGACY PALETTES (deprecated — kept for backward compat)
         // ═══════════════════════════════════════════════════════════
         ocean: {
           50: '#f0f9ff',   100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
@@ -159,16 +131,13 @@ const config: Config = {
       //  TYPOGRAPHY
       // ═══════════════════════════════════════════════════════════
       fontFamily: {
-        // Wired up in src/app/layout.tsx via the `geist` package.
-        // CSS variables: --font-geist-sans, --font-geist-mono.
         sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-geist-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'monospace'],
+        serif: ['IBM Plex Serif', 'Georgia', 'serif'],
       },
 
-      // Semantic font sizes with line-height, letter-spacing and weight baked in.
-      // Prefer these over raw text-3xl etc. for new code.
       fontSize: {
-        // Display — only for hero spot names and major numeric displays
+        // Display — hero scores, major numeric displays
         'display-xl': ['3.5rem',  { lineHeight: '1.05', letterSpacing: '-0.03em',  fontWeight: '700' }],
         'display-lg': ['2.5rem',  { lineHeight: '1.1',  letterSpacing: '-0.025em', fontWeight: '700' }],
 
@@ -186,7 +155,7 @@ const config: Config = {
         'meta':       ['0.75rem', { lineHeight: '1.4',  letterSpacing: '0.005em' }],
         'meta-sm':    ['0.6875rem',{ lineHeight: '1.4', letterSpacing: '0.04em',  fontWeight: '500' }],
 
-        // Numeric — pair with `font-mono tabular-nums` utilities for alignment
+        // Numeric — pair with font-mono for alignment
         'num-xl':     ['3rem',    { lineHeight: '1', fontWeight: '600' }],
         'num-lg':     ['2rem',    { lineHeight: '1', fontWeight: '600' }],
         'num':        ['1.125rem',{ lineHeight: '1', fontWeight: '500' }],
@@ -198,19 +167,20 @@ const config: Config = {
       //  RADIUS / SHADOWS
       // ═══════════════════════════════════════════════════════════
       borderRadius: {
-        // One radius per category — don't mix raw rounded-xl/2xl ad hoc
-        'card':    '1rem',     // 16px — default card
-        'card-lg': '1.5rem',   // 24px — hero cards, major surfaces
-        'pill':    '9999px',
+        'chip':  '4px',
+        'input': '6px',
+        'card':  '8px',
+        'modal': '12px',
+        'pill':  '9999px',
       },
 
       boxShadow: {
         'card':         '0 1px 2px 0 rgb(0 0 0 / 0.2), 0 1px 3px 0 rgb(0 0 0 / 0.15)',
         'card-hover':   '0 8px 24px -4px rgb(0 0 0 / 0.3), 0 4px 8px -2px rgb(0 0 0 / 0.2)',
         'inset-divider':'inset 0 -1px 0 0 rgb(255 255 255 / 0.06)',
+        'modal':        '0 8px 24px -4px rgb(0 0 0 / 0.3), 0 4px 8px -2px rgb(0 0 0 / 0.2)',
 
-        // Score glows for badges, gauges, hero CTAs.
-        // Fase 7.2: convertido para CSS variables — agora respeitam o tema.
+        // Score glows
         'glow-epic':   '0 0 32px -4px rgb(var(--score-epic) / 0.45)',
         'glow-good':   '0 0 32px -4px rgb(var(--score-good) / 0.40)',
         'glow-fair':   '0 0 24px -4px rgb(var(--score-fair) / 0.35)',
@@ -220,7 +190,6 @@ const config: Config = {
 
       // ═══════════════════════════════════════════════════════════
       //  ANIMATION
-      //  prefers-reduced-motion handled globally in globals.css
       // ═══════════════════════════════════════════════════════════
       transitionDuration: {
         'fast': '120ms',
@@ -252,7 +221,15 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        '.font-tabular': {
+          'font-variant-numeric': 'tabular-nums',
+        },
+      })
+    }),
+  ],
 }
 
 export default config

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Trophy, MapPin, Wind, Waves, Clock, ArrowLeft, Crown, Medal, Award } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Trophy, MapPin, Wind, Waves, Clock, ArrowLeft, Crown, Medal, Award, Check, Search, X } from 'lucide-react';
 import { spots } from '@/lib/spots';
 import { fetchMarineData, getCurrentConditions } from '@/lib/openmeteo';
 import { getAllSportScores, getScoreColor } from '@/lib/sportScore';
@@ -35,27 +35,32 @@ function getDriveTimeFromPorto(region: string): string {
   return times[region] || '—';
 }
 
-// Read spots from URL query string directly — avoids useSearchParams crash in static export
 function getSpotsFromUrl(): string[] {
   if (typeof window === 'undefined') return [];
   try {
     const params = new URLSearchParams(window.location.search);
     const spotsParam = params.get('spots');
     return spotsParam ? spotsParam.split(',').filter(Boolean) : [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
-// Read locale from pathname — avoids useParams in static export
 function getLocaleFromPath(): string {
   if (typeof window === 'undefined') return 'pt';
   try {
     const match = window.location.pathname.match(/^\/(pt|en)\//);
     return match ? match[1] : 'pt';
-  } catch {
-    return 'pt';
+  } catch { return 'pt'; }
+}
+
+// Group spots by region
+function groupByRegion(spotsList: typeof spots): Map<string, typeof spots> {
+  const map = new Map<string, typeof spots>();
+  for (const spot of spotsList) {
+    const region = spot.region || 'Other';
+    if (!map.has(region)) map.set(region, []);
+    map.get(region)!.push(spot);
   }
+  return map;
 }
 
 export default function CompareClient() {
@@ -65,16 +70,19 @@ export default function CompareClient() {
   const [baseCity, setBaseCity] = useState<'lisbon' | 'porto'>('lisbon');
   const [slugs, setSlugs] = useState<string[]>([]);
   const [locale, setLocale] = useState('pt');
+  const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [picking, setPicking] = useState(false);
 
-  // Read URL params once on mount (safe for static export)
   useEffect(() => {
-    setSlugs(getSpotsFromUrl());
+    const urlSlugs = getSpotsFromUrl();
+    setSlugs(urlSlugs);
     setLocale(getLocaleFromPath());
+    setPicking(urlSlugs.length === 0);
   }, []);
 
   const isPt = locale === 'pt';
 
-  // Fetch data for selected spots
   useEffect(() => {
     if (!slugs.length) { setLoading(false); return; }
 
@@ -88,10 +96,9 @@ export default function CompareClient() {
           const data = await fetchMarineData(spot.lat, spot.lon);
           const conditions = getCurrentConditions(data);
           const allScores = getAllSportScores(spot, conditions);
-          const driveTime = baseCity === 'lisbon' 
+          const driveTime = baseCity === 'lisbon'
             ? getDriveTimeFromLisbon(spot.region)
             : getDriveTimeFromPorto(spot.region);
-
           return { spot, conditions, allScores, driveTime };
         } catch { return null; }
       })
@@ -100,6 +107,123 @@ export default function CompareClient() {
       setLoading(false);
     });
   }, [slugs, baseCity]);
+
+  const startCompare = () => {
+    if (selectedSlugs.length < 2) return;
+    const url = `/${locale}/compare?spots=${selectedSlugs.join(',')}`;
+    window.history.pushState({}, '', url);
+    setSlugs([...selectedSlugs]);
+    setLoading(true);
+    setPicking(false);
+  };
+
+  const toggleSpot = (slug: string) => {
+    setSelectedSlugs(prev => {
+      if (prev.includes(slug)) return prev.filter(s => s !== slug);
+      if (prev.length >= 3) return prev;
+      return [...prev, slug];
+    });
+  };
+
+  const filteredSpots = useMemo(() => {
+    if (!searchQuery.trim()) return spots;
+    const q = searchQuery.toLowerCase();
+    return spots.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.nameEn.toLowerCase().includes(q) ||
+      s.region.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
+
+  const regionGroups = useMemo(() => groupByRegion(filteredSpots), [filteredSpots]);
+
+  if (picking) {
+    return (
+      <div className="min-h-screen bg-bg-base py-8">
+        <div className="max-w-4xl mx-auto px-4 space-y-6">
+          <Link href={`/${locale}/spots/`} className="inline-flex items-center gap-2 text-fg-muted hover:text-fg">
+            <ArrowLeft className="w-4 h-4" />
+            {isPt ? 'Voltar' : 'Back'}
+          </Link>
+
+          <div className="text-center space-y-2">
+            <Trophy className="w-12 h-12 text-score-fair mx-auto" />
+            <h1 className="text-3xl font-bold text-fg">Spot vs Spot</h1>
+            <p className="text-fg-muted">{isPt ? 'Escolhe 2-3 spots para comparar' : 'Pick 2-3 spots to compare'}</p>
+          </div>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder={isPt ? 'Procurar spot...' : 'Search spot...'}
+              className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-divider bg-surface-1 text-sm text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-2 focus:ring-data-waves/30"
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-fg-muted">
+              {selectedSlugs.length}/3 {isPt ? 'selecionados' : 'selected'}
+            </span>
+            <div className="flex gap-2">
+              {selectedSlugs.length > 0 && (
+                <button onClick={() => setSelectedSlugs([])} className="text-sm text-fg-muted hover:text-fg px-3 py-1">
+                  <X className="w-4 h-4 inline mr-1" />{isPt ? 'Limpar' : 'Clear'}
+                </button>
+              )}
+              <button
+                onClick={startCompare}
+                disabled={selectedSlugs.length < 2}
+                className="px-4 py-2 rounded-lg bg-data-waves text-bg-base font-medium text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-data-waves/80 transition-colors"
+              >
+                {isPt ? 'Comparar' : 'Compare'}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-6 max-h-[60vh] overflow-y-auto">
+            {Array.from(regionGroups.entries()).map(([region, regionSpots]) => (
+              <div key={region}>
+                <h3 className="text-sm font-semibold text-fg-muted uppercase tracking-wide mb-2">{region}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {regionSpots.map(spot => {
+                    const selected = selectedSlugs.includes(spot.slug);
+                    return (
+                      <button
+                        key={spot.id}
+                        onClick={() => toggleSpot(spot.slug)}
+                        className={[
+                          'flex items-center gap-3 p-3 rounded-lg border text-left transition-all',
+                          selected
+                            ? 'bg-data-waves/10 border-data-waves text-fg'
+                            : 'bg-surface-1 border-divider text-fg-muted hover:bg-surface-2 hover:text-fg',
+                          selectedSlugs.length >= 3 && !selected ? 'opacity-50' : '',
+                        ].join(' ')}
+                        disabled={selectedSlugs.length >= 3 && !selected}
+                      >
+                        <div className={[
+                          'w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all',
+                          selected ? 'bg-data-waves border-data-waves' : 'border-fg-disabled',
+                        ].join(' ')}>
+                          {selected && <Check className="w-3 h-3 text-white" />}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium truncate">{isPt ? spot.name : spot.nameEn}</div>
+                          <div className="text-xs text-fg-subtle">{spot.region}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -119,21 +243,25 @@ export default function CompareClient() {
           <Trophy className="w-16 h-16 text-score-fair mx-auto" />
           <h1 className="text-3xl font-bold text-fg">Spot vs Spot</h1>
           <p className="text-fg-muted">
-            {isPt 
-              ? 'Escolhe 2-3 spots para comparar. Exemplo: /compare/?spots=supertubos,guincho'
-              : 'Pick 2-3 spots to compare. Example: /compare/?spots=supertubos,guincho'
-            }
+            {isPt
+              ? 'Seleciona 2-3 spots para comparar condições.'
+              : 'Pick 2-3 spots to compare conditions.'}
           </p>
+          <button
+            onClick={() => setPicking(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-data-waves text-bg-base font-medium hover:bg-data-waves/80 transition-colors"
+          >
+            {isPt ? 'Escolher spots' : 'Choose spots'}
+          </button>
         </div>
       </div>
     );
   }
 
-  const sorted = [...battleData].sort((a, b) => 
+  const sorted = [...battleData].sort((a, b) =>
     (b.allScores[selectedSport]?.score || 0) - (a.allScores[selectedSport]?.score || 0)
   );
   const winner = sorted[0];
-
   const rankIcons = [Crown, Medal, Award];
   const rankColors = ['text-score-fair', 'text-fg-muted', 'text-score-poor'];
 
@@ -151,18 +279,25 @@ export default function CompareClient() {
           </div>
         </div>
 
-        <div className="text-center space-y-2">
-          <Trophy className="w-12 h-12 text-score-fair mx-auto" />
-          <h1 className="text-4xl font-bold text-fg">Spot vs Spot</h1>
-          <p className="text-fg-muted">{isPt ? 'Quem ganha hoje?' : 'Who wins today?'}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-fg">Spot vs Spot</h1>
+            <p className="text-fg-muted">{isPt ? 'Quem ganha hoje?' : 'Who wins today?'}</p>
+          </div>
+          <button
+            onClick={() => { setPicking(true); setSelectedSlugs(slugs); }}
+            className="text-sm text-data-waves hover:underline"
+          >
+            {isPt ? 'Trocar spots' : 'Change spots'}
+          </button>
         </div>
 
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
           {(['surf', 'kitesurf', 'windsurf', 'bodyboard'] as SportType[]).map(sport => (
             <button
               key={sport}
               onClick={() => setSelectedSport(sport)}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${selectedSport === sport ? 'bg-surface-2 text-fg border border-divider' : 'bg-surface-1 text-fg-muted'}`}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${selectedSport === sport ? 'bg-surface-2 text-fg border border-divider' : 'bg-surface-1 text-fg-muted hover:bg-surface-2'}`}
             >
               {sport.charAt(0).toUpperCase() + sport.slice(1)}
             </button>
@@ -182,16 +317,14 @@ export default function CompareClient() {
             const Icon = rankIcons[i] || Award;
             const colors = getScoreColor(data.allScores[selectedSport]?.score || 0);
             const score = data.allScores[selectedSport];
-            
+
             return (
               <div key={data.spot.id} className="bg-surface-1 backdrop-blur-sm border border-divider rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Icon className={`w-6 h-6 ${rankColors[i]}`} />
                     {data.conditions.source === 'mock' && (
-                      <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-score-fair/20 text-score-fair border border-score-fair/30">
-                        DEMO
-                      </span>
+                      <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-score-fair/20 text-score-fair border border-score-fair/30">DEMO</span>
                     )}
                   </div>
                   <span className={`text-3xl font-bold ${colors.text}`}>#{i + 1}</span>
@@ -207,15 +340,15 @@ export default function CompareClient() {
 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-fg-muted flex items-center gap-1"><Waves className="w-4 h-4"/>{isPt ? 'Ondas' : 'Waves'}</span>
+                    <span className="text-fg-muted flex items-center gap-1"><Waves className="w-4 h-4" />{isPt ? 'Ondas' : 'Waves'}</span>
                     <span className="font-bold">{data.conditions.waveHeight.toFixed(1)}m</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-fg-muted flex items-center gap-1"><Wind className="w-4 h-4"/>{isPt ? 'Vento' : 'Wind'}</span>
+                    <span className="text-fg-muted flex items-center gap-1"><Wind className="w-4 h-4" />{isPt ? 'Vento' : 'Wind'}</span>
                     <span className="font-bold">{(data.conditions.windSpeed * 1.94384).toFixed(0)}kt</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-fg-muted flex items-center gap-1"><Clock className="w-4 h-4"/>{isPt ? 'Condução' : 'Drive'}</span>
+                    <span className="text-fg-muted flex items-center gap-1"><Clock className="w-4 h-4" />{isPt ? 'Condução' : 'Drive'}</span>
                     <span className="text-data-waves">{data.driveTime}</span>
                   </div>
                 </div>

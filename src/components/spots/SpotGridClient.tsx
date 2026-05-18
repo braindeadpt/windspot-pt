@@ -3,13 +3,16 @@
 import { useState, useEffect, useMemo } from 'react';
 // useSearchParams removed — using window.location.search for static export safety
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { Wind, Waves, Zap, Filter, Star, RotateCcw, ArrowRight, MapPin, Navigation } from 'lucide-react';
-import SpotMapInteractive from './SpotMapInteractive';
 import { getMacroRegion, type MacroRegion } from '@/lib/regions';
 import { getCompatibleSports, type SportType } from '@/lib/sportRatings';
+import type { SportScore } from '@/lib/sportScore';
 import { getTranslation } from '@/lib/i18n';
 import { useGeolocation, calculateDistance, formatDistance } from '@/lib/geolocation';
 import type { Spot } from '@/types';
+
+const SpotMapInteractive = dynamic(() => import('./SpotMapInteractive'), { ssr: false });
 
 // ─── Types ───
 interface SpotData {
@@ -23,7 +26,7 @@ interface SpotData {
     windGust: number;
     waterTemp: number;
   };
-  allScores: Record<SportType, any>;
+  allScores: Record<SportType, SportScore>;
 }
 
 // ─── Sport config (Fase 4b order: affinity grouping) ───
@@ -154,10 +157,9 @@ export function SpotGridClient({
   useEffect(() => {
     setMounted(true);
 
-    // Resolve sport: URL > localStorage > default
+    // Resolve sport: URL > 'all' default (no localStorage — always start fresh)
     const sportFromUrl = initialSport || urlSport;
-    const lsSport = typeof window !== 'undefined' ? localStorage.getItem(LS_SPORT_KEY) : null;
-    const resolvedSport = (sportFromUrl as SportType | 'all') || (lsSport as SportType | 'all') || 'all';
+    const resolvedSport = (sportFromUrl as SportType | 'all') || 'all';
     if (SPORTS.some(s => s.id === resolvedSport)) {
       setSelectedSport(resolvedSport);
     }
@@ -388,7 +390,7 @@ export function SpotGridClient({
       {/* ─── Interactive Map ─── */}
       <div className="mb-8">
         <SpotMapInteractive
-          spotsData={filtered}
+          spotsData={spotsData}
           selectedSport={selectedSport}
           selectedRegion={selectedRegion}
           locale={locale}

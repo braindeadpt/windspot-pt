@@ -7,12 +7,16 @@ import {
 import { spots } from '@/lib/spots';
 import { getAllSportScores, getScoreColor } from '@/lib/sportScore';
 import type { SportType } from '@/lib/sportRatings';
-import { getCompatibleSports } from '@/lib/sportRatings';
+import { getCompatibleSports, ALL_SPORTS } from '@/lib/sportRatings';
+import type { SportScore } from '@/lib/sportScore';
 import { getTranslation } from '@/lib/i18n';
+import type { Locale } from '@/lib/i18n';
 import { getMacroRegion, MACRO_REGIONS } from '@/lib/regions';
 import { SpotGridClient } from '@/components/spots/SpotGridClient';
 import DawnPatrolBanner from '@/components/DawnPatrolBannerWrapper';
 import HomepageSearch from '@/components/ui/HomepageSearch';
+import { getScoreRgb } from '@/lib/map-constants';
+import { truncateAtWord } from '@/lib/text';
 
 // ─── Types ───
 interface SpotData {
@@ -26,7 +30,7 @@ interface SpotData {
     windGust: number;
     waterTemp: number;
   };
-  allScores: Record<SportType, any>;
+  allScores: Record<SportType, SportScore>;
 }
 
 // ─── Load dawn-patrol.json at BUILD TIME ───
@@ -56,7 +60,7 @@ function loadConditions(): Record<string, any> {
 export default async function HomePage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams?: Promise<{ sport?: string; region?: string }> }) {
   const { locale } = await params;
   const isPt = locale === 'pt';
-  const t = getTranslation(locale as any);
+  const t = getTranslation(locale as Locale);
 
   // Load data at BUILD TIME - visible to Googlebot!
   const conditions = loadConditions();
@@ -161,25 +165,35 @@ export default async function HomePage({ params, searchParams }: { params: Promi
 
       {/* Live Ticker - FIX U1: with fallback */}
       {tickerSpots.length > 0 ? (
-        <div className="w-full bg-surface-1 border-y border-divider overflow-hidden">
-          <div className="flex animate-marquee whitespace-nowrap" style={{ animationDuration: '60s' }}>
-            {[...tickerSpots, ...tickerSpots].map((data, i) => {
-              const score = data.allScores?.['surf']?.score || 0;
-            const color = score >= 85 ? 'rgb(var(--score-good))' : score >= 70 ? 'rgb(var(--score-fair))' : score >= 50 ? 'rgb(var(--score-mid))' : 'rgb(var(--score-poor))';
-            return (
-              <Link
-                key={`${data.spot.id}-${i}`}
-                href={`/${locale}/spots/${data.spot.slug}/`}
-                className="inline-flex items-center gap-3 px-5 py-1.5 hover:bg-surface-2 transition-colors"
-              >
-                <span className="w-0.5 h-4 rounded-full" style={{ backgroundColor: color }} />
-                <span className="font-sans font-semibold text-sm text-fg">{isPt ? data.spot.name : data.spot.nameEn}</span>
-                <span className="font-mono text-xs text-fg-subtle">{data.conditions.waveHeight.toFixed(1)}m · {(data.conditions.windSpeed * 1.94384).toFixed(0)}kt</span>
-                <span className="font-mono text-xs font-bold tabular-nums" style={{ color }}>{score}</span>
-              </Link>
-            );
-          })}
-        </div>
+        <div
+          className="w-full bg-surface-1 border-y border-divider overflow-hidden"
+          role="region"
+          aria-label={isPt ? 'Spots em destaque' : 'Top spots'}
+          aria-live="off"
+        >
+          <div
+            className="[mask-image:linear-gradient(to_right,transparent_0,black_5%,black_95%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0,black_5%,black_95%,transparent_100%)]"
+          >
+            <ul role="list" className="flex animate-marquee whitespace-nowrap motion-reduce:animate-none hover:[animation-play-state:paused]" style={{ animationDuration: '60s' }}>
+              {[...tickerSpots, ...tickerSpots].map((data, i) => {
+                const score = data.allScores?.['surf']?.score || 0;
+                const color = getScoreRgb(score);
+                return (
+                  <li key={`${data.spot.id}-${i}`} className="inline-flex">
+                    <Link
+                      href={`/${locale}/spots/${data.spot.slug}/`}
+                      className="inline-flex items-center gap-3 px-5 py-1.5 hover:bg-surface-2 transition-colors"
+                    >
+                      <span className="w-0.5 h-4 rounded-full" style={{ backgroundColor: color }} />
+                      <span className="font-sans font-semibold text-sm text-fg">{isPt ? data.spot.name : data.spot.nameEn}</span>
+                      <span className="font-mono text-xs text-fg-subtle">{data.conditions.waveHeight.toFixed(1)}m · {(data.conditions.windSpeed * 1.94384).toFixed(0)}kt</span>
+                      <span className="font-mono text-xs font-bold tabular-nums" style={{ color }}>{score}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       ) : (
         <div className="w-full bg-surface-1 border-y border-divider px-4 py-2 text-center text-meta text-fg-muted">
@@ -199,7 +213,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
             {/* Context line */}
             <p className="text-meta-sm text-fg-subtle font-mono uppercase tracking-wider">
               {new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date()).replace(/^\w/, c => c.toUpperCase())}
-              {dawnHeadline && ` · ${dawnHeadline.slice(0, 50)}${dawnHeadline.length > 50 ? '…' : ''}`}
+              {dawnHeadline && ` · ${truncateAtWord(dawnHeadline, 50)}`}
             </p>
 
             {/* Headline */}
@@ -256,7 +270,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
             </div>
           </div>
           <div>
-            <div className="font-mono text-num-lg text-fg">7</div>
+            <div className="font-mono text-num-lg text-fg">{ALL_SPORTS.length}</div>
             <div className="text-meta-sm text-fg-subtle">
               {isPt ? 'Desportos' : 'Sports'}
             </div>

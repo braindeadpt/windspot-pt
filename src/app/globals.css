@@ -6,138 +6,132 @@
  *  CSS CUSTOM PROPERTIES
  *  Defined here so they're available to both Tailwind utilities AND
  *  inline styles (used by ScoreGauge, WaveShape SVG strokes).
+ *
+ *  DESIGN SYSTEM v2.0 — Ocean-tech, dark default, light toggle via
+ *  `.theme-ocean` class on <html>.
  * ═══════════════════════════════════════════════════════════════════════ */
 
 @layer base {
   :root {
-    /* ═══════════════════════════════════════════════════════════════
-     * THEME TOKENS — Fase 7.1
-     * Todos os tokens semânticos como CSS variables para permitir
-     * override por tema (Fase 7.2: .theme-coast).
-     *
-     * Valores mantêm os actuais dark — visualmente NADA muda.
-     * ═══════════════════════════════════════════════════════════════ */
-
-    /* ───── Surfaces & backgrounds ───── */
-    --bg-base:       9 9 11;          /* zinc-950 */
-    --bg-elevated:  24 24 27;          /* zinc-900 */
+    /* ───── DARK MODE (default) — slate-950 base ───── */
+    
+    /* Surfaces & backgrounds */
+    --bg-base:       15 23 42;          /* slate-950  #0F172A */
+    --bg-elevated:  30 41 59;           /* slate-800  #1E293B */
     --surface-1:   255 255 255 / 0.04;
     --surface-2:   255 255 255 / 0.08;
     --surface-3:   255 255 255 / 0.12;
     --divider:     255 255 255 / 0.08;
     --divider-strong: 255 255 255 / 0.12;
 
-    /* ───── Foreground / text ───── */
-    --fg:          255 255 255 / 0.95;
-    --fg-muted:    255 255 255 / 0.65;
-    --fg-subtle:   255 255 255 / 0.55;
-    --fg-disabled: 255 255 255 / 0.30;
+    /* Foreground / text */
+    --fg:          241 245 249 / 0.95;  /* slate-100  #F1F5F9 */
+    --fg-muted:    148 163 184 / 0.65;  /* slate-400  #94A3B8 */
+    --fg-subtle:   100 116 139 / 0.55;  /* slate-500  #64748B */
+    --fg-disabled: 71 85 105 / 0.30;    /* slate-600  #475569 */
 
     /* Alpha-free RGB companions — for composing custom alpha values
        in SVG attributes and other contexts where Tailwind opacity
        modifiers don't work (e.g. rgb(var(--fg-rgb) / 0.04)). */
-    --fg-rgb:          255 255 255;
-    --fg-muted-rgb:    255 255 255;
-    --fg-subtle-rgb:   255 255 255;
-    --fg-disabled-rgb: 255 255 255;
+    --fg-rgb:          241 245 249;
+    --fg-muted-rgb:    148 163 184;
+    --fg-subtle-rgb:   100 116 139;
+    --fg-disabled-rgb: 71 85 105;
     --surface-1-rgb:   255 255 255;
     --surface-2-rgb:   255 255 255;
     --surface-3-rgb:   255 255 255;
     --divider-rgb:     255 255 255;
     --divider-strong-rgb: 255 255 255;
 
-    /* ───── Data viz colors ───── */
-    --data-waves:   96 165 250;   /* blue-400 */
-    --data-wind:   251 191 36;    /* amber-400 */
-    --data-water:   45 212 191;   /* teal-400 */
-    --data-period: 167 139 250;   /* violet-400 */
+    /* Data viz colors */
+    --data-waves:   14 165 233;   /* sky-500   */
+    --data-wind:   139 92 246;    /* violet-500 */
+    --data-water:   6 182 212;    /* cyan-500  */
+    --data-period: 245 158 11;    /* amber-500 */
 
-    /* ───── Sport accents ───── */
-    --sport-surf:       34 211 238;   /* cyan-400 */
-    --sport-kitesurf:  192 132 252;   /* purple-400 */
-    --sport-windsurf:  251 146 60;    /* orange-400 */
-    --sport-bodyboard:  45 212 191;   /* teal-400 */
-    --sport-sup:       110 231 183;   /* emerald-300 */
-    --sport-wakeboard: 232 121 249;   /* fuchsia-400 */
-    --sport-foil:      250 204 21;    /* yellow-400 */
+    /* Sport accents (diferenciados para identificação rápida) */
+    --sport-surf:       14 165 233;   /* sky-500     */
+    --sport-kitesurf:  139 92 246;    /* violet-500  */
+    --sport-windsurf:  245 158 11;    /* amber-500   */
+    --sport-bodyboard:  16 185 129;   /* emerald-500 */
+    --sport-sup:        6 182 212;    /* cyan-500    */
+    --sport-wakeboard: 236 72 153;    /* pink-500    */
+    --sport-foil:       99 102 241;   /* indigo-500  */
 
-    /* ───── Wind direction tints ───── */
+    /* Wind direction tints */
     --windDir-offshore:  34 197 94;    /* green-500 */
-    --windDir-onshore:  239 68 68;     /* red-500 */
+    --windDir-onshore:  239 68 68;     /* red-500   */
     --windDir-cross:    148 163 184;   /* slate-400 */
 
-    /* Score color tokens — single source of truth.
-       Pair with Tailwind shadow-glow-{epic,good,fair,poor,closed}. */
-    --score-epic:   52 211 153;   /* emerald-400 */
-    --score-good:   56 189 248;   /* sky-400     */
-    --score-fair:  251 191 36;    /* amber-400   */
-    --score-poor:  249 115 22;    /* orange-500  */
-    --score-closed:244 63 94;     /* rose-500    */
+    /* Score colors — single source of truth.
+       Scale: EPICO (azul) > BOM (verde-mar) > FUN (âmbar) > FLAT (vermelho) > FECHADO (cinza) */
+    --score-epic:   14 165 233;   /* sky-500    — 80-100 */
+    --score-good:   16 185 129;   /* emerald-500 — 60-79 */
+    --score-fair:   245 158 11;   /* amber-500  — 40-59 */
+    --score-poor:   239 68 68;    /* red-500    — 20-39 */
+    --score-closed: 107 114 128;  /* gray-500   — 0-19  */
 
-    /* Aliases used by the ScoreGauge SVG and similar.
-       Read via `rgb(var(--score-current) / <alpha>)`. */
+    /* Aliases used by the ScoreGauge SVG and similar */
     --score-current: var(--score-good);
   }
 
   /* ═══════════════════════════════════════════════════════════════
-   * THEME COAST — Fase 7.2
-   * Paleta clara "final de tarde na praia portuguesa".
-   * Aplica-se ao elemento <html> com class="theme-coast".
-   * Toggle manual via DevTools (Fase 7.3 adiciona controlo UI).
+   * THEME OCEAN — Light mode (white-sand base)
+   * Aplica-se ao elemento <html> com class="theme-ocean".
    * ═══════════════════════════════════════════════════════════════ */
-  .theme-coast {
-    /* ───── Surfaces & backgrounds ───── */
-    --bg-base:       250 246 239;      /* #faf6ef — bege cremoso */
-    --bg-elevated:  255 252 246;       /* #fffcf6 — off-white */
-    --surface-1:    26 43 58 / 0.05;   /* navy a 5% */
-    --surface-2:    26 43 58 / 0.08;   /* navy a 8% */
-    --surface-3:    26 43 58 / 0.12;   /* navy a 12% */
-    --divider:      26 43 58 / 0.10;
-    --divider-strong: 26 43 58 / 0.18;
+  .theme-ocean {
+    /* Surfaces & backgrounds */
+    --bg-base:       250 250 247;      /* #FAFAF7 — white-sand */
+    --bg-elevated:  255 255 255;       /* #FFFFFF — white */
+    --surface-1:    15 23 42 / 0.04;   /* slate a 4% */
+    --surface-2:    15 23 42 / 0.08;   /* slate a 8% */
+    --surface-3:    15 23 42 / 0.12;   /* slate a 12% */
+    --divider:      15 23 42 / 0.10;
+    --divider-strong: 15 23 42 / 0.18;
 
-    /* ───── Foreground / text ───── */
-    --fg:           26 43 58 / 0.95;   /* navy escuro */
-    --fg-muted:     26 43 58 / 0.70;
-    --fg-subtle:    26 43 58 / 0.55;
-    --fg-disabled:  26 43 58 / 0.30;
+    /* Foreground / text */
+    --fg:           30 41 59 / 0.95;   /* slate-800  #1E293B */
+    --fg-muted:     100 116 139 / 0.70;/* slate-500  #64748B */
+    --fg-subtle:    148 163 184 / 0.55;/* slate-400  #94A3B8 */
+    --fg-disabled:  203 213 225 / 0.30;/* slate-300  #CBD5E1 */
 
-    /* Alpha-free RGB companions — see :root for explanation. */
-    --fg-rgb:          26 43 58;
-    --fg-muted-rgb:    26 43 58;
-    --fg-subtle-rgb:   26 43 58;
-    --fg-disabled-rgb: 26 43 58;
-    --surface-1-rgb:   26 43 58;
-    --surface-2-rgb:   26 43 58;
-    --surface-3-rgb:   26 43 58;
-    --divider-rgb:     26 43 58;
-    --divider-strong-rgb: 26 43 58;
+    /* Alpha-free RGB companions */
+    --fg-rgb:          30 41 59;
+    --fg-muted-rgb:    100 116 139;
+    --fg-subtle-rgb:   148 163 184;
+    --fg-disabled-rgb: 203 213 225;
+    --surface-1-rgb:   15 23 42;
+    --surface-2-rgb:   15 23 42;
+    --surface-3-rgb:   15 23 42;
+    --divider-rgb:     15 23 42;
+    --divider-strong-rgb: 15 23 42;
 
-    /* ───── Data viz (mais saturados para fundo claro) ───── */
-    --data-waves:    37 99 235;        /* blue-600 */
-    --data-wind:    217 119 6;         /* amber-600 */
-    --data-water:    13 148 136;       /* teal-600 */
-    --data-period:  124 58 237;        /* violet-600 */
+    /* Data viz — mais vibrantes para fundo claro */
+    --data-waves:    14 165 233;   /* sky-500   */
+    --data-wind:    139 92 246;    /* violet-500 */
+    --data-water:    6 182 212;    /* cyan-500  */
+    --data-period:  245 158 11;    /* amber-500 */
 
-    /* ───── Sport accents ───── */
-    --sport-surf:        8 145 178;     /* cyan-600 */
-    --sport-kitesurf:  147 51 234;      /* purple-600 */
-    --sport-windsurf:  234 88 12;       /* orange-600 */
-    --sport-bodyboard:  13 148 136;     /* teal-600 */
-    --sport-sup:         5 150 105;     /* emerald-600 */
-    --sport-wakeboard: 192 38 211;      /* fuchsia-600 */
-    --sport-foil:      202 138 4;       /* yellow-600 */
+    /* Sport accents (light-optimized) */
+    --sport-surf:        7 89 133;     /* sky-700     */
+    --sport-kitesurf:  126 34 206;     /* violet-700  */
+    --sport-windsurf:  217 119 6;      /* amber-600   */
+    --sport-bodyboard:  5 150 105;     /* emerald-600 */
+    --sport-sup:        14 116 144;    /* cyan-700    */
+    --sport-wakeboard: 190 18 60;      /* pink-700    */
+    --sport-foil:       67 56 202;     /* indigo-700  */
 
-    /* ───── Wind direction ───── */
+    /* Wind direction */
     --windDir-offshore:  22 163 74;     /* green-600 */
-    --windDir-onshore:  220 38 38;      /* red-600 */
+    --windDir-onshore:  220 38 38;      /* red-600   */
     --windDir-cross:   100 116 139;     /* slate-500 */
 
-    /* ───── Score colors (mais saturados para fundo claro) ───── */
-    --score-epic:      5 150 105;       /* emerald-600 */
-    --score-good:     37 99 235;        /* blue-600 */
-    --score-fair:    217 119 6;         /* amber-600 */
-    --score-poor:    234 88 12;         /* orange-600 */
-    --score-closed:  220 38 38;         /* red-600 */
+    /* Score colors — mais saturados para fundo claro */
+    --score-epic:     2 132 199;       /* sky-600 */
+    --score-good:     5 150 105;       /* emerald-600 */
+    --score-fair:    217 119 6;        /* amber-600 */
+    --score-poor:    220 38 38;        /* red-600 */
+    --score-closed:  107 114 128;      /* gray-500 */
   }
 
   /* Default surface */
@@ -146,9 +140,7 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Smooth theme transitions — Fase 7.4
-     Apply to main surfaces so theme toggle feels responsive
-     without janking every element on the page. */
+  /* Smooth theme transitions */
   body,
   .card-1,
   .card-2,
@@ -165,19 +157,17 @@
   }
 
   /* ──────────────────────────────────────────────────────────────────
-   *  Focus visibility — apply to any interactive element.
-   *  Uses :focus-visible so mouse clicks don't show a ring.
+   *  Focus visibility
    * ────────────────────────────────────────────────────────────────── */
   *:focus {
     outline: none;
   }
   *:focus-visible {
-    outline: 2px solid rgb(var(--score-good) / 0.8);
+    outline: 2px solid rgb(var(--accent-positive, var(--score-good)) / 0.8);
     outline-offset: 2px;
     border-radius: 4px;
   }
 
-  /* Inputs/textarea/select keep a slightly tighter ring */
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
@@ -185,9 +175,7 @@
   }
 
   /* ──────────────────────────────────────────────────────────────────
-   *  Reduced motion — disable all animations/transitions for users
-   *  who request it. Override per-element if a transition is essential
-   *  for understanding (e.g. tab content swap).
+   *  Reduced motion
    * ────────────────────────────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -203,13 +191,10 @@
 
 /* ═══════════════════════════════════════════════════════════════════════
  *  COMPONENT UTILITIES
- *  Small, opinionated patterns used across multiple components.
  * ═══════════════════════════════════════════════════════════════════════ */
 
 @layer components {
-  /* Card surfaces.
-     Use card-1 for default, card-2 for emphasised, card-hero for major
-     hero surfaces. All can be combined with shadow-card / shadow-card-hover. */
+  /* Card surfaces */
   .card-1 {
     @apply bg-surface-1 border border-divider rounded-card backdrop-blur-sm;
   }
@@ -217,11 +202,10 @@
     @apply bg-surface-2 border border-divider-strong rounded-card backdrop-blur-md;
   }
   .card-hero {
-    @apply bg-surface-1 border border-divider-strong rounded-card-lg backdrop-blur-md;
+    @apply bg-surface-1 border border-divider-strong rounded-card backdrop-blur-md;
   }
 
-  /* Pill — used for filter chips, sport selectors, score badges.
-     Adjust active state per component, this is just the base. */
+  /* Pill — filter chips, sport selectors, score badges */
   .pill {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill text-meta font-medium
            transition-colors duration-base;
@@ -233,8 +217,7 @@
     @apply bg-surface-2 text-fg border border-divider-strong;
   }
 
-  /* Skeleton shimmer for loading states.
-     Use on a div with explicit width/height. */
+  /* Skeleton shimmer for loading states */
   .skeleton {
     @apply bg-surface-1 rounded-card overflow-hidden relative;
     background-image: linear-gradient(
@@ -247,10 +230,7 @@
     @apply animate-shimmer;
   }
 
-  /* Score badge — uses CSS variable set inline.
-     Usage:
-       <span class="score-badge" style="--score-current: var(--score-good)">87</span>
-  */
+  /* Score badge — uses CSS variable set inline */
   .score-badge {
     @apply inline-flex items-center justify-center font-mono font-semibold;
     color: rgb(var(--score-current));
@@ -258,8 +238,7 @@
     border: 1px solid rgb(var(--score-current) / 0.25);
   }
 
-  /* Sport accent text — semantic shortcut.
-     <span class="sport-accent" data-sport="kitesurf">Kite</span> */
+  /* Sport accent text — semantic shortcut */
   .sport-accent[data-sport="surf"]      { @apply text-sport-surf; }
   .sport-accent[data-sport="kitesurf"]  { @apply text-sport-kitesurf; }
   .sport-accent[data-sport="windsurf"]  { @apply text-sport-windsurf; }
@@ -268,16 +247,8 @@
   .sport-accent[data-sport="wakeboard"] { @apply text-sport-wakeboard; }
   .sport-accent[data-sport="foil"]      { @apply text-sport-foil; }
 
-  /* ═══════════════════════════════════════════════════════════════
-   * THEME OVERRIDES
-   * Fase 7.2 vai adicionar uma scope `.theme-coast` aqui que
-   * sobrescreve as variables acima com valores light.
-   * Fase 7.3 vai adicionar o toggle que aplica/remove a class
-   * `.theme-coast` no elemento <html>.
-   * ═══════════════════════════════════════════════════════════════ */
-
   /* ──────────────────────────────────────────────────────────────────
-   *  LEGACY (deprecated — kept until Fase 4 migrates all callers)
+   *  LEGACY (deprecated)
    * ────────────────────────────────────────────────────────────────── */
   .glass-card {
     @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
@@ -293,11 +264,10 @@
 
 /* ═══════════════════════════════════════════════════════════════════════
  *  RAW UTILITIES
- *  Things that don't fit Tailwind's @apply pattern.
  * ═══════════════════════════════════════════════════════════════════════ */
 
 @layer utilities {
-  /* Scrollbar hide — used by horizontal filter rows */
+  /* Scrollbar hide */
   .no-scrollbar,
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -308,8 +278,7 @@
     display: none;
   }
 
-  /* Edge fade — for horizontal scroll containers, gives a visual hint
-     that there's more content off-screen. Apply to the wrapper element. */
+  /* Edge fade for horizontal scroll containers */
   .edge-fade-x {
     mask-image: linear-gradient(
       to right,
@@ -320,6 +289,7 @@
     );
   }
 
+  /* Line clamps */
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -333,9 +303,128 @@
     overflow: hidden;
   }
 
-  /* Number alignment helper — use on any element containing only digits
-     when you need tabular spacing without switching to font-mono. */
+  /* Number alignment helper */
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+ *  LEAFLET OVERRIDES
+ *  Theme-aware styling for Leaflet popups, marker clusters, and
+ *  map container using design system CSS custom properties.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Map Container ── */
+.leaflet-container {
+  background: rgb(var(--bg-base));
+  font-family: inherit;
+}
+
+/* ── Zoom Control ── */
+.leaflet-control-zoom a {
+  background: rgb(var(--bg-elevated)) !important;
+  color: rgb(var(--fg)) !important;
+  border-color: rgb(var(--divider)) !important;
+}
+.leaflet-control-zoom a:hover {
+  background: rgb(var(--surface-2)) !important;
+}
+.leaflet-control-zoom {
+  border: 1px solid rgb(var(--divider)) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+/* ── Attribution ── */
+.leaflet-control-attribution {
+  background: rgb(var(--bg-elevated) / 0.85) !important;
+  color: rgb(var(--fg-muted)) !important;
+  font-size: 10px !important;
+  padding: 2px 8px !important;
+  backdrop-filter: blur(4px);
+  border-radius: 6px 0 0 0 !important;
+}
+.leaflet-control-attribution a {
+  color: rgb(var(--data-waves)) !important;
+}
+
+/* ── Popup ── */
+.spot-popup .leaflet-popup-content-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.spot-popup .leaflet-popup-content {
+  margin: 0 !important;
+  padding: 12px;
+  background: rgb(var(--bg-elevated));
+  border: 1px solid rgb(var(--divider));
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+.spot-popup .leaflet-popup-tip {
+  display: none;
+}
+.spot-popup .leaflet-popup-close-button {
+  display: none;
+}
+
+/* ── Marker Clusters ── */
+.marker-cluster-small {
+  background: transparent !important;
+}
+.marker-cluster-small div {
+  display: none !important;
+}
+.marker-cluster-medium {
+  background: transparent !important;
+}
+.marker-cluster-medium div {
+  display: none !important;
+}
+.marker-cluster-large {
+  background: transparent !important;
+}
+.marker-cluster-large div {
+  display: none !important;
+}
+
+/* ── Custom cluster icon (ventu-cluster-icon) ── */
+.ventu-cluster-icon {
+  background: transparent !important;
+}
+.ventu-cluster-icon div {
+  display: flex !important;
+}
+
+/* ── Spot marker ── */
+.spot-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* ── Layer toggle ── */
+.layer-toggle-control {
+  background: rgb(var(--bg-elevated)) !important;
+  border: 1px solid rgb(var(--divider)) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+.layer-toggle-control button {
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  transition: background 0.15s, color 0.15s;
+}
+
+/* ── Legend ── */
+.legend-control {
+  margin-bottom: 60px;
 }
