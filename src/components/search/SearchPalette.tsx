@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Search, X, ArrowRight, Waves, MapPin, Newspaper, Tag } from 'lucide-react';
 import { spots } from '@/lib/spots';
 import type { Spot, NewsItem } from '@/types';
 import { getTranslation } from '@/lib/i18n';
+import { newsSlug } from '@/lib/news';
 
 interface SearchPaletteProps {
   locale: string;
@@ -49,6 +51,7 @@ export default function SearchPalette({ locale, onClose }: SearchPaletteProps) {
   const [allResults, setAllResults] = useState<SearchResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const t = getTranslation(locale as 'pt' | 'en');
   const isPt = locale === 'pt';
 
@@ -128,7 +131,7 @@ export default function SearchPalette({ locale, onClose }: SearchPaletteProps) {
           label: title,
           labelEn: n.title,
           meta: n.source,
-          href: `/${locale}/noticias/${n.id}`,
+          href: `/${locale}/news/${newsSlug(n)}`,
           icon: Newspaper,
         });
       }
@@ -155,7 +158,7 @@ export default function SearchPalette({ locale, onClose }: SearchPaletteProps) {
         return;
       }
       if (e.key === 'Enter' && allResults[selectedIndex]) {
-        window.location.href = allResults[selectedIndex].href;
+        router.push(allResults[selectedIndex].href);
         return;
       }
     },
@@ -174,7 +177,7 @@ export default function SearchPalette({ locale, onClose }: SearchPaletteProps) {
     inputRef.current?.focus();
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || e.key === '/') {
+      if ((e.key === 'k' && (e.metaKey || e.ctrlKey))) {
         e.preventDefault();
         onClose();
       }

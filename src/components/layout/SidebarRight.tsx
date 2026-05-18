@@ -20,9 +20,13 @@ export default function SidebarRight({ locale }: SidebarRightProps) {
   const isPt = locale === 'pt';
 
   const items: SidebarItem[] = [
-    { id: 'camadas', icon: Layers, i18nKey: 'sidebarCamadas', active: true },
-    { id: 'chat', icon: MessageCircle, i18nKey: 'sidebarChat', active: true },
+    // TODO Lote E: activate Layers drawer (map overlays)
+    { id: 'camadas', icon: Layers, i18nKey: 'sidebarCamadas', active: false, placeholder: true },
+    // TODO Lote F: activate Chat drawer (AI chat)
+    { id: 'chat', icon: MessageCircle, i18nKey: 'sidebarChat', active: false, placeholder: true },
+    // TODO Lote G: activate Profile drawer (user profile)
     { id: 'perfil', icon: User, i18nKey: 'sidebarPerfil', active: false, placeholder: true },
+    // TODO Lote H: activate Rankings drawer
     { id: 'rankings', icon: BarChart3, i18nKey: 'sidebarRankings', active: false, placeholder: true },
   ];
 

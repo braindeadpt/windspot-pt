@@ -11,6 +11,7 @@ import type { SportScore } from '@/lib/sportScore';
 import { getTranslation } from '@/lib/i18n';
 import { useGeolocation, calculateDistance, formatDistance } from '@/lib/geolocation';
 import type { Spot } from '@/types';
+import SpotDrawer from './SpotDrawer';
 
 const SpotMapInteractive = dynamic(() => import('./SpotMapInteractive'), { ssr: false });
 
@@ -151,6 +152,7 @@ export function SpotGridClient({
   const [selectedSport, setSelectedSport] = useState<SportType | 'all'>('all');
   const [selectedRegion, setSelectedRegion] = useState<string>('Todos');
   const [sortBy, setSortBy] = useState<SortOption>('score');
+  const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const { latitude, longitude, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
 
@@ -212,6 +214,11 @@ export function SpotGridClient({
     });
     return sortedSpots;
   }, [filtered, selectedSport, sortBy, latitude, longitude]);
+
+  const selectedSpotData = useMemo(() => {
+    if (!selectedSpotId) return null;
+    return spotsData.find(d => d.spot.id === selectedSpotId) || null;
+  }, [selectedSpotId, spotsData]);
 
   // ─── Derived: counts ───
   const onCount = sorted.filter(d => {
@@ -394,6 +401,7 @@ export function SpotGridClient({
           selectedSport={selectedSport}
           selectedRegion={selectedRegion}
           locale={locale}
+          onSpotSelect={setSelectedSpotId}
         />
       </div>
 
@@ -449,6 +457,13 @@ export function SpotGridClient({
           </Link>
         </div>
       )}
+
+      {/* Spot drawer */}
+      <SpotDrawer
+        spotData={selectedSpotData}
+        onClose={() => setSelectedSpotId(null)}
+        locale={locale}
+      />
     </section>
   );
 }

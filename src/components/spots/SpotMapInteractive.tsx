@@ -5,7 +5,6 @@ import type L from 'leaflet';
 import type { Spot } from '@/types';
 import type { SportType } from '@/lib/sportRatings';
 import type { SportScore } from '@/lib/sportScore';
-import { renderSpotPopup } from './SpotPopupContent';
 import MapLegend from './MapLegend';
 import MapLayerToggle from './MapLayerToggle';
 import type { BasemapMode } from './MapLayerToggle';
@@ -41,6 +40,7 @@ interface SpotMapInteractiveProps {
   selectedSport: SportType | 'all';
   selectedRegion: string;
   locale: string;
+  onSpotSelect?: (spotId: string) => void;
 }
 
 // ─── Helpers ───
@@ -65,6 +65,7 @@ export default function SpotMapInteractive({
   selectedSport,
   selectedRegion,
   locale,
+  onSpotSelect,
 }: SpotMapInteractiveProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -240,26 +241,8 @@ export default function SpotMapInteractive({
 
       (marker as any).spotScore = score;
 
-      const windKnots = conditions?.windSpeed ? (conditions.windSpeed * 1.94384).toFixed(0) : '—';
-      const waveH = conditions?.waveHeight ? conditions.waveHeight.toFixed(1) : '—';
-      const waterT = conditions?.waterTemp ? Math.round(conditions.waterTemp) : '—';
-
-      const popupHtml = renderSpotPopup({
-        name: spot.name,
-        region: spot.region,
-        score,
-        scoreColor,
-        waveHeight: waveH,
-        windKnots,
-        waterTemp: waterT,
-        spotSlug: spot.slug,
-        locale,
-      });
-
-      marker.bindPopup(popupHtml, {
-        closeButton: false,
-        className: 'spot-popup',
-        offset: [0, -10],
+      marker.on('click', () => {
+        onSpotSelect?.(spot.id);
       });
 
       mcg.addLayer(marker);
