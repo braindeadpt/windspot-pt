@@ -166,14 +166,12 @@ export default async function HomePage({ params, searchParams }: { params: Promi
       {/* Live Ticker - FIX U1: with fallback */}
       {tickerSpots.length > 0 ? (
         <div
-          className="w-full bg-surface-1 border-y border-divider overflow-hidden"
+          className="w-full bg-surface-1 border-y border-divider overflow-x-auto scrollbar-hide"
           role="region"
           aria-label={isPt ? 'Spots em destaque' : 'Top spots'}
           aria-live="off"
         >
-          <div
-            className="[mask-image:linear-gradient(to_right,transparent_0,black_5%,black_95%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0,black_5%,black_95%,transparent_100%)]"
-          >
+          <div className="edge-fade-x">
             <ul role="list" className="flex animate-marquee whitespace-nowrap motion-reduce:animate-none hover:[animation-play-state:paused]" style={{ animationDuration: '60s' }}>
               {[...tickerSpots, ...tickerSpots].map((data, i) => {
                 const score = data.allScores?.['surf']?.score || 0;
