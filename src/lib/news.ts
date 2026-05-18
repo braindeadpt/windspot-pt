@@ -22,6 +22,8 @@ export const DEFAULT_FILTERS: NewsFiltersState = {
   page: 1,
 };
 
+// Stable deterministic slug: strip diacritics → lowercase → collapse non-alphanumeric → truncate
+// Appending last 6 chars of the item's UUID avoids collisions from identical titles
 export function slugify(text: string): string {
   return text
     .normalize('NFD')
@@ -46,8 +48,7 @@ export function filterNewsByDate(news: NewsItem[], period: DateFilter): NewsItem
   if (period === 'all') return news;
   const start = new Date();
   start.setHours(0, 0, 0, 0);
-  if (period === 'today') {
-  } else if (period === '7d') {
+  if (period === '7d') {
     start.setDate(start.getDate() - 7);
   } else if (period === '30d') {
     start.setDate(start.getDate() - 30);

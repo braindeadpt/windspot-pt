@@ -106,6 +106,7 @@ export default function NewsArchiveClient({ news, locale }: NewsArchiveClientPro
     page,
   }), [category, period, debouncedQuery, page]);
 
+  const isDebouncing = searchInput !== debouncedQuery && searchInput !== '';
   const filteredAll = useMemo(() => filterNews(news, currentFilters), [news, currentFilters]);
   const { items: pageItems, total, totalPages, currentPage } = useMemo(
     () => paginateNews(filteredAll, page),
@@ -148,6 +149,7 @@ export default function NewsArchiveClient({ news, locale }: NewsArchiveClientPro
             }}
             locale={locale}
             total={filteredAll.length}
+            debouncing={isDebouncing}
           />
         </div>
       </div>

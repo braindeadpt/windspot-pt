@@ -8,6 +8,7 @@ interface NewsFiltersProps {
   onChange: (filters: Partial<NewsFiltersState>) => void;
   locale: string;
   total: number;
+  debouncing?: boolean;
 }
 
 const categoryLabels: Record<string, { pt: string; en: string }> = {
@@ -36,7 +37,7 @@ const categoryColors: Record<string, string> = {
   general:    'bg-data-water/12 text-data-water border border-data-water/25',
 };
 
-export default function NewsFilters({ filters, onChange, locale, total }: NewsFiltersProps) {
+export default function NewsFilters({ filters, onChange, locale, total, debouncing }: NewsFiltersProps) {
   const isPt = locale === 'pt';
   const hasActiveFilters = filters.category !== 'all' || filters.period !== 'all' || filters.query !== '';
 
@@ -94,7 +95,13 @@ export default function NewsFilters({ filters, onChange, locale, total }: NewsFi
         </div>
 
         <div className="relative flex-1 w-full sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle pointer-events-none" />
+          {debouncing ? (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2">
+              <div className="w-4 h-4 rounded-full border-2 border-data-waves/30 border-t-data-waves animate-spin" />
+            </div>
+          ) : (
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle pointer-events-none" />
+          )}
           <input
             type="search"
             value={filters.query}
