@@ -42,7 +42,7 @@ function decodeEntities(text) {
 function extractField(itemXml, fieldName) {
   const cdataR = new RegExp(`<${fieldName}[\\s\\S]*?>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</${fieldName}>`);
   const m = itemXml.match(cdataR);
-  if (m) return decodeEntities(m[1].trim());
+  if (m) return decodeEntities(m[1].replace(/<[^>]*>/g, '').trim());
 
   const plainR = new RegExp(`<${fieldName}[\\s\\S]*?>([\\s\\S]*?)</${fieldName}>`);
   const m2 = itemXml.match(plainR);
@@ -94,7 +94,7 @@ async function fetchFeed(feed) {
     while ((match = itemRegex.exec(xml)) !== null) {
       const raw = match[0];
       const title = extractField(raw, 'title');
-      const description = extractField(raw, 'description');
+      const description = extractField(raw, 'description').replace(/\s*The\s+post\s+.*?appeared\s+first\s+on\s+.*?\.\s*/gi, '').trim();
       const link = extractField(raw, 'link');
       const pubDate = extractField(raw, 'pubDate');
 
