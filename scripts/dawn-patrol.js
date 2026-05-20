@@ -51,7 +51,7 @@ async function fetchWithRetry(url, retries = 2) {
 async function fetchSpotData(lat, lon) {
   // Marine API: waves + sea surface temperature
   // NOTE: water_temperature is NOT valid on marine-api. Use sea_surface_temperature.
-  const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=wave_height,wave_direction,wave_period,sea_surface_temperature&timezone=Europe/Lisbon&forecast_days=2`;
+  const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=wave_height,wave_direction,wave_period,sea_surface_temperature,sea_level_height_msl&timezone=Europe/Lisbon&forecast_days=2`;
 
   // Forecast API: wind (10m) — marine API does not have wind variables
   const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=Europe/Lisbon&forecast_days=2&wind_speed_unit=ms`;
@@ -74,6 +74,7 @@ async function fetchSpotData(lat, lon) {
     wave_direction: marine.hourly.wave_direction,
     wave_period: marine.hourly.wave_period,
     sea_surface_temperature: marine.hourly.sea_surface_temperature,
+    sea_level_height_msl: marine.hourly.sea_level_height_msl,
     wind_speed_10m: forecast.hourly.wind_speed_10m,
     wind_direction_10m: forecast.hourly.wind_direction_10m,
     wind_gusts_10m: forecast.hourly.wind_gusts_10m,
@@ -97,6 +98,10 @@ function getMorningConditions(hourly) {
 
     if (idx === -1) return null;
 
+    const seaLevel = hourly.sea_level_height_msl?.[idx] || 0;
+    const seaLevelNext = hourly.sea_level_height_msl?.[idx + 1];
+    const tideStatus = seaLevel > 0.3 ? 'high' : seaLevel < -0.3 ? 'low' : (seaLevelNext !== undefined && seaLevelNext > seaLevel) ? 'rising' : 'falling';
+
     return {
       hour: h,
       waveHeight: hourly.wave_height[idx],
@@ -106,6 +111,8 @@ function getMorningConditions(hourly) {
       windDirection: hourly.wind_direction_10m[idx],
       windGust: hourly.wind_gusts_10m[idx],
       waterTemp: hourly.sea_surface_temperature[idx],
+      tideHeight: seaLevel,
+      tideStatus,
     };
   }).filter(Boolean);
 
