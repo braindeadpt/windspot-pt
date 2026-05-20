@@ -88,6 +88,7 @@ export const spots: Spot[] = [
       type: 'kitesurf', difficulty: 'intermediate', bestWind: 'NW, N', bestSwell: 'SW',
       description: 'Lagoa, foz do rio e praia aberta — três spots num só. Água plana na lagoa, ondas no oceano. Versátil e consistente.',
       descriptionEn: 'Lagoon, river mouth and open beach — three spots in one. Flat water in the lagoon, waves in the ocean. Versatile and consistent.',
+      compatibleSports: ['kitesurf', 'foil', 'windsurf', 'wakeboard'],
       facilities: ['Estacionamento', 'Escolas kite', 'Aluguer', 'WC'],
       hazards: ['Correntes na foz', 'Rochas na lagoa']
     },
@@ -266,16 +267,6 @@ export const spots: Spot[] = [
       descriptionEn: 'Rustic and little-frequented beach between Figueira da Foz and Nazaré. Powerful beach break with tubular waves on good days. For surfers who enjoy isolation.',
       facilities: ['Estacionamento'],
       hazards: ['Correntes fortes', 'Sem infraestruturas']
-    },
-  {
-      id: 'praia-norte', slug: 'praia-norte', name: 'Praia do Norte', nameEn: 'Praia do Norte',
-      region: 'Nazaré', regionEn: 'Nazare', lat: 39.604, lon: -9.075,
-      coastOrientation: 270,
-      type: 'big-wave', difficulty: 'expert', bestWind: 'N, NNE', bestSwell: 'W, WNW',
-      description: 'Ondas colossais até 30m+. Local do recorde mundial de surf. Apenas para profissionais.',
-      descriptionEn: 'Colossal waves up to 30m+. World record surf location. Professionals only.',
-      facilities: ['Salva-vidas', 'Acesso controlado'],
-      hazards: ['Ondas mortais', 'Correntes extremas', 'Rochas']
     },
   {
       id: 'castelo-bode', slug: 'castelo-bode', name: 'Castelo de Bode', nameEn: 'Castelo de Bode',
@@ -469,9 +460,10 @@ export const spots: Spot[] = [
       id: 'guincho', slug: 'guincho', name: 'Guincho', nameEn: 'Guincho',
       region: 'Cascais', regionEn: 'Cascais', lat: 38.733, lon: -9.473,
       coastOrientation: 270,
-      type: 'kitesurf', difficulty: 'intermediate', bestWind: 'N, NNW', bestSwell: 'SW, W',
+      type: 'multisport', difficulty: 'intermediate', bestWind: 'N, NNW', bestSwell: 'SW, W',
       description: 'Spot icónico de kitesurf e windsurf. Vento térmico Nortada consistente no verão. Melhor vento de Portugal.',
       descriptionEn: 'Iconic kitesurf and windsurf spot. Consistent thermal Nortada wind in summer. Best wind in Portugal.',
+      compatibleSports: ['surf', 'kitesurf', 'windsurf'],
       facilities: ['Estacionamento', 'Restaurante', 'Escola kite', 'WC'],
       hazards: ['Vento forte', 'Correntes', 'Rochas']
     },
